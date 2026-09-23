@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#02060d">
+<meta name="theme-color" content="#02060c">
 <title>JOHANN · KI MIT HERZ</title>
 
 <style>
 :root{
-  --blue:#078dff;
-  --cyan:#55d9ff;
-  --white:#edf7ff;
-  --muted:#8da2b8;
+  --blue:#119dff;
+  --cyan:#55ddff;
+  --white:#eef7ff;
+  --muted:#8799ac;
 }
 
 *{box-sizing:border-box}
@@ -21,7 +21,7 @@ html,body{
   width:100%;
   height:100%;
   overflow:hidden;
-  background:#01040a;
+  background:#01050a;
   color:var(--white);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
@@ -32,77 +32,67 @@ body{
   overscroll-behavior:none;
 }
 
-/* ---------- RAUM ---------- */
-
-.room{
+.scene{
   position:fixed;
   inset:0;
   overflow:hidden;
   background:
-    radial-gradient(ellipse at 50% 48%,rgba(0,76,160,.16),transparent 38%),
-    linear-gradient(180deg,#020914 0%,#020811 58%,#01040a 100%);
+    radial-gradient(ellipse at 50% 48%,
+      rgba(0,93,180,.10) 0%,
+      rgba(0,38,80,.045) 32%,
+      transparent 60%),
+    linear-gradient(180deg,#06101a 0%,#020811 55%,#010408 100%);
 }
 
-/* linke dunkle Wand / Pflanzenecke */
-.left-wall{
+/* =========================
+   RAUM
+========================= */
+
+.back-wall{
   position:absolute;
-  inset:0 67% 0 0;
+  inset:0 0 31% 0;
   background:
-    linear-gradient(90deg,rgba(0,0,0,.7),rgba(3,10,19,.15));
+    linear-gradient(90deg,
+      rgba(4,12,20,.98) 0%,
+      rgba(7,18,29,.95) 22%,
+      rgba(5,15,26,.96) 66%,
+      rgba(7,21,34,.93) 100%);
 }
 
-.plant{
+.panel{
   position:absolute;
-  left:-3vw;
-  bottom:21vh;
-  width:30vw;
-  height:34vh;
-  opacity:.25;
-  filter:blur(5px);
-}
-
-.plant::before,
-.plant::after{
-  content:"";
-  position:absolute;
-  left:32%;
+  top:0;
   bottom:0;
-  width:25%;
-  height:38%;
-  background:linear-gradient(90deg,#061008,#102518,#050b07);
-  clip-path:polygon(20% 0,80% 0,100% 100%,0 100%);
+  width:1px;
+  background:linear-gradient(
+    transparent,
+    rgba(67,135,188,.17) 15%,
+    rgba(67,135,188,.13) 85%,
+    transparent
+  );
+  box-shadow:0 0 14px rgba(0,91,170,.06);
 }
 
-.leaf{
-  position:absolute;
-  left:40%;
-  bottom:30%;
-  width:38%;
-  height:12%;
-  border-radius:100% 0 100% 0;
-  background:#15301d;
-  transform-origin:left center;
-}
+.p1{left:14%}
+.p2{left:34%}
+.p3{left:67%}
+.p4{left:86%}
 
-.leaf:nth-child(1){transform:rotate(-58deg) translateX(-40px)}
-.leaf:nth-child(2){transform:rotate(-25deg) translateX(-30px)}
-.leaf:nth-child(3){transform:rotate(18deg)}
-.leaf:nth-child(4){transform:rotate(52deg)}
-.leaf:nth-child(5){bottom:46%;transform:rotate(-42deg)}
-.leaf:nth-child(6){bottom:53%;transform:rotate(34deg)}
-
-/* Fenster rechts */
 .window{
   position:absolute;
-  right:-2%;
   top:0;
-  width:34%;
-  height:71%;
-  border-left:2px solid rgba(63,126,180,.11);
+  right:0;
+  width:30%;
+  height:69%;
+  overflow:hidden;
+  border-left:1px solid rgba(83,158,215,.20);
   background:
-    linear-gradient(90deg,rgba(5,16,30,.7),rgba(5,20,38,.28)),
-    radial-gradient(circle at 60% 52%,rgba(15,76,130,.20),transparent 45%);
-  filter:blur(.2px);
+    linear-gradient(90deg,
+      rgba(5,17,29,.35),
+      rgba(7,28,48,.13)),
+    radial-gradient(circle at 65% 50%,
+      rgba(34,104,160,.24),
+      transparent 56%);
 }
 
 .window::before{
@@ -110,91 +100,142 @@ body{
   position:absolute;
   inset:0;
   background:
-    linear-gradient(90deg,transparent 48%,rgba(72,130,180,.11) 49%,rgba(72,130,180,.11) 50%,transparent 51%),
-    linear-gradient(180deg,transparent 48%,rgba(72,130,180,.08) 49%,rgba(72,130,180,.08) 50%,transparent 51%);
+    linear-gradient(90deg,
+      transparent 49.4%,
+      rgba(112,174,220,.17) 50%,
+      transparent 50.6%),
+    linear-gradient(180deg,
+      transparent 47%,
+      rgba(112,174,220,.11) 47.5%,
+      transparent 48%);
 }
 
-.city{
+.window::after{
+  content:"";
   position:absolute;
+  left:10%;
   right:0;
-  bottom:28%;
-  width:35%;
-  height:22%;
-  opacity:.20;
-  filter:blur(5px);
+  bottom:8%;
+  height:28%;
+  opacity:.55;
+  filter:blur(2px);
   background:
-    radial-gradient(circle at 8% 72%,#ffd891 0 2px,transparent 3px),
-    radial-gradient(circle at 22% 54%,#8bc9ff 0 2px,transparent 3px),
-    radial-gradient(circle at 36% 80%,#ffd891 0 2px,transparent 3px),
-    radial-gradient(circle at 54% 63%,#a8d8ff 0 2px,transparent 3px),
-    radial-gradient(circle at 70% 76%,#ffd891 0 2px,transparent 3px),
-    radial-gradient(circle at 87% 50%,#7cc6ff 0 2px,transparent 3px);
+    radial-gradient(circle at 5% 68%,#f3d58a 0 1px,transparent 2px),
+    radial-gradient(circle at 18% 47%,#83cfff 0 1px,transparent 2px),
+    radial-gradient(circle at 31% 73%,#ffd990 0 1px,transparent 2px),
+    radial-gradient(circle at 46% 41%,#8bd2ff 0 1px,transparent 2px),
+    radial-gradient(circle at 58% 68%,#ffd07d 0 1px,transparent 2px),
+    radial-gradient(circle at 73% 53%,#82caff 0 1px,transparent 2px),
+    radial-gradient(circle at 88% 75%,#ffd891 0 1px,transparent 2px);
 }
 
-/* Boden wie im Referenzbild – keine Tron-Kacheln */
+/* angedeutete Pflanze links */
+
+.plant{
+  position:absolute;
+  left:-20px;
+  bottom:28%;
+  width:180px;
+  height:270px;
+  opacity:.34;
+  filter:blur(1.8px);
+}
+
+.stem{
+  position:absolute;
+  left:76px;
+  bottom:0;
+  width:4px;
+  height:190px;
+  background:#11261e;
+  transform:rotate(-4deg);
+}
+
+.leaf{
+  position:absolute;
+  width:90px;
+  height:31px;
+  background:
+    linear-gradient(90deg,#07120e,#163225);
+  border-radius:100% 0 100% 0;
+  transform-origin:0 50%;
+}
+
+.l1{left:75px;bottom:145px;transform:rotate(-38deg)}
+.l2{left:75px;bottom:115px;transform:rotate(20deg)}
+.l3{left:72px;bottom:85px;transform:rotate(-62deg)}
+.l4{left:75px;bottom:60px;transform:rotate(38deg)}
+.l5{left:70px;bottom:172px;transform:rotate(-78deg);width:75px}
+
+/* Boden */
+
 .floor{
   position:absolute;
   left:0;
   right:0;
   bottom:0;
-  height:36%;
+  height:32%;
+  border-top:1px solid rgba(72,133,181,.15);
   background:
-    radial-gradient(ellipse at 50% 0%,rgba(0,107,220,.15),transparent 46%),
-    linear-gradient(180deg,rgba(3,11,20,.55),#01040a 78%);
-  border-top:1px solid rgba(45,119,185,.09);
+    radial-gradient(ellipse at 50% 0%,
+      rgba(0,118,235,.12),
+      rgba(0,63,130,.035) 33%,
+      transparent 62%),
+    linear-gradient(180deg,#05101a 0%,#010408 86%);
 }
 
-.floor::after{
+.floor::before{
   content:"";
   position:absolute;
-  left:24%;
-  right:24%;
-  top:-1px;
-  height:78%;
-  background:linear-gradient(180deg,rgba(10,123,255,.12),transparent);
-  clip-path:polygon(35% 0,65% 0,100% 100%,0 100%);
-  filter:blur(24px);
+  inset:0;
+  opacity:.25;
+  background:
+    linear-gradient(90deg,
+      transparent 49.8%,
+      rgba(57,113,158,.13) 50%,
+      transparent 50.2%);
 }
 
-/* ---------- UI ---------- */
+.floor-glow{
+  position:absolute;
+  left:50%;
+  top:68%;
+  width:46%;
+  height:30%;
+  transform:translateX(-50%);
+  background:linear-gradient(
+    180deg,
+    rgba(0,123,255,.13),
+    rgba(0,65,150,.025) 62%,
+    transparent
+  );
+  clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);
+  filter:blur(12px);
+}
+
+/* =========================
+   KOPFZEILE
+========================= */
 
 .clock{
   position:absolute;
   z-index:20;
-  left:max(5vw,22px);
-  top:max(4vh,env(safe-area-inset-top));
+  top:max(4.5vh,env(safe-area-inset-top));
+  left:5.5vw;
 }
 
 .time{
-  font-size:clamp(42px,8vw,72px);
-  font-weight:200;
-  letter-spacing:.01em;
+  font-size:clamp(37px,7vw,68px);
   line-height:1;
+  font-weight:200;
+  letter-spacing:-.02em;
 }
 
 .date{
-  margin-top:8px;
-  color:#b6c2ce;
-  font-size:clamp(13px,2.2vw,19px);
+  margin-top:12px;
+  color:#aab7c5;
+  font-size:clamp(11px,1.8vw,17px);
   font-weight:300;
-}
-
-.greeting{
-  margin-top:34px;
-  max-width:230px;
-  font-size:clamp(16px,2.6vw,23px);
-  line-height:1.4;
-  font-weight:300;
-}
-
-.greeting::after{
-  content:"";
-  display:block;
-  width:45px;
-  height:2px;
-  margin-top:15px;
-  background:#18a9ff;
-  box-shadow:0 0 10px rgba(0,169,255,.5);
 }
 
 .brand{
@@ -208,357 +249,318 @@ body{
 }
 
 .logo{
-  font-size:clamp(26px,5vw,48px);
+  font-size:clamp(24px,4.5vw,43px);
   font-weight:250;
-  letter-spacing:.32em;
-  margin-left:.32em;
+  letter-spacing:.30em;
+  margin-left:.30em;
 }
 
 .logo .a{
   color:#159eff;
-  text-shadow:0 0 18px rgba(0,145,255,.65);
+  text-shadow:
+    0 0 10px rgba(0,150,255,.5),
+    0 0 28px rgba(0,120,255,.25);
 }
 
-.tagline{
-  margin-top:8px;
-  margin-left:.42em;
-  color:#42aef7;
-  font-size:clamp(8px,1.2vw,12px);
+.tag{
+  margin-top:10px;
+  margin-left:.45em;
+  color:#61b8f3;
+  font-size:clamp(7px,1vw,10px);
   letter-spacing:.48em;
 }
 
 .weather{
   position:absolute;
   z-index:20;
-  right:max(5vw,22px);
   top:max(5vh,env(safe-area-inset-top));
+  right:5vw;
   display:flex;
-  gap:14px;
   align-items:flex-start;
+  gap:10px;
 }
 
-.cloud{
-  width:43px;
-  height:23px;
-  margin-top:9px;
-  border:2px solid #b9d7f5;
-  border-radius:20px;
-  position:relative;
-  opacity:.9;
-}
-
-.cloud::before{
-  content:"";
-  position:absolute;
-  width:19px;
-  height:19px;
-  left:7px;
-  top:-11px;
-  border:2px solid #b9d7f5;
-  border-bottom:0;
-  border-radius:50% 50% 0 0;
-  background:#06101d;
-}
-
-.temp{
-  font-size:clamp(29px,5vw,48px);
-  font-weight:250;
+.weather-icon{
+  width:48px;
+  text-align:center;
+  font-size:32px;
   line-height:1;
+  filter:drop-shadow(0 0 8px rgba(70,170,255,.15));
 }
 
-.weatherText{
-  margin-top:5px;
-  color:#c5d0dc;
-  font-size:13px;
-  line-height:1.3;
+.temperature{
+  font-size:clamp(28px,4.5vw,44px);
+  line-height:.9;
+  font-weight:250;
 }
 
-/* ---------- JOHANN ---------- */
+.weather-info{
+  margin-top:8px;
+  color:#b8c4d0;
+  font-size:12px;
+  line-height:1.35;
+}
 
-.johann-wrap{
+/* =========================
+   JOHANN
+========================= */
+
+.johann{
   position:absolute;
   z-index:10;
   left:50%;
-  top:49%;
-  width:min(62vw,620px);
+  top:48%;
+  width:min(73vw,650px);
   aspect-ratio:1;
   transform:translate(-50%,-50%);
   touch-action:none;
 }
 
 #energy{
+  display:block;
   width:100%;
   height:100%;
-  display:block;
-  filter:
-    drop-shadow(0 0 12px rgba(0,132,255,.35))
-    drop-shadow(0 0 36px rgba(0,85,255,.18));
 }
 
-.reflection{
-  position:absolute;
-  z-index:7;
-  left:50%;
-  top:72%;
-  width:min(48vw,470px);
-  height:12vh;
-  transform:translateX(-50%);
-  border-radius:50%;
-  background:
-    radial-gradient(ellipse,
-      rgba(49,183,255,.30) 0%,
-      rgba(0,107,255,.12) 25%,
-      rgba(0,64,150,.04) 47%,
-      transparent 70%);
-  filter:blur(15px);
-  opacity:.7;
-  animation:reflect 4s ease-in-out infinite;
-}
-
-.floor-point{
+.shadow{
   position:absolute;
   z-index:8;
   left:50%;
-  top:70.8%;
-  width:5px;
-  height:5px;
+  top:67.5%;
+  width:min(46vw,440px);
+  height:7%;
   transform:translateX(-50%);
   border-radius:50%;
-  background:#bdf7ff;
-  box-shadow:
-    0 0 8px #fff,
-    0 0 22px #21bfff,
-    0 0 60px #007fff;
+  background:radial-gradient(
+    ellipse,
+    rgba(56,189,255,.20),
+    rgba(0,104,255,.08) 33%,
+    transparent 70%
+  );
+  filter:blur(13px);
 }
 
-/* ---------- UNTEN ---------- */
-
-.motto{
+.lightpoint{
   position:absolute;
-  z-index:20;
-  left:0;
-  right:0;
-  bottom:11.5vh;
-  text-align:center;
-  color:#72869b;
-  font-size:clamp(8px,1.1vw,12px);
-  letter-spacing:.36em;
+  z-index:9;
+  left:50%;
+  top:67.5%;
+  width:5px;
+  height:5px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:#dffcff;
+  box-shadow:
+    0 0 8px white,
+    0 0 20px #45d8ff,
+    0 0 45px #007cff;
 }
 
-.motto span{color:#27aaff}
+/* =========================
+   BEDIENUNG
+========================= */
 
-.command{
+.controls{
   position:absolute;
   z-index:30;
   left:4vw;
   right:4vw;
-  bottom:max(3vh,env(safe-area-inset-bottom));
+  bottom:max(4vh,env(safe-area-inset-bottom));
   display:flex;
   align-items:center;
-  gap:14px;
+  gap:16px;
 }
 
-.mic,
-.more{
-  flex:0 0 52px;
-  width:52px;
-  height:52px;
+.round{
+  width:54px;
+  height:54px;
+  flex:0 0 54px;
   border-radius:50%;
-  border:1px solid rgba(16,153,255,.58);
-  background:rgba(1,12,25,.56);
-  box-shadow:inset 0 0 20px rgba(0,91,180,.08);
-  color:#1caaff;
+  border:1px solid rgba(17,154,255,.75);
+  background:rgba(2,11,21,.72);
+  color:#16a9ff;
   display:grid;
   place-items:center;
-  font-size:23px;
+  font-size:21px;
+  box-shadow:
+    inset 0 0 22px rgba(0,116,220,.08),
+    0 0 15px rgba(0,102,200,.06);
   backdrop-filter:blur(12px);
 }
 
-.input{
+.command{
   flex:1;
-  height:52px;
-  border-radius:28px;
-  border:1px solid rgba(20,126,215,.43);
-  background:rgba(1,9,20,.48);
-  color:#8fa5ba;
+  height:54px;
+  border-radius:30px;
+  border:1px solid rgba(19,139,225,.55);
+  background:rgba(1,8,17,.67);
+  color:#899aad;
   display:flex;
   align-items:center;
-  padding:0 22px;
+  padding:0 24px;
   font-size:14px;
   font-weight:300;
-  backdrop-filter:blur(14px);
-  box-shadow:
-    inset 0 0 25px rgba(0,91,180,.06),
-    0 0 22px rgba(0,72,150,.04);
+  backdrop-filter:blur(13px);
+  box-shadow:inset 0 0 30px rgba(0,92,180,.04);
 }
 
-.status{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  white-space:nowrap;
-  margin-left:8px;
-  color:#d2dae2;
-  font-size:9px;
-  letter-spacing:.28em;
+.dots{
+  letter-spacing:5px;
+  padding-left:5px;
 }
 
-.green{
-  width:10px;
-  height:10px;
-  border-radius:50%;
-  background:#00e99a;
-  box-shadow:0 0 13px #00e99a;
-}
-
-@keyframes reflect{
-  0%,100%{opacity:.48;transform:translateX(-50%) scaleX(.88)}
-  50%{opacity:.76;transform:translateX(-50%) scaleX(1.05)}
-}
-
-/* ---------- HANDY ---------- */
+/* =========================
+   HANDY
+========================= */
 
 @media(max-width:700px){
+
   .clock{
-    top:max(3.3vh,env(safe-area-inset-top));
+    top:max(4.5vh,env(safe-area-inset-top));
+    left:5.5vw;
   }
 
   .time{font-size:34px}
-  .date{font-size:11px}
 
-  .greeting{
-    margin-top:20px;
-    font-size:13px;
-    max-width:125px;
+  .date{
+    font-size:10px;
+    margin-top:10px;
   }
 
   .brand{
-    top:max(4vh,env(safe-area-inset-top));
+    top:max(5vh,env(safe-area-inset-top));
   }
 
-  .logo{font-size:24px}
-  .tagline{font-size:7px}
+  .logo{font-size:22px}
+  .tag{font-size:6px}
 
   .weather{
-    top:max(4vh,env(safe-area-inset-top));
-    gap:7px;
+    top:max(5vh,env(safe-area-inset-top));
+    right:5vw;
+    gap:4px;
   }
 
-  .cloud{
-    transform:scale(.7);
-    transform-origin:right top;
+  .weather-icon{
+    font-size:25px;
+    width:34px;
   }
 
-  .temp{font-size:25px}
-  .weatherText{font-size:9px}
+  .temperature{font-size:25px}
 
-  .johann-wrap{
+  .weather-info{
+    margin-top:5px;
+    font-size:9px;
+  }
+
+  .johann{
+    width:min(92vw,520px);
     top:47%;
-    width:min(91vw,470px);
   }
 
-  .reflection{
-    top:66%;
-    width:70vw;
+  .shadow,
+  .lightpoint{
+    top:65.5%;
   }
 
-  .floor-point{top:65.5%}
+  .controls{
+    left:14px;
+    right:14px;
+    gap:12px;
+  }
 
-  .motto{
-    bottom:12.5vh;
-    font-size:7px;
+  .round{
+    width:47px;
+    height:47px;
+    flex-basis:47px;
   }
 
   .command{
-    left:14px;
-    right:14px;
-  }
-
-  .mic,.more{
-    width:45px;
-    height:45px;
-    flex-basis:45px;
-  }
-
-  .input{
-    height:45px;
+    height:47px;
+    padding:0 17px;
     font-size:11px;
-    padding:0 15px;
   }
 
-  .status{
-    display:none;
+  .plant{
+    opacity:.27;
   }
-}
-
-@media(max-height:720px){
-  .greeting{display:none}
-  .johann-wrap{width:min(68vh,88vw)}
-  .motto{display:none}
 }
 </style>
 </head>
 
 <body>
 
-<main class="room">
+<main class="scene">
 
-  <div class="left-wall"></div>
-
-  <div class="plant">
-    <i class="leaf"></i><i class="leaf"></i><i class="leaf"></i>
-    <i class="leaf"></i><i class="leaf"></i><i class="leaf"></i>
+  <div class="back-wall">
+    <i class="panel p1"></i>
+    <i class="panel p2"></i>
+    <i class="panel p3"></i>
+    <i class="panel p4"></i>
   </div>
 
   <div class="window"></div>
-  <div class="city"></div>
+
+  <div class="plant">
+    <i class="stem"></i>
+    <i class="leaf l1"></i>
+    <i class="leaf l2"></i>
+    <i class="leaf l3"></i>
+    <i class="leaf l4"></i>
+    <i class="leaf l5"></i>
+  </div>
+
   <div class="floor"></div>
+  <div class="floor-glow"></div>
 
   <section class="clock">
-    <div class="time" id="time">19:24</div>
-    <div class="date" id="date">Mi, 22. Januar 2025</div>
-    <div class="greeting">„Schön, dass<br>du da bist, Björn.“</div>
+    <div class="time" id="time">--:--</div>
+    <div class="date" id="date"></div>
   </section>
 
   <header class="brand">
     <div class="logo">JOH<span class="a">A</span>NN</div>
-    <div class="tagline">KI MIT HERZ</div>
+    <div class="tag">KI MIT HERZ</div>
   </header>
 
   <section class="weather">
-    <div class="cloud"></div>
+    <div class="weather-icon" id="weatherIcon">◌</div>
+
     <div>
-      <div class="temp">4°</div>
-      <div class="weatherText">Bochum<br>Bewölkt</div>
+      <div class="temperature" id="temperature">--°</div>
+      <div class="weather-info">
+        <span id="weatherCity">Bochum</span><br>
+        <span id="weatherText">Wetter laden…</span>
+      </div>
     </div>
   </section>
 
-  <div class="johann-wrap" id="touchArea">
+  <div class="johann" id="touchArea">
     <canvas id="energy"></canvas>
   </div>
 
-  <div class="reflection"></div>
-  <div class="floor-point"></div>
+  <div class="shadow"></div>
+  <div class="lightpoint"></div>
 
-  <div class="motto">
-    <span>ZUHAUSE.</span> INTELLIGENTER. GEMEINSAM.
-  </div>
+  <section class="controls">
+    <button class="round" aria-label="Johann">◉</button>
 
-  <section class="command">
-    <button class="mic" aria-label="Johann aktivieren">◉</button>
-    <div class="input" id="message">Sag einfach, was du brauchst ...</div>
-    <button class="more" aria-label="Mehr">•••</button>
-    <div class="status">ALLES GUT <i class="green"></i></div>
+    <div class="command" id="message">
+      Sag einfach, was du brauchst ...
+    </div>
+
+    <button class="round dots" aria-label="Mehr">•••</button>
   </section>
 
 </main>
 
 <script>
-/* ==========================================================
+
+/* ===============================================
    UHR
-========================================================== */
+=============================================== */
 
 function updateClock(){
+
   const now = new Date();
 
   document.getElementById("time").textContent =
@@ -580,133 +582,345 @@ updateClock();
 setInterval(updateClock,1000);
 
 
-/* ==========================================================
-   JOHANN CANVAS
-========================================================== */
+/* ===============================================
+   LIVE-WETTER BOCHUM
+   Open-Meteo – kein API-Key nötig
+=============================================== */
 
-const canvas = document.getElementById("energy");
-const ctx = canvas.getContext("2d");
-const touchArea = document.getElementById("touchArea");
-const message = document.getElementById("message");
+function weatherDescription(code){
 
-let W=0,H=0,cx=0,cy=0;
-let dpr=Math.min(window.devicePixelRatio || 1,2);
+  if(code === 0) return ["Klar","☀"];
 
-let pointerX=0;
-let pointerY=0;
+  if([1,2].includes(code))
+    return ["Leicht bewölkt","◒"];
+
+  if(code === 3)
+    return ["Bewölkt","☁"];
+
+  if([45,48].includes(code))
+    return ["Nebel","≋"];
+
+  if([51,53,55,56,57].includes(code))
+    return ["Nieselregen","☂"];
+
+  if([61,63,65,66,67,80,81,82].includes(code))
+    return ["Regen","☂"];
+
+  if([71,73,75,77,85,86].includes(code))
+    return ["Schnee","❄"];
+
+  if([95,96,99].includes(code))
+    return ["Gewitter","ϟ"];
+
+  return ["Aktuell","◌"];
+}
+
+async function loadWeather(){
+
+  const temperature =
+    document.getElementById("temperature");
+
+  const text =
+    document.getElementById("weatherText");
+
+  const icon =
+    document.getElementById("weatherIcon");
+
+  try{
+
+    const url =
+      "https://api.open-meteo.com/v1/forecast" +
+      "?latitude=51.4818" +
+      "&longitude=7.2162" +
+      "&current=temperature_2m,weather_code" +
+      "&timezone=Europe%2FBerlin";
+
+    const response = await fetch(url);
+
+    if(!response.ok){
+      throw new Error("Wetterdienst nicht erreichbar");
+    }
+
+    const data = await response.json();
+
+    const temp =
+      Math.round(data.current.temperature_2m);
+
+    const code =
+      data.current.weather_code;
+
+    const result =
+      weatherDescription(code);
+
+    temperature.textContent = temp + "°";
+    text.textContent = result[0];
+    icon.textContent = result[1];
+
+  }
+  catch(error){
+
+    temperature.textContent = "--°";
+    text.textContent = "Keine Verbindung";
+    icon.textContent = "◌";
+
+    console.error(error);
+  }
+}
+
+loadWeather();
+
+/* alle 10 Minuten aktualisieren */
+setInterval(loadWeather,600000);
+
+
+/* ===============================================
+   JOHANN ENERGY
+=============================================== */
+
+const canvas =
+  document.getElementById("energy");
+
+const ctx =
+  canvas.getContext("2d");
+
+const touchArea =
+  document.getElementById("touchArea");
+
+const message =
+  document.getElementById("message");
+
+let W,H,cx,cy;
+let dpr =
+  Math.min(window.devicePixelRatio || 1,2);
+
+let active=false;
+let holding=false;
+
+let targetEnergy=0;
+let energy=0;
+
 let targetX=0;
 let targetY=0;
+let offsetX=0;
+let offsetY=0;
 
-let energy=0;
-let targetEnergy=0;
+let holdTimer;
 
-let touching=false;
-let holding=false;
-let holdTimer=null;
-
-const stars=[];
-const trails=[];
+const particles=[];
+const paths=[];
 
 
-/* ---------- GRÖSSE ---------- */
+/* ===============================================
+   GRÖSSE
+=============================================== */
 
 function resize(){
-  const rect=canvas.getBoundingClientRect();
 
-  W=rect.width;
-  H=rect.height;
+  const r =
+    canvas.getBoundingClientRect();
 
-  canvas.width=W*dpr;
-  canvas.height=H*dpr;
+  W=r.width;
+  H=r.height;
 
-  ctx.setTransform(dpr,0,0,dpr,0,0);
+  canvas.width =
+    Math.floor(W*dpr);
+
+  canvas.height =
+    Math.floor(H*dpr);
+
+  ctx.setTransform(
+    dpr,0,0,dpr,0,0
+  );
 
   cx=W/2;
   cy=H/2;
 
-  createParticles();
+  createEnergy();
 }
 
-window.addEventListener("resize",resize);
+window.addEventListener(
+  "resize",
+  resize
+);
 
 
-/* ---------- PARTIKEL ---------- */
+/* ===============================================
+   ENERGIE ERZEUGEN
+=============================================== */
 
-function createParticles(){
-  stars.length=0;
+function createEnergy(){
 
-  const count=Math.max(90,Math.floor(W*.32));
+  particles.length=0;
+  paths.length=0;
 
-  for(let i=0;i<count;i++){
-    const angle=Math.random()*Math.PI*2;
-    const radius=W*(.17+Math.random()*.29);
+  /* viele kleine Lichtpartikel */
 
-    stars.push({
-      angle,
-      radius,
-      speed:(Math.random()*.0016+.00025)*
+  for(let i=0;i<170;i++){
+
+    particles.push({
+
+      angle:
+        Math.random()*Math.PI*2,
+
+      radius:
+        W*(.16+Math.random()*.25),
+
+      squash:
+        .54+Math.random()*.34,
+
+      speed:
+        (.00008+Math.random()*.00055) *
         (Math.random()>.5?1:-1),
 
-      size:Math.random()*1.35+.25,
-      alpha:Math.random()*.75+.15,
-      wobble:Math.random()*Math.PI*2
+      size:
+        .25+Math.random()*1.25,
+
+      alpha:
+        .10+Math.random()*.72,
+
+      phase:
+        Math.random()*Math.PI*2
     });
   }
 
-  trails.length=0;
 
-  for(let i=0;i<18;i++){
-    trails.push({
-      radius:W*(.25+Math.random()*.14),
-      squash:.48+Math.random()*.42,
-      rotation:Math.random()*Math.PI,
-      speed:(.00018+Math.random()*.00055)*
+  /* viele sehr feine Energiebahnen */
+
+  for(let i=0;i<36;i++){
+
+    paths.push({
+
+      radius:
+        W*(.20+Math.random()*.18),
+
+      squash:
+        .48+Math.random()*.46,
+
+      rotation:
+        Math.random()*Math.PI*2,
+
+      speed:
+        (.000035+Math.random()*.00020) *
         (Math.random()>.5?1:-1),
-      width:.35+Math.random()*1.1,
-      alpha:.12+Math.random()*.34,
-      phase:Math.random()*Math.PI*2,
-      length:.7+Math.random()*2.5
+
+      start:
+        Math.random()*Math.PI*2,
+
+      length:
+        .35+Math.random()*2.25,
+
+      width:
+        .25+Math.random()*.72,
+
+      alpha:
+        .055+Math.random()*.20
     });
   }
 }
 
 
-/* ---------- ENERGIEBAHN ---------- */
+/* ===============================================
+   WEICHER NEBEL IM INNEREN
+=============================================== */
 
-function drawTrail(t,time){
+function drawAtmosphere(time){
 
-  const rotation=t.rotation+time*t.speed;
+  const x =
+    cx+offsetX*.2;
+
+  const y =
+    cy+offsetY*.2;
+
+  const pulse =
+    1+Math.sin(time*.0012)*.025;
+
+  const gradient =
+    ctx.createRadialGradient(
+      x,y,0,
+      x,y,W*.31*pulse
+    );
+
+  gradient.addColorStop(
+    0,
+    "rgba(0,116,255,.095)"
+  );
+
+  gradient.addColorStop(
+    .28,
+    "rgba(0,91,205,.055)"
+  );
+
+  gradient.addColorStop(
+    .65,
+    "rgba(0,65,160,.018)"
+  );
+
+  gradient.addColorStop(
+    1,
+    "rgba(0,50,120,0)"
+  );
+
+  ctx.fillStyle=gradient;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x,y,
+    W*.31*pulse,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+}
+
+
+/* ===============================================
+   FEINE UMLAUFBAHNEN
+=============================================== */
+
+function drawPath(p,time){
 
   ctx.save();
 
   ctx.translate(
-    cx+pointerX*.18,
-    cy+pointerY*.18
+    cx+offsetX*.35,
+    cy+offsetY*.35
   );
 
-  ctx.rotate(rotation);
-  ctx.scale(1,t.squash);
+  ctx.rotate(
+    p.rotation+
+    time*p.speed
+  );
+
+  ctx.scale(
+    1,
+    p.squash
+  );
 
   ctx.beginPath();
 
-  const start=t.phase+Math.sin(time*.0003+t.phase)*.3;
-
   ctx.arc(
-    0,0,
-    t.radius*(1+energy*.025),
-    start,
-    start+t.length
+    0,
+    0,
+    p.radius*(1+energy*.025),
+    p.start,
+    p.start+p.length
   );
 
-  const glow=
-    t.alpha+
-    energy*.15;
+  ctx.strokeStyle =
+    `rgba(44,158,235,${
+      p.alpha+energy*.055
+    })`;
 
-  ctx.strokeStyle=`rgba(38,161,255,${glow})`;
-  ctx.lineWidth=t.width*(1+energy*.5);
+  ctx.lineWidth =
+    p.width*(1+energy*.25);
 
-  ctx.shadowColor="rgba(0,139,255,.85)";
-  ctx.shadowBlur=5+energy*11;
+  ctx.shadowColor =
+    "rgba(0,139,255,.5)";
+
+  ctx.shadowBlur =
+    2+energy*4;
 
   ctx.stroke();
 
@@ -714,102 +928,124 @@ function drawTrail(t,time){
 }
 
 
-/* ---------- ZENTRUM ---------- */
+/* ===============================================
+   HELLERE ENERGIESTRÖME
+=============================================== */
 
-function drawCore(time){
+function drawStreams(time){
 
-  const pulse=
-    1+
-    Math.sin(time*.0023)*.045+
-    energy*.18;
+  for(let i=0;i<9;i++){
 
-  const x=cx+pointerX*.38;
-  const y=cy+pointerY*.38;
+    ctx.save();
 
-  const halo=ctx.createRadialGradient(
-    x,y,0,
-    x,y,W*.22*pulse
-  );
+    ctx.translate(
+      cx+offsetX*.42,
+      cy+offsetY*.42
+    );
 
-  halo.addColorStop(0,
-    `rgba(215,250,255,${.90+energy*.1})`);
+    const rotation =
+      time *
+      (.000025+i*.000006) +
+      i*.72;
 
-  halo.addColorStop(.025,
-    "rgba(110,225,255,.96)");
+    ctx.rotate(rotation);
 
-  halo.addColorStop(.08,
-    "rgba(0,149,255,.75)");
+    ctx.scale(
+      1,
+      .55+(i%4)*.09
+    );
 
-  halo.addColorStop(.22,
-    "rgba(0,94,255,.20)");
+    const radius =
+      W*(.255+(i%5)*.018);
 
-  halo.addColorStop(.55,
-    "rgba(0,65,200,.045)");
-
-  halo.addColorStop(1,
-    "rgba(0,40,140,0)");
-
-  ctx.fillStyle=halo;
-
-  ctx.beginPath();
-  ctx.arc(x,y,W*.22*pulse,0,Math.PI*2);
-  ctx.fill();
-
-
-  /* winziger heller Kern */
-
-  const core=ctx.createRadialGradient(
-    x,y,0,
-    x,y,10+energy*6
-  );
-
-  core.addColorStop(0,"white");
-  core.addColorStop(.15,"#dfffff");
-  core.addColorStop(.38,"#52d9ff");
-  core.addColorStop(.7,"rgba(0,137,255,.65)");
-  core.addColorStop(1,"rgba(0,110,255,0)");
-
-  ctx.fillStyle=core;
-  ctx.beginPath();
-  ctx.arc(x,y,11+energy*7,0,Math.PI*2);
-  ctx.fill();
-}
-
-
-/* ---------- PARTIKEL ---------- */
-
-function drawParticles(time){
-
-  for(const p of stars){
-
-    p.angle+=p.speed*(1+energy*2);
-
-    const wobble=
-      Math.sin(time*.001+p.wobble)*7;
-
-    const x=
-      cx+
-      Math.cos(p.angle)*
-      (p.radius+wobble)+
-      pointerX*.13;
-
-    const y=
-      cy+
-      Math.sin(p.angle)*
-      (p.radius*.72+wobble*.3)+
-      pointerY*.13;
+    const start =
+      i*.77 +
+      Math.sin(
+        time*.0004+i
+      )*.12;
 
     ctx.beginPath();
 
-    ctx.fillStyle=
-      `rgba(93,199,255,${p.alpha})`;
+    ctx.arc(
+      0,
+      0,
+      radius,
+      start,
+      start+.55+(i%3)*.32
+    );
 
-    ctx.shadowColor="#159fff";
-    ctx.shadowBlur=4;
+    ctx.strokeStyle =
+      `rgba(60,188,255,${
+        .14+energy*.09
+      })`;
+
+    ctx.lineWidth =
+      .45+(i%3)*.18;
+
+    ctx.shadowColor =
+      "#159fff";
+
+    ctx.shadowBlur =
+      5+energy*4;
+
+    ctx.stroke();
+
+    ctx.restore();
+  }
+}
+
+
+/* ===============================================
+   PARTIKEL
+=============================================== */
+
+function drawParticles(time){
+
+  for(const p of particles){
+
+    p.angle +=
+      p.speed*(1+energy*.7);
+
+    const wobble =
+      Math.sin(
+        time*.001+p.phase
+      )*5;
+
+    const x =
+      cx+
+      Math.cos(p.angle)*
+      (p.radius+wobble)+
+      offsetX*.28;
+
+    const y =
+      cy+
+      Math.sin(p.angle)*
+      (p.radius*p.squash)+
+      offsetY*.28;
+
+    let alpha=p.alpha;
+
+    if(Math.sin(
+      time*.002+p.phase
+    )>.82){
+      alpha*=1.7;
+    }
+
+    ctx.beginPath();
+
+    ctx.fillStyle =
+      `rgba(65,192,255,${alpha})`;
+
+    ctx.shadowColor =
+      "#1aaaff";
+
+    ctx.shadowBlur =
+      p.size>1 ? 7 : 3;
 
     ctx.arc(
-      x,y,
-      p.size*(1+energy*.45),
+      x,
+      y,
+      p.size*(1+energy*.18),
       0,
       Math.PI*2
     );
@@ -819,143 +1055,244 @@ function drawParticles(time){
 }
 
 
-/* ---------- EIN PAAR HELLE LICHTSTRÖME ---------- */
+/* ===============================================
+   KERN
+   bewusst klein – kein Scheinwerfer mehr 😅
+=============================================== */
 
-function drawBrightStreams(time){
+function drawCore(time){
 
-  for(let i=0;i<5;i++){
+  const x =
+    cx+offsetX*.52;
 
-    const rot=
-      time*(.00010+i*.000018)+
-      i*1.21;
+  const y =
+    cy+offsetY*.52;
 
-    ctx.save();
-    ctx.translate(
-      cx+pointerX*.22,
-      cy+pointerY*.22
+  const pulse =
+    1+
+    Math.sin(time*.002)*.06+
+    energy*.12;
+
+  /* sehr kleiner Halo */
+
+  const halo =
+    ctx.createRadialGradient(
+      x,y,0,
+      x,y,W*.075*pulse
     );
 
-    ctx.rotate(rot);
+  halo.addColorStop(
+    0,
+    "rgba(190,250,255,.85)"
+  );
 
-    ctx.scale(
-      1,
-      .62+i*.035
+  halo.addColorStop(
+    .10,
+    "rgba(62,215,255,.62)"
+  );
+
+  halo.addColorStop(
+    .28,
+    "rgba(0,147,255,.20)"
+  );
+
+  halo.addColorStop(
+    1,
+    "rgba(0,105,255,0)"
+  );
+
+  ctx.fillStyle=halo;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x,y,
+    W*.075*pulse,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  /* eigentlicher Energiekern */
+
+  const radius =
+    Math.max(
+      3.8,
+      W*.011
+    )*(1+energy*.15);
+
+  const core =
+    ctx.createRadialGradient(
+      x,y,0,
+      x,y,radius*2.2
     );
 
-    ctx.beginPath();
+  core.addColorStop(
+    0,
+    "#ffffff"
+  );
 
-    const radius=W*(.285+i*.011);
+  core.addColorStop(
+    .20,
+    "#bdfcff"
+  );
 
-    ctx.arc(
-      0,0,
-      radius,
-      .2+i*.53,
-      1.65+i*.53
-    );
+  core.addColorStop(
+    .48,
+    "#35d9ff"
+  );
 
-    ctx.strokeStyle=
-      `rgba(65,194,255,${.27+energy*.22})`;
+  core.addColorStop(
+    .72,
+    "rgba(0,145,255,.75)"
+  );
 
-    ctx.lineWidth=
-      .75+energy*.65;
+  core.addColorStop(
+    1,
+    "rgba(0,100,255,0)"
+  );
 
-    ctx.shadowColor="#008fff";
-    ctx.shadowBlur=10+energy*10;
+  ctx.fillStyle=core;
 
-    ctx.stroke();
+  ctx.beginPath();
 
-    ctx.restore();
-  }
+  ctx.arc(
+    x,y,
+    radius*2.2,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
 }
 
 
-/* ---------- FRAME ---------- */
+/* ===============================================
+   ANIMATION
+=============================================== */
 
 function animate(time){
 
-  ctx.clearRect(0,0,W,H);
+  ctx.clearRect(
+    0,0,W,H
+  );
 
-  pointerX+=(targetX-pointerX)*.065;
-  pointerY+=(targetY-pointerY)*.065;
-  energy+=(targetEnergy-energy)*.055;
+  offsetX +=
+    (targetX-offsetX)*.055;
 
-  ctx.globalCompositeOperation="lighter";
+  offsetY +=
+    (targetY-offsetY)*.055;
 
+  energy +=
+    (targetEnergy-energy)*.045;
+
+  ctx.globalCompositeOperation =
+    "lighter";
+
+  drawAtmosphere(time);
+
+  for(const p of paths){
+    drawPath(p,time);
+  }
+
+  drawStreams(time);
+  drawParticles(time);
   drawCore(time);
 
-  for(const t of trails){
-    drawTrail(t,time);
-  }
+  ctx.globalCompositeOperation =
+    "source-over";
 
-  drawBrightStreams(time);
-  drawParticles(time);
-
-  ctx.globalCompositeOperation="source-over";
-
-  requestAnimationFrame(animate);
+  requestAnimationFrame(
+    animate
+  );
 }
 
 
-/* ==========================================================
-   BERÜHRUNG
-========================================================== */
+/* ===============================================
+   TOUCH
+=============================================== */
 
-function moveTarget(event){
+function pointerPosition(event){
 
-  const r=touchArea.getBoundingClientRect();
+  const r =
+    touchArea.getBoundingClientRect();
 
-  const px=
-    event.clientX-(r.left+r.width/2);
+  const x =
+    event.clientX -
+    (r.left+r.width/2);
 
-  const py=
-    event.clientY-(r.top+r.height/2);
+  const y =
+    event.clientY -
+    (r.top+r.height/2);
 
-  targetX=
-    Math.max(-26,Math.min(26,px*.12));
+  targetX =
+    Math.max(
+      -24,
+      Math.min(
+        24,
+        x*.10
+      )
+    );
 
-  targetY=
-    Math.max(-26,Math.min(26,py*.12));
+  targetY =
+    Math.max(
+      -24,
+      Math.min(
+        24,
+        y*.10
+      )
+    );
 }
 
 
-touchArea.addEventListener("pointerdown",event=>{
+touchArea.addEventListener(
+  "pointerdown",
+  event=>{
 
-  touching=true;
-  holding=false;
+    active=true;
+    holding=false;
 
-  touchArea.setPointerCapture(event.pointerId);
+    touchArea.setPointerCapture(
+      event.pointerId
+    );
 
-  moveTarget(event);
+    pointerPosition(event);
 
-  targetEnergy=.75;
+    targetEnergy=.65;
 
-  message.textContent="Ja?";
+    message.textContent="Ja?";
 
-  holdTimer=setTimeout(()=>{
+    holdTimer=setTimeout(()=>{
 
-    holding=true;
-    targetEnergy=1.45;
+      holding=true;
+      targetEnergy=1.35;
 
-    message.textContent="Ich höre.";
+      message.textContent=
+        "Ich höre dir zu.";
 
-  },550);
-});
-
-
-touchArea.addEventListener("pointermove",event=>{
-
-  if(touching){
-    moveTarget(event);
+    },550);
   }
+);
 
-});
+
+touchArea.addEventListener(
+  "pointermove",
+  event=>{
+
+    if(active){
+      pointerPosition(event);
+    }
+  }
+);
 
 
 function release(){
 
   clearTimeout(holdTimer);
 
-  touching=false;
+  active=false;
   holding=false;
 
   targetX=0;
@@ -963,19 +1300,29 @@ function release(){
   targetEnergy=0;
 
   setTimeout(()=>{
-    if(!touching){
-      message.textContent=
+
+    if(!active){
+
+      message.textContent =
         "Sag einfach, was du brauchst ...";
     }
-  },850);
+
+  },800);
 }
 
 
-touchArea.addEventListener("pointerup",release);
-touchArea.addEventListener("pointercancel",release);
+touchArea.addEventListener(
+  "pointerup",
+  release
+);
+
+touchArea.addEventListener(
+  "pointercancel",
+  release
+);
 
 
-/* ---------- START ---------- */
+/* START */
 
 resize();
 requestAnimationFrame(animate);
