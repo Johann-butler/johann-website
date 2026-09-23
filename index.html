@@ -88,6 +88,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 .support-round{text-decoration:none;display:grid;place-items:center;color:#a6dcff;font-size:23px;transition:transform .2s,box-shadow .2s}.support-round:active{transform:scale(.91)}.support-round:focus-visible{outline:3px solid #9bd8ff;outline-offset:3px}
 /* Kurze Kugel-Antworten bleiben oberhalb des Eingabefelds lesbar. */
 .speech{z-index:35;max-height:21vh;overflow-y:auto}
+/* V10: Johanns Wunschbox */
+.feedback-card{max-width:690px;margin:0 auto;background:linear-gradient(145deg,rgba(25,61,100,.87),rgba(7,25,47,.83));border-color:#5aa7dc}
+.feedback-card h2{font-size:clamp(26px,5vw,37px);margin:14px 0 5px}.feedback-card label{display:block;color:#e4f4ff;font-weight:650;margin-top:12px}
+.feedback-card select{appearance:auto}.feedback-card textarea{resize:vertical;min-height:135px}.feedback-consent{display:flex!important;align-items:flex-start;gap:10px;font-weight:400!important;font-size:13px;line-height:1.5;color:#d0e4f4!important}.feedback-consent input{margin-top:4px;flex:none;width:18px;height:18px}.feedback-honeypot{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}.feedback-status{min-height:22px;color:#b4e4ff;font-weight:600;line-height:1.5}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#061322">
@@ -125,7 +129,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
     <button class="tile sudoku-tile" data-view="sudoku"><span class="tile-icon">🧩</span><span class="tile-title">Sudoku</span><div class="tile-sub">Achims Rätsel-Lounge · persönliche Spielstände</div></button>
     <button class="tile" data-view="football"><span class="tile-icon">⚽</span><span class="tile-title">Fußball</span><div class="tile-sub">Dein Verein · 1.–3. Liga · The Haggens</div></button>
     <button class="tile" data-view="weather"><span class="tile-icon">🌤️</span><span class="tile-title">Wetter</span><div class="tile-sub">Aktuell in Bochum</div></button>
-    <button class="tile" data-view="notes"><span class="tile-icon">📝</span><span class="tile-title">Notizen</span><div class="tile-sub">Deine Gedanken auf diesem Gerät</div></button>
+    <button class="tile" data-view="notes"><span class="tile-icon">💙</span><span class="tile-title">Sag es Johann!</span><div class="tile-sub">Ideen, Wünsche und Verbesserungsvorschläge</div></button>
     <button class="tile" data-view="reminders"><span class="tile-icon">🔔</span><span class="tile-title">Erinnerungen</span><div class="tile-sub">Lokale Aufgaben und Termine</div></button>
     <button class="tile" data-view="memory"><span class="tile-icon">🧠</span><span class="tile-title">Gedächtnis</span><div class="tile-sub">Datenbankanbindung vorbereiten</div></button>
     <button class="tile" data-view="status"><span class="tile-icon">⚙️</span><span class="tile-title">Systemstatus</span><div class="tile-sub">Johanns Funktionen im Überblick</div></button>
@@ -167,10 +171,25 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
    </div>
   </section>
   <section class="panel-section" id="view-weather"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><div class="dashboard-weather" id="dashboardWeather">Wetter in Bochum wird geladen …</div><p class="muted">Die Wetterdaten stammen von Open-Meteo und werden regelmäßig aktualisiert.</p></div></section>
-  <section class="panel-section" id="view-notes"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><label for="newNote">Neue Notiz</label><textarea class="field" id="newNote" rows="4" maxlength="3000" placeholder="Was soll Johann für dich festhalten?"></textarea><button class="primary" id="addNote">Notiz speichern</button><p class="mini">Notizen werden vorerst ausschließlich auf diesem Gerät gespeichert.</p></div><div id="notesList"></div></section>
+  <section class="panel-section" id="view-notes"><button class="backbtn" data-view="home">← Zurück</button>
+  <div class="glass feedback-card"><span class="pill">💙 JOHANNS WUNSCHBOX</span><h2>Sag es Johann!</h2>
+  <p class="muted">Du hast eine Idee, einen Wunsch oder etwas funktioniert nicht? Erzähl es mir. Ich halte deinen Vorschlag fest und gebe ihn an meinen Entwickler weiter.</p>
+  <form id="feedbackForm">
+    <label for="feedbackType">Was möchtest du mir sagen?</label>
+    <select id="feedbackType" class="field" required><option value="Idee">💡 Ich habe eine Idee</option><option value="Wunsch">✨ Ich wünsche mir etwas</option><option value="Problem">🔧 Etwas funktioniert nicht</option><option value="Sonstiges">💬 Ich möchte dir etwas sagen</option></select>
+    <label for="feedbackMessage">Deine Nachricht</label>
+    <textarea class="field" id="feedbackMessage" rows="5" minlength="5" maxlength="1800" required placeholder="Lieber Johann, ich hätte da eine Idee …"></textarea>
+    <label for="feedbackContact">E-Mail für Rückfragen (freiwillig)</label>
+    <input class="field" id="feedbackContact" type="email" maxlength="180" autocomplete="email" placeholder="deine@email.de">
+    <label class="feedback-consent"><input id="feedbackConsent" type="checkbox" required> Ich bin einverstanden, dass meine Nachricht an den Entwickler weitergegeben und zur Bearbeitung gespeichert wird. Eine angegebene E-Mail wird nur für Rückfragen genutzt.</label>
+    <p class="mini">Bitte keine Passwörter oder vertraulichen persönlichen Daten eingeben.</p>
+    <div class="feedback-honeypot" aria-hidden="true"><label for="feedbackWebsite">Website</label><input id="feedbackWebsite" tabindex="-1" autocomplete="off"></div>
+    <button type="submit" class="primary" id="feedbackSend">An Johann senden 💙</button>
+    <p id="feedbackStatus" class="feedback-status" role="status" aria-live="polite"></p>
+  </form></div></section>
   <section class="panel-section" id="view-reminders"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><label for="reminderText">Erinnerung</label><input class="field" id="reminderText" maxlength="180" placeholder="Was steht an?"><label for="reminderDate">Wann?</label><input class="field" id="reminderDate" type="datetime-local"><button class="primary" id="addReminder">Erinnerung speichern</button><p class="mini">Noch keine Push-Nachrichten: Fällige Erinnerungen erscheinen hier, wenn du die Seite öffnest. Aktive Benachrichtigungen folgen mit deinem Server.</p></div><div id="remindersList"></div></section>
   <section class="panel-section" id="view-memory"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Gedächtnis</h2><p class="muted">Deine D1-Datenbank ist vorbereitet. Damit hier Erinnerungen sicher verwaltet werden können, ergänzen wir im nächsten Schritt den Worker um geschützte Admin-Funktionen. Bis dahin zeigt dieses Menü bewusst keine privaten Daten an.</p><span class="pill">🔒 Admin-Bereich in Vorbereitung</span></div></section>
-  <section class="panel-section" id="view-status"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Systemstatus</h2><p>🌤️ Wetter: <span id="statusWeather">Wird geprüft</span></p><p>🧠 KI: Über den bestehenden Cloudflare-Worker angebunden</p><p>🧩 Sudoku: Im Browser spielbar</p><p>💾 Spielstände und Notizen: Auf diesem Gerät</p><p>🔒 Geschütztes Gedächtnis: Noch nicht freigeschaltet</p><p>🏠 Heimserver &amp; Sprachsteuerung: Später</p></div></section>
+  <section class="panel-section" id="view-status"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Systemstatus</h2><p>🌤️ Wetter: <span id="statusWeather">Wird geprüft</span></p><p>🧠 KI: Über den bestehenden Cloudflare-Worker angebunden</p><p>🧩 Sudoku: Im Browser spielbar</p><p>💾 Sudoku-Spielstände: Auf diesem Gerät</p><p>💙 Wunschbox: Versand nach Einrichtung des Workers</p><p>🔒 Geschütztes Gedächtnis: Noch nicht freigeschaltet</p><p>🏠 Heimserver &amp; Sprachsteuerung: Später</p></div></section>
  </div>
 </div>
 
@@ -311,7 +330,7 @@ safeResize(true);requestAnimationFrame(animate);
 // JOHANN · Dashboard, Browser-Sudoku und lokale Werkzeuge
 const $=id=>document.getElementById(id);
 const dash=$('dashboard');
-const viewTitles={home:'Kommandozentrale',sudoku:'Sudoku',weather:'Wetter',notes:'Notizen',reminders:'Erinnerungen',memory:'Gedächtnis',status:'Systemstatus',football:'Fußball'};
+const viewTitles={home:'Kommandozentrale',sudoku:'Sudoku',weather:'Wetter',notes:'Sag es Johann!',reminders:'Erinnerungen',memory:'Gedächtnis',status:'Systemstatus',football:'Fußball'};
 function openDashboard(view='home'){
  dash.classList.add('open');document.body.style.overflow='hidden';showView(view);
  $('closePanel').focus();
@@ -322,7 +341,7 @@ function showView(view){
  $('panelTitle').textContent=viewTitles[view]||'Kommandozentrale';
  if(view==='sudoku')renderSudokuHome();
  if(view==='football')initFootball();
- if(view==='notes')renderNotes();
+ if(view==='notes')$('feedbackStatus').textContent='';
  if(view==='reminders')renderReminders();
  if(view==='weather')$('dashboardWeather').textContent=`Bochum: ${$('temperature').textContent} · ${$('weatherText').textContent}`;
  if(view==='status')$('statusWeather').textContent=$('weatherText').textContent;
@@ -347,9 +366,22 @@ function showAssistantReply(question,result){
 }
 const localRead=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}};
 const localWrite=(key,data)=>{try{localStorage.setItem(key,JSON.stringify(data));return true}catch{return false}};
-// Notes and reminders stay local: no silent uploads and no background notifications.
-function renderNotes(){const notes=localRead('johann-notes-v1',[]),el=$('notesList');el.replaceChildren();if(!notes.length){el.textContent='Noch keine Notizen.';return}notes.forEach((n,i)=>{const d=document.createElement('div');d.className='glass note';const b=document.createElement('button');b.className='secondary';b.textContent='Löschen';b.onclick=()=>{notes.splice(i,1);localWrite('johann-notes-v1',notes);renderNotes()};d.append(b,document.createTextNode(n.text));el.append(d)})}
-$('addNote').onclick=()=>{const text=$('newNote').value.trim();if(!text)return;const n=localRead('johann-notes-v1',[]);n.unshift({text,at:Date.now()});if(localWrite('johann-notes-v1',n)){$('newNote').value='';renderNotes()}else alert('Speichern ist in diesem Browser nicht verfügbar.')};
+// Feedback is submitted only with explicit consent. Reminders remain local.
+$('feedbackForm').addEventListener('submit',async e=>{
+ e.preventDefault();const btn=$('feedbackSend'),status=$('feedbackStatus');
+ const message=$('feedbackMessage').value.trim(),category=$('feedbackType').value,contact=$('feedbackContact').value.trim();
+ if(message.length<5||message.length>1800||!$('feedbackConsent').checked){status.textContent='Bitte prüfe deine Nachricht und die Einwilligung.';return}
+ btn.disabled=true;btn.textContent='Einen Moment, ich merke es mir …';status.textContent='Ich gebe deinen Vorschlag weiter …';
+ try{
+  const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),14000);
+  let response;try{response=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'feedback',category,message,contact,website:$('feedbackWebsite').value}),signal:ctrl.signal})}finally{clearTimeout(timeout)}
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok||!data.ok)throw Error(data.error||'Das hat gerade nicht funktioniert.');
+  status.textContent=data.delivered?'Ist gespeichert! 💙 Danke, dass du mir hilfst, besser zu werden. Ich habe deinen Vorschlag weitergegeben.':'Ist gespeichert! 💙 Die Weiterleitung dauert noch etwas. Danke für deinen Vorschlag.';
+  $('feedbackMessage').value='';$('feedbackContact').value='';$('feedbackConsent').checked=false;
+ }catch(err){status.textContent='Das hat leider noch nicht geklappt. Bitte versuch es später erneut. Deine Nachricht bleibt im Feld stehen.'}
+ finally{btn.disabled=false;btn.textContent='An Johann senden 💙'}
+});
 function renderReminders(){const list=localRead('johann-reminders-v1',[]),el=$('remindersList');el.replaceChildren();if(!list.length){el.textContent='Noch keine Erinnerungen.';return}list.sort((a,b)=>a.at-b.at).forEach(r=>{const d=document.createElement('div');d.className='glass note';const b=document.createElement('button');b.className='secondary';b.textContent='Erledigt / löschen';b.onclick=()=>{localWrite('johann-reminders-v1',list.filter(x=>x.id!==r.id));renderReminders()};const date=new Date(r.at);d.append(b,document.createTextNode((r.at<=Date.now()?'🔔 Fällig · ':'📅 ')+date.toLocaleString('de-DE')+' · '+r.text));el.append(d)})}
 $('addReminder').onclick=()=>{const text=$('reminderText').value.trim(),date=$('reminderDate').value;if(!text||!date||!Number.isFinite(new Date(date).getTime()))return alert('Bitte Text und Datum eingeben.');const n=localRead('johann-reminders-v1',[]);n.push({id:Date.now()+Math.random(),text,at:new Date(date).getTime()});if(localWrite('johann-reminders-v1',n)){$('reminderText').value='';$('reminderDate').value='';renderReminders()}else alert('Speichern ist nicht verfügbar.')};
 // Sudoku accounts in this first version are browser-local only; this is not server authentication.

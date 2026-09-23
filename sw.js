@@ -1,4 +1,4 @@
-const CACHE = 'johann-shell-v9';
+const CACHE = 'johann-shell-v10';
 const SHELL = ['./','./index.html','./manifest.webmanifest','./johann-icon-192.png','./johann-icon-512.png','./johann-icon-180.png'];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('johann-shell-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
