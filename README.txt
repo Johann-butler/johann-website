@@ -1,0 +1,1 @@
+JOHANN V8: Alle Dateien direkt ins GitHub-Repository hochladen; index.html und sw.js ersetzen. Wetterbilder bleiben bestehen. Regionalliga: SG Wattenscheid 09 mit offiziellem Spielplan-Link; RWE mit OpenLigaDB, falls verfügbar. Animierte Kugel: antippen fuer Lichtblitz und Federreaktion.
