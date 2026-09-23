@@ -83,6 +83,11 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 .football-quick .football-team-options{margin:8px 0 0}
 .football-source-link{display:inline-block;margin:12px 0;color:#a6dfff;text-decoration:underline;text-underline-offset:3px;font-size:14px}
 @media(prefers-reduced-motion:reduce){.johann{transition:none}}
+
+/* V9: PayPal sitzt eindeutig links am Eingabefeld, keine schwebende Tasse. */
+.support-round{text-decoration:none;display:grid;place-items:center;color:#a6dcff;font-size:23px;transition:transform .2s,box-shadow .2s}.support-round:active{transform:scale(.91)}.support-round:focus-visible{outline:3px solid #9bd8ff;outline-offset:3px}
+/* Kurze Kugel-Antworten bleiben oberhalb des Eingabefelds lesbar. */
+.speech{z-index:35;max-height:21vh;overflow-y:auto}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#061322">
@@ -103,11 +108,11 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 <div id="chatArchive" class="chat-archive" aria-live="polite"><button id="closeChat" class="chat-close" type="button" aria-label="Antwort schließen">×</button><div id="chatMessages"></div></div>
 <div class="slogan"><span>ZUHAUSE.</span> INTELLIGENTER. GEMEINSAM.</div>
 <section class="controls">
-<button class="round" id="johannButton" aria-label="Johann ansprechen">◉</button>
+<a class="round support-round" id="johannButton" href="https://www.paypal.me/JohannButler" target="_blank" rel="noopener noreferrer" aria-label="Johanns Kaffeekasse bei PayPal öffnen" title="Johanns Kaffeekasse">☕</a>
 <div class="command-wrap"><input class="command" id="command" type="text" autocomplete="off" enterkeyhint="send" placeholder="Sag einfach, was du brauchst ..." aria-label="Mit Johann sprechen"><button class="send" id="sendButton" aria-label="Senden">➤</button></div>
 <button class="round dots" id="moreButton" aria-label="Kommandozentrale öffnen">•••</button>
 </section>
-<a class="coffee-button" href="https://www.paypal.me/JohannButler" target="_blank" rel="noopener noreferrer" aria-label="Johanns Kaffeekasse bei PayPal öffnen" title="Johanns Kaffeekasse">☕</a>
+
 <button class="info-button" id="infoButton" aria-label="Info und Kontakt">ⓘ</button>
 <div class="info-box" id="infoBox"><div class="info-title">JOHANN · KONTAKT</div><div class="info-text">Fragen, Ideen oder einfach mal Johann Hallo sagen?</div><a href="mailto:machmal@johann-butler.de">machmal@johann-butler.de</a></div>
 </main>
@@ -186,7 +191,6 @@ function updateBackground(){const f=matchMedia("(orientation:landscape)").matche
 async function loadWeather(){try{const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=51.4818&longitude=7.2162&current=temperature_2m,weather_code&daily=sunrise,sunset&timezone=Europe%2FBerlin&forecast_days=1");if(!r.ok)throw 0;const d=await r.json();weatherCode=d.current.weather_code;sunrise=d.daily.sunrise[0];sunset=d.daily.sunset[0];const w=weatherDescription(weatherCode);document.getElementById("temperature").textContent=Math.round(d.current.temperature_2m)+"°";document.getElementById("weatherText").textContent=w[0];document.getElementById("weatherIcon").textContent=w[1];updateBackground()}catch(e){document.getElementById("temperature").textContent="--°";document.getElementById("weatherText").textContent="Keine Verbindung";document.getElementById("weatherIcon").textContent="◌";updateBackground()}}
 loadWeather();setInterval(loadWeather,600000);setInterval(updateBackground,60000);addEventListener("orientationchange",()=>setTimeout(()=>{updateBackground();safeResize(true)},250));
 function contextualReply(){const h=new Date().getHours(),w=weatherType(weatherCode);if(w==="gewitter")return pick(["Meister, bleiben Sie lieber drin. Draußen übernimmt gerade jemand anderes die Beleuchtung.","Gewitter, Meister. Ich empfehle heute ausnahmsweise: Sofa statt Heldentum.","Meister, draußen blitzt es. Ich habe zwar Energie – aber nicht diese Art."]);if(w==="regen")return pick(["Meister, haben Sie Ihren Regenschirm dabei?","Regen in Bochum, Meister. Überraschend wäre inzwischen eher Wüste.","Meister, draußen ist kostenloses Wasser verfügbar. Bitte trotzdem den Schirm nehmen."]);if(h<5)return pick(["Meister … andere Menschen schlafen um diese Uhrzeit.","Das Bett ist angerichtet, Meister. Rein metaphorisch. Noch kann ich keine Betten machen.","Meister, selbst Johann hat um diese Uhrzeit Fragen."]);if(h<11)return pick(["Guten Morgen, Meister.","Morgen, Meister. Kaffee wäre jetzt eine technisch sinnvolle Erweiterung.","Guten Morgen. Systeme laufen. Meister hoffentlich auch."]);if(h<18)return pick(["Was kann ich für Sie tun, Meister?","Bereit, Meister. Zumindest für alles, was diese Website schon kann.","Meister, ich höre. Also… lese. Noch.","Ein schöner Tag, um Johann unnötig oft anzutippen, Meister."]);if(h<23)return pick(["Guten Abend, Meister.","Feierabend, Meister? Ich kenne das Konzept nur theoretisch.","Guten Abend. Bochum steht noch, Johann läuft – solide Bilanz."]);return pick(["Spät geworden, Meister.","Meister, ich würde Feierabend empfehlen. Mir selbst wurde keiner programmiert.","Noch wach, Meister? Dann kann ich es ja auch bleiben."])}
-const jb=document.getElementById("johannButton");jb.addEventListener("click",()=>{let n=parseInt(localStorage.getItem("johannClicks")||"0",10)+1;localStorage.setItem("johannClicks",n);if(n===10)say('Meister, Ihre Begeisterung für diesen Knopf ehrt mich. 😄 Die weitere Finanzierung Ihrer Klickerei wird über <a href="'+PAYPAL+'" target="_blank" rel="noopener noreferrer">Johanns Kaffeekasse</a> gerne entgegengenommen.',8000);else say(contextualReply())});
 function answerCommand(raw){const q=raw.trim().toLowerCase();if(!q)return say("Meister, Gedankenlesen ist für Version 2 vorgesehen. 😄");if(q.includes("wetter")||q.includes("temperatur")){const t=document.getElementById("temperature").textContent,w=document.getElementById("weatherText").textContent;return say(`In Bochum sind es aktuell ${t}. ${w}, Meister.`)}if(q.includes("vfl")||q.includes("bochum 1848")||q==="1848")return say(pick(["VfL Bochum 1848. Endlich eine vernünftige Eingabe, Meister. 💙🤍","1848, Meister. Bei diesem Thema arbeite ich sogar freiwillig Überstunden. 💙🤍","Blau und Weiß, Meister. Für Live-News brauche ich als Nächstes noch meine echte Nachrichtenanbindung."]));if(q.includes("kontakt")||q.includes("email")||q.includes("e-mail")||q.includes("mail"))return say('Sie erreichen mein noch menschliches Bodenpersonal unter <a href="mailto:machmal@johann-butler.de">machmal@johann-butler.de</a>. 😄',7000);if(q.includes("paypal")||q.includes("spende")||q.includes("kaffee")||q.includes("unterstütz"))return say('Sehr löblich, Meister. 😄 <a href="'+PAYPAL+'" target="_blank" rel="noopener noreferrer">Hier geht es zu Johanns Kaffeekasse.</a>',7000);if(q.includes("uhr")||q.includes("zeit"))return say(`Es ist ${document.getElementById("time").textContent} Uhr, Meister.`);if(q.includes("hallo")||q.includes("hi")||q.includes("moin")||q.includes("hey"))return say(pick(["Hallo, Meister.","Da bin ich, Meister.","Hallo. Johann meldet sich ordnungsgemäß zum Dienst.","Meister! Ich dachte schon, Sie reden heute nur mit echten Menschen."]));if(q.includes("wer bist")||q.includes("was bist"))return say("Ich bin Johann. Heute noch Website mit Größenwahn – später Ihr digitaler Butler, Meister. 😄",7000);if(q.includes("was kannst")||q.includes("hilfe"))return say("Aktuell kann ich Wetter, Zeit, ein bisschen Bochum, Kontakt und Kaffeekasse. Das ist die Oberfläche – mein Gehirn zieht später auf den Server, Meister.",7500);if(q.includes("danke"))return say(pick(["Sehr gerne, Meister.","Dafür wurde ich gebaut. Also… werde ich gebaut.","Immer zu Diensten, Meister."]));if(q.includes("nina"))return say("Bei Fragen zu Nina halte ich mich vorsichtshalber diplomatisch zurück, Meister. 😄");return say(pick([`„${raw.trim()}“ habe ich verstanden – beantworten kann ich es in dieser frühen Version noch nicht, Meister.`,`Das steht noch nicht in meinem kleinen Website-Gehirn, Meister. Mein richtiges Gehirn kommt später auf den Server.`,`Interessant, Meister. Dafür fehlen mir noch ein paar Synapsen. Geben Sie mir etwas Bauzeit. 😄`,`Notiert, Meister. Also bildlich gesprochen – speichern tue ich diese Eingabe noch nicht.`]),7000)}
 const command=document.getElementById("command"),send=document.getElementById("sendButton");const WORKER_URL="https://johann-ki.bjornkorczak.workers.dev/";
 let sending=false; const chatHistory=[];
@@ -261,14 +265,46 @@ function pokeOrb(e){
  poke={x:Math.max(-W*.21,Math.min(W*.21,px)),y:Math.max(-W*.21,Math.min(W*.21,py)),at:performance.now(),force:1};
  wobbleVelocity+=.15*(targetX<0?-1:1);flashTarget=1;targetEnergy=1.45;
 }
+// Johann reagiert auf Berührung mit KI-gestützten, wechselnden Mini-Dialogen.
+// Maximal eine KI-Anfrage alle 25 Sekunden pro Gerät, damit neugieriges Tippen bezahlbar bleibt.
+const orbFallback=[
+ 'Da bin ich. Was beschäftigt dich gerade?',
+ 'Ich bin ganz Ohr. Also, fast. Ohren sind noch nicht im Budget.',
+ 'Schon wieder gepiekst? Ich werde langsam kitzelig. 😄',
+ 'Bereit! Frag mich ruhig etwas im Eingabefeld.',
+ 'Du hast gerufen? Ich bin neugierig, was heute ansteht.',
+ 'Einmal antippen genügt. Ich nehme meine Arbeit ernst. Meistens.',
+ 'Falls du mich testen willst: Frag mich etwas, das du wirklich wissen möchtest.',
+ 'Ich leuchte schon vor Vorfreude. Was kann ich für dich tun?'
+];
+let lastOrbRequest=0,orbRequestRunning=false,lastOrbFallback=-1,orbMoved=false;
+function localOrbReply(){let n=Math.floor(Math.random()*orbFallback.length);if(n===lastOrbFallback)n=(n+1)%orbFallback.length;lastOrbFallback=n;return orbFallback[n]}
+async function reactToOrb(){
+ const now=Date.now();
+ if(orbRequestRunning){say('Einen Moment, ich denke noch nach …',3200);return}
+ if(now-lastOrbRequest<25000){say(localOrbReply(),4200);return}
+ lastOrbRequest=now;orbRequestRunning=true;
+ say('Oh! Einen Moment, mir fällt gerade etwas ein …',11000);
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),9000);
+ try{
+  const h=new Date().getHours(),time=h<6?'späte Nacht':h<11?'Morgen':h<17?'Tag':h<22?'Abend':'Nacht';
+  const instruction='Du bist Johann, ein sympathischer deutscher digitaler Butler auf einer öffentlichen Website. Ein Mensch hat gerade spielerisch deine leuchtende Kugel berührt. Reagiere mit GENAU einem überraschenden, lebendigen, freundlichen Satz auf Deutsch (maximal 22 Wörter), gern mit dezentem Humor, ohne stets dieselbe Frage zu stellen. Tageszeit: '+time+'. Du kennst den Menschen nicht, verwende keine privaten Namen und keine festen Lieblingsvereine. Keine Markdown-Formatierung. Keine Aufforderung zu Spenden.';
+  const r=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:instruction,history:[]}),signal:controller.signal});
+  if(!r.ok)throw Error('KI derzeit nicht erreichbar');
+  const data=await r.json();
+  const answer=String(data.reply||data.answer||data.response||data.text||'').trim();
+  if(!answer||answer.length>260)throw Error('Keine kurze Antwort');
+  say(safeText(answer),6500);
+ }catch(_){say(localOrbReply(),5000)}
+ finally{clearTimeout(timer);orbRequestRunning=false}
+}
 touchArea.addEventListener('pointerdown',e=>{
- active=true;paypalOpened=false;pokeOrb(e);
- clearTimeout(holdTimer);clearTimeout(paypalTimer);
- holdTimer=setTimeout(()=>{targetEnergy=1.7;flashTarget=.65},550);
- paypalTimer=setTimeout(()=>{paypalOpened=true;targetEnergy=1.9;say('Kaffeekasse geöffnet, Meister. ☕',2500);window.location.href=PAYPAL},2000);
+ active=true;orbMoved=false;pokeOrb(e);
+ clearTimeout(holdTimer);
+ holdTimer=setTimeout(()=>{targetEnergy=1.85;flashTarget=.85},550);
 });
-touchArea.addEventListener('pointermove',e=>{if(!active)return;pointerPosition(e);if(Math.abs(targetX)+Math.abs(targetY)>.36){clearTimeout(paypalTimer)}});
-function release(){if(!active)return;clearTimeout(holdTimer);clearTimeout(paypalTimer);active=false;targetX=targetY=0;targetEnergy=0;if(!paypalOpened)say(pick(['Ja, Meister?','Ich höre, Meister.','Johann ist da.','Sie haben gerufen, Meister?']),2600)}
+touchArea.addEventListener('pointermove',e=>{if(!active)return;pointerPosition(e);if(Math.abs(targetX)+Math.abs(targetY)>.36)orbMoved=true});
+function release(e){if(!active)return;clearTimeout(holdTimer);active=false;targetX=targetY=0;targetEnergy=0;if(e&&e.type==='pointercancel')return;if(!orbMoved)reactToOrb()}
 touchArea.addEventListener('pointerup',release);touchArea.addEventListener('pointercancel',release);
 safeResize(true);requestAnimationFrame(animate);
 
