@@ -54,6 +54,22 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 .cell.same{background:#b6e2ff}
 .cell.error{background:#ffe0e5!important}
 @media(max-width:600px){.panel-backdrop{padding:7px}.panel{height:calc(100dvh - 14px);border-radius:22px}.sudoku-board{border-width:3px}.cell.block-right{border-right-width:3px}.cell.block-bottom{border-bottom-width:3px}}
+/* Lesbarer Antwortbereich: keine überlappenden Sprechblasen */
+.chat-archive{z-index:65;bottom:calc(86px + env(safe-area-inset-bottom));width:min(620px,calc(100vw - 28px));max-height:min(57dvh,580px);padding:44px 18px 18px;background:rgba(4,15,31,.94);border:1px solid rgba(69,171,245,.8);box-shadow:0 12px 48px #000a;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);font-size:clamp(15px,3.8vw,17px);line-height:1.6;overscroll-behavior:contain;user-select:text;-webkit-user-select:text}
+.chat-line{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid #315270;overflow-wrap:anywhere}
+.chat-line>div{margin-bottom:10px;white-space:pre-wrap}
+.chat-close{position:sticky;float:right;top:-36px;margin-top:-32px;margin-right:-5px;z-index:2;border:1px solid #5b9bd0;border-radius:50%;width:35px;height:35px;background:#173b5d;color:white;font-size:25px;line-height:1;cursor:pointer}
+.chat-archive a{color:#87d1ff;text-decoration:underline;overflow-wrap:anywhere}
+@media(max-width:600px){.chat-archive{bottom:calc(76px + env(safe-area-inset-bottom));max-height:55dvh}}
+
+/* Johann V4: sichtbare Kaffeekasse – zurückhaltend auf der Startseite. */
+.coffee-button{position:fixed;right:72px;bottom:calc(82px + env(safe-area-inset-bottom));z-index:100;width:42px;height:42px;border-radius:50%;border:1px solid rgba(0,136,232,.65);background:rgba(0,7,17,.72);color:#83ceff;font-size:21px;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 0 16px rgba(0,92,169,.16)}
+.coffee-button:focus-visible,.support-link:focus-visible{outline:3px solid #91d7ff;outline-offset:3px}
+.support-card{display:flex;align-items:center;gap:15px;flex-wrap:wrap;margin-top:20px;padding:19px;border:1px solid rgba(124,204,255,.45);border-radius:20px;background:linear-gradient(125deg,rgba(13,62,106,.69),rgba(7,31,59,.52));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.support-icon{display:grid;place-items:center;flex:0 0 54px;width:54px;height:54px;border-radius:16px;background:rgba(76,160,224,.19);font-size:29px}
+.support-copy{flex:1 1 180px}.support-copy h2{font-size:19px;margin:0 0 5px}.support-copy p{font-size:13px;line-height:1.45;color:#c4def2;margin:0}
+.support-link{display:inline-flex;justify-content:center;align-items:center;min-height:46px;padding:12px 17px;border-radius:13px;background:#2788e6;color:#fff;font-weight:700;text-decoration:none;white-space:nowrap}
+@media(max-width:600px){.coffee-button{right:69px;bottom:calc(82px + env(safe-area-inset-bottom))}.support-link{width:100%}}
 </style>
 </head>
 <body>
@@ -64,13 +80,14 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 <div class="johann" id="touchArea"><canvas id="energy"></canvas></div>
 <div class="orb-reflection"></div><div class="orb-floor-point"></div>
 <div class="speech" id="speech"></div>
-<div id="chatArchive" class="chat-archive" aria-live="polite"></div>
+<div id="chatArchive" class="chat-archive" aria-live="polite"><button id="closeChat" class="chat-close" type="button" aria-label="Antwort schließen">×</button><div id="chatMessages"></div></div>
 <div class="slogan"><span>ZUHAUSE.</span> INTELLIGENTER. GEMEINSAM.</div>
 <section class="controls">
 <button class="round" id="johannButton" aria-label="Johann ansprechen">◉</button>
 <div class="command-wrap"><input class="command" id="command" type="text" autocomplete="off" enterkeyhint="send" placeholder="Sag einfach, was du brauchst ..." aria-label="Mit Johann sprechen"><button class="send" id="sendButton" aria-label="Senden">➤</button></div>
 <button class="round dots" id="moreButton" aria-label="Kommandozentrale öffnen">•••</button>
 </section>
+<a class="coffee-button" href="https://www.paypal.me/JohannButler" target="_blank" rel="noopener noreferrer" aria-label="Johanns Kaffeekasse bei PayPal öffnen" title="Johanns Kaffeekasse">☕</a>
 <button class="info-button" id="infoButton" aria-label="Info und Kontakt">ⓘ</button>
 <div class="info-box" id="infoBox"><div class="info-title">JOHANN · KONTAKT</div><div class="info-text">Fragen, Ideen oder einfach mal Johann Hallo sagen?</div><a href="mailto:machmal@johann-butler.de">machmal@johann-butler.de</a></div>
 </main>
@@ -87,6 +104,11 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
     <button class="tile" data-view="memory"><span class="tile-icon">🧠</span><span class="tile-title">Gedächtnis</span><div class="tile-sub">Datenbankanbindung vorbereiten</div></button>
     <button class="tile" data-view="status"><span class="tile-icon">⚙️</span><span class="tile-title">Systemstatus</span><div class="tile-sub">Johanns Funktionen im Überblick</div></button>
    </div>
+   <aside class="support-card" aria-label="Johanns Kaffeekasse">
+    <div class="support-icon" aria-hidden="true">☕</div>
+    <div class="support-copy"><h2>Johanns Kaffeekasse</h2><p>Gefällt dir Johann? Unterstütze seine Weiterentwicklung – ganz freiwillig. 💙</p></div>
+    <a class="support-link" href="https://www.paypal.me/JohannButler" target="_blank" rel="noopener noreferrer">Mit PayPal unterstützen ↗</a>
+   </aside>
   </section>
   <section class="panel-section" id="view-sudoku">
    <button class="backbtn" data-view="home">← Zur Kommandozentrale</button>
@@ -139,6 +161,7 @@ async function submit(){
   if(!v){say("Was möchten Sie wissen, Meister? 😄");return}
   if(v.length>1000){say("Maximal 1000 Zeichen auf einmal, Meister.");return}
   command.value="";command.blur();sending=true;send.disabled=true;
+  chatArchive.classList.remove('show');
   say("Einen Moment, Meister. Ich schaue nach …",20000);
   const controller=new AbortController();
   const timeout=setTimeout(()=>controller.abort(),25000);
@@ -195,7 +218,8 @@ $('closePanel').addEventListener('click',closeDashboard);
 dash.addEventListener('click',e=>{if(e.target===dash)closeDashboard()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&dash.classList.contains('open'))closeDashboard()});
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
-const chatArchive=$('chatArchive');
+const chatArchive=$('chatArchive'),chatMessages=$('chatMessages');
+$('closeChat').addEventListener('click',()=>chatArchive.classList.remove('show'));
 function showAssistantReply(question,result){
  const reply=String(result.reply||'Da fehlen mir gerade die Worte, Meister.');
  chatHistory.push({role:'user',content:question},{role:'assistant',content:reply});
@@ -204,8 +228,8 @@ function showAssistantReply(question,result){
  const u=document.createElement('div');const label=document.createElement('strong');label.textContent='Du: ';u.append(label,document.createTextNode(question));
  const a=document.createElement('div');const al=document.createElement('strong');al.textContent='Johann: ';a.append(al,document.createTextNode(reply));block.append(u,a);
  if(Array.isArray(result.sources)&&result.sources.length){const sources=document.createElement('div');sources.className='mini';sources.textContent='Quellen: ';result.sources.slice(0,5).forEach((item,i)=>{try{const url=new URL(item.url);if(!['https:','http:'].includes(url.protocol))return;const link=document.createElement('a');link.href=url.href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=item.title||url.hostname;sources.append(i?' · ':'',link)}catch{}});block.append(sources)}
- chatArchive.prepend(block);while(chatArchive.children.length>6)chatArchive.lastElementChild.remove();chatArchive.classList.add('show');
- say(safeText(reply).replace(/\n/g,'<br>'),14000);
+ clearTimeout(speechTimer);speech.classList.remove('show');
+ chatMessages.prepend(block);while(chatMessages.children.length>6)chatMessages.lastElementChild.remove();chatArchive.classList.add('show');chatArchive.scrollTop=0;
 }
 const localRead=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}};
 const localWrite=(key,data)=>{try{localStorage.setItem(key,JSON.stringify(data));return true}catch{return false}};
