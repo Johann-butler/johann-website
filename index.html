@@ -1,359 +1,676 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#03060b">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#020711">
+<title>JOHANN — KI mit Herz</title>
 
-  <title>JOHANN — KI mit Herz</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden}
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+:root{
+  --x:0px;
+  --y:0px;
+  --energy:1;
+  --blue:#078cff;
+  --cyan:#67ddff;
+}
 
-    :root {
-      --blue: #35a7ff;
-      --blue-light: #8dd5ff;
-      --white: #f4f9ff;
-      --muted: #7f93a8;
-      --background: #03060b;
-    }
+body{
+  background:#02050b;
+  color:#eef8ff;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+}
 
-    body {
-      min-height: 100vh;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 50% 45%,
-          rgba(0, 119, 255, 0.12),
-          transparent 32%),
-        radial-gradient(circle at 50% 100%,
-          rgba(0, 91, 255, 0.08),
-          transparent 45%),
-        var(--background);
+/* =========================
+   DER RAUM
+========================= */
 
-      color: var(--white);
-      font-family: -apple-system, BlinkMacSystemFont,
-                   "Segoe UI", Roboto, Arial, sans-serif;
-    }
+.room{
+  position:relative;
+  width:100%;
+  height:100dvh;
+  overflow:hidden;
 
-    .page {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 30px 24px;
-      isolation: isolate;
-    }
+  background:
+    radial-gradient(ellipse at 50% 48%,
+      rgba(0,105,220,.18) 0%,
+      rgba(0,50,120,.07) 30%,
+      transparent 58%),
+    linear-gradient(#06101d 0%,#02060c 67%,#010308 100%);
+}
 
-    .grid {
-      position: absolute;
-      inset: 0;
-      z-index: -3;
-      opacity: 0.16;
-      background-image:
-        linear-gradient(rgba(70, 160, 255, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(70, 160, 255, 0.08) 1px, transparent 1px);
-      background-size: 45px 45px;
-      mask-image: linear-gradient(to bottom, transparent, black 35%, transparent);
-    }
+.ceiling{
+  position:absolute;
+  inset:0 0 42% 0;
+  opacity:.42;
+  background:
+    linear-gradient(90deg,
+      transparent 0 11%,
+      rgba(40,115,180,.12) 11.2% 11.5%,
+      transparent 11.7% 30%,
+      rgba(40,115,180,.12) 30.2% 30.5%,
+      transparent 30.7% 69%,
+      rgba(40,115,180,.12) 69.2% 69.5%,
+      transparent 69.7% 88%,
+      rgba(40,115,180,.12) 88.2% 88.5%,
+      transparent 88.7%),
+    linear-gradient(
+      rgba(80,145,200,.09) 1px,
+      transparent 1px);
+  background-size:auto,100% 76px;
+}
 
-    .glow {
-      position: absolute;
-      width: 420px;
-      height: 420px;
-      border-radius: 50%;
-      background: rgba(0, 119, 255, 0.11);
-      filter: blur(90px);
-      z-index: -2;
-      animation: breathe 5s ease-in-out infinite;
-    }
+.wall-line{
+  position:absolute;
+  left:4%;
+  right:4%;
+  top:19%;
+  height:1px;
+  background:linear-gradient(90deg,
+    transparent,
+    rgba(70,155,225,.25),
+    transparent);
+  box-shadow:0 0 12px rgba(0,120,255,.16);
+}
 
-    .brand {
-      text-align: center;
-      margin-bottom: 48px;
-    }
+.floor{
+  position:absolute;
+  left:-35%;
+  width:170%;
+  height:52%;
+  bottom:-16%;
+  transform:perspective(520px) rotateX(61deg);
+  transform-origin:center top;
 
-    .brand h1 {
-      font-size: clamp(3.5rem, 14vw, 7rem);
-      line-height: 0.9;
-      letter-spacing: 0.16em;
-      margin-left: 0.16em;
-      font-weight: 750;
-      text-shadow:
-        0 0 25px rgba(80, 180, 255, 0.18),
-        0 0 70px rgba(0, 110, 255, 0.12);
-    }
+  background:
+    linear-gradient(rgba(34,110,180,.10) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(34,110,180,.10) 1px,transparent 1px),
+    radial-gradient(ellipse at 50% 4%,
+      rgba(0,120,255,.16),
+      transparent 45%);
 
-    .brand p {
-      margin-top: 17px;
-      color: var(--blue-light);
-      font-size: 0.72rem;
-      letter-spacing: 0.55em;
-      margin-left: 0.55em;
-      font-weight: 600;
-      opacity: 0.8;
-    }
+  background-size:75px 75px,75px 75px,auto;
+  border-top:1px solid rgba(50,145,220,.18);
+}
 
-    .eye-area {
-      position: relative;
-      width: min(78vw, 360px);
-      height: 170px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+.room-light{
+  position:absolute;
+  left:50%;
+  top:49%;
+  width:520px;
+  height:520px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
 
-    .eye-aura {
-      position: absolute;
-      width: 85%;
-      height: 90px;
-      border-radius: 50%;
-      background: rgba(0, 145, 255, 0.2);
-      filter: blur(38px);
-      animation: aura 4s ease-in-out infinite;
-    }
+  background:radial-gradient(circle,
+    rgba(0,125,255,.14),
+    rgba(0,65,170,.06) 40%,
+    transparent 68%);
 
-    .eye {
-      position: relative;
-      width: 100%;
-      height: 125px;
-      overflow: hidden;
-      clip-path: polygon(
-        0% 50%,
-        14% 25%,
-        34% 10%,
-        50% 5%,
-        66% 10%,
-        86% 25%,
-        100% 50%,
-        86% 75%,
-        66% 90%,
-        50% 95%,
-        34% 90%,
-        14% 75%
-      );
+  filter:blur(40px);
+  animation:roomBreath 5s ease-in-out infinite;
+}
 
-      background:
-        radial-gradient(circle at center,
-          #ffffff 0 5%,
-          #92ddff 6% 11%,
-          #168cff 12% 21%,
-          #041b34 22% 31%,
-          #73caff 32% 34%,
-          rgba(8, 43, 77, 0.95) 35% 48%,
-          rgba(4, 18, 31, 0.98) 58%);
 
-      border: 1px solid rgba(130, 210, 255, 0.5);
+/* =========================
+   JOHANN SCHRIFTZUG
+========================= */
 
-      box-shadow:
-        inset 0 0 25px rgba(80, 190, 255, 0.65),
-        0 0 18px rgba(0, 160, 255, 0.75),
-        0 0 55px rgba(0, 110, 255, 0.55);
+.brand{
+  position:absolute;
+  z-index:20;
+  top:max(38px,env(safe-area-inset-top));
+  left:0;
+  right:0;
+  text-align:center;
+  pointer-events:none;
+}
 
-      animation:
-        eyePulse 3.8s ease-in-out infinite,
-        blink 8s ease-in-out infinite;
-    }
+.brand h1{
+  font-size:clamp(2.7rem,11vw,5.5rem);
+  font-weight:280;
+  letter-spacing:.25em;
+  margin-left:.25em;
+  text-shadow:0 0 30px rgba(0,120,255,.12);
+}
 
-    .eye::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(
-          115deg,
-          transparent 20%,
-          rgba(255,255,255,0.18) 43%,
-          transparent 53%
-        );
-      animation: scan 5s linear infinite;
-    }
+.brand .a{
+  color:#1a9dff;
+  text-shadow:
+    0 0 8px #168cff,
+    0 0 25px rgba(0,145,255,.7);
+}
 
-    .eye::after {
-      content: "";
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: white;
-      left: 44%;
-      top: 32%;
-      filter: blur(2px);
-      opacity: 0.7;
-    }
+.brand p{
+  margin-top:8px;
+  margin-left:.55em;
+  color:#70bfff;
+  font-size:.62rem;
+  letter-spacing:.55em;
+}
 
-    .status {
-      margin-top: 42px;
-      text-align: center;
-    }
 
-    .online {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      padding: 8px 14px;
-      border: 1px solid rgba(70, 170, 255, 0.2);
-      border-radius: 999px;
-      background: rgba(15, 40, 65, 0.28);
-      backdrop-filter: blur(10px);
+/* =========================
+   JOHANN
+========================= */
 
-      color: #a8dfff;
-      font-size: 0.65rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-    }
+.stage{
+  position:absolute;
+  z-index:10;
+  left:50%;
+  top:49%;
+  transform:translate(-50%,-50%);
+  width:min(78vw,390px);
+  aspect-ratio:1;
+}
 
-    .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #4cc2ff;
-      box-shadow: 0 0 12px #2aaeff;
-      animation: dotPulse 2s infinite;
-    }
+.johann{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-    .message {
-      margin-top: 22px;
-      font-size: clamp(1.3rem, 5vw, 1.8rem);
-      font-weight: 300;
-      letter-spacing: 0.06em;
-    }
+  transform:
+    translate(var(--x),var(--y))
+    scale(var(--energy));
 
-    .subline {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 0.78rem;
-      letter-spacing: 0.12em;
-      text-align: center;
-    }
+  transition:
+    transform .16s ease-out,
+    filter .5s ease;
 
-    .footer {
-      position: absolute;
-      bottom: 24px;
-      color: rgba(150, 175, 200, 0.38);
-      font-size: 0.58rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-    }
+  filter:
+    drop-shadow(0 0 22px rgba(0,135,255,.65))
+    drop-shadow(0 0 65px rgba(0,80,255,.28));
+}
 
-    @keyframes breathe {
-      0%, 100% {
-        transform: scale(0.9);
-        opacity: 0.55;
-      }
-      50% {
-        transform: scale(1.1);
-        opacity: 1;
-      }
-    }
 
-    @keyframes aura {
-      0%, 100% {
-        transform: scale(0.88);
-        opacity: 0.5;
-      }
-      50% {
-        transform: scale(1.08);
-        opacity: 0.95;
-      }
-    }
+/* große Aura */
 
-    @keyframes eyePulse {
-      0%, 100% {
-        filter: brightness(0.9);
-      }
-      50% {
-        filter: brightness(1.25);
-      }
-    }
+.aura{
+  position:absolute;
+  width:115%;
+  height:115%;
+  border-radius:50%;
 
-    @keyframes blink {
-      0%, 45%, 49%, 53%, 100% {
-        transform: scaleY(1);
-      }
-      47%, 51% {
-        transform: scaleY(0.06);
-      }
-    }
+  background:radial-gradient(circle,
+    transparent 35%,
+    rgba(0,140,255,.10) 53%,
+    transparent 72%);
 
-    @keyframes scan {
-      from {
-        transform: translateX(-120%);
-      }
-      to {
-        transform: translateX(120%);
-      }
-    }
+  filter:blur(17px);
+  animation:aura 4.5s ease-in-out infinite;
+}
 
-    @keyframes dotPulse {
-      0%, 100% {
-        opacity: 0.45;
-      }
-      50% {
-        opacity: 1;
-      }
-    }
 
-    @media (max-height: 650px) {
-      .brand {
-        margin-bottom: 20px;
-      }
+/* unregelmäßige Energiebahnen */
 
-      .status {
-        margin-top: 20px;
-      }
+.arc{
+  position:absolute;
+  border-radius:50%;
+  border-style:solid;
+  border-color:
+    rgba(75,205,255,.8)
+    rgba(0,105,255,.10)
+    rgba(0,125,255,.45)
+    rgba(60,195,255,.15);
 
-      .footer {
-        display: none;
-      }
-    }
-  </style>
+  box-shadow:
+    0 0 7px rgba(35,175,255,.8),
+    inset 0 0 12px rgba(0,110,255,.25);
+}
+
+.a1{
+  width:91%;height:83%;
+  border-width:2px 1px 1px 2px;
+  animation:spin 12s linear infinite;
+}
+
+.a2{
+  width:76%;height:96%;
+  border-width:1px 2px 2px 1px;
+  animation:spinBack 9s linear infinite;
+}
+
+.a3{
+  width:95%;height:57%;
+  border-width:2px 1px 1px 1px;
+  animation:spin 7.5s linear infinite;
+}
+
+.a4{
+  width:65%;height:88%;
+  border-width:1px 1px 2px 2px;
+  animation:spinBack 14s linear infinite;
+}
+
+.a5{
+  width:86%;height:70%;
+  border-width:1px 2px 1px 1px;
+  animation:spinTilt 10s linear infinite;
+}
+
+
+/* inneres Energiefeld */
+
+.inner{
+  position:absolute;
+  width:57%;
+  height:57%;
+  border-radius:50%;
+
+  background:
+    radial-gradient(circle,
+      rgba(80,210,255,.12),
+      rgba(0,90,220,.06) 48%,
+      transparent 70%);
+
+  border:1px solid rgba(90,210,255,.55);
+
+  box-shadow:
+    0 0 14px rgba(50,200,255,.7),
+    0 0 38px rgba(0,120,255,.4),
+    inset 0 0 30px rgba(0,135,255,.28);
+
+  animation:innerBreath 3.7s ease-in-out infinite;
+}
+
+
+/* Kern */
+
+.core{
+  position:absolute;
+  width:15%;
+  height:15%;
+  border-radius:50%;
+
+  background:radial-gradient(circle,
+    #fff 0 7%,
+    #d8f9ff 8% 13%,
+    #78e4ff 18%,
+    #16aaff 36%,
+    #006cff 58%,
+    rgba(0,80,255,.18) 72%,
+    transparent 76%);
+
+  box-shadow:
+    0 0 9px #fff,
+    0 0 20px #65e1ff,
+    0 0 45px #008cff,
+    0 0 85px rgba(0,100,255,.9);
+
+  animation:coreBreath 2.8s ease-in-out infinite;
+}
+
+
+/* Partikel */
+
+.particle{
+  position:absolute;
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:#a9edff;
+  box-shadow:0 0 7px #37c7ff;
+  opacity:.75;
+}
+
+.p1{left:8%;top:35%;animation:particle1 5s ease-in-out infinite}
+.p2{left:22%;top:74%;animation:particle2 7s ease-in-out infinite}
+.p3{left:73%;top:19%;animation:particle3 6s ease-in-out infinite}
+.p4{left:89%;top:56%;animation:particle1 8s ease-in-out infinite reverse}
+.p5{left:59%;top:91%;animation:particle2 5.5s ease-in-out infinite reverse}
+.p6{left:35%;top:9%;animation:particle3 7.5s ease-in-out infinite}
+
+
+/* Bodenreflexion */
+
+.reflection{
+  position:absolute;
+  z-index:4;
+  left:50%;
+  top:68%;
+  width:min(62vw,300px);
+  height:120px;
+  transform:translateX(-50%);
+
+  background:radial-gradient(ellipse,
+    rgba(35,175,255,.35),
+    rgba(0,90,255,.13) 35%,
+    transparent 68%);
+
+  filter:blur(17px);
+  opacity:.65;
+  animation:reflection 3.5s ease-in-out infinite;
+}
+
+
+/* =========================
+   TEXT / STATUS
+========================= */
+
+.response{
+  position:absolute;
+  z-index:20;
+  left:20px;
+  right:20px;
+  top:72%;
+  text-align:center;
+  pointer-events:none;
+}
+
+#message{
+  font-size:clamp(1.15rem,4.8vw,1.55rem);
+  font-weight:300;
+  letter-spacing:.06em;
+  min-height:32px;
+  transition:opacity .25s ease;
+}
+
+.sub{
+  margin-top:12px;
+  color:#667c93;
+  font-size:.60rem;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+}
+
+.online{
+  position:absolute;
+  z-index:20;
+  bottom:max(24px,env(safe-area-inset-bottom));
+  left:0;
+  right:0;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:9px;
+
+  color:#62778d;
+  font-size:.55rem;
+  letter-spacing:.25em;
+}
+
+.dot{
+  width:6px;height:6px;
+  border-radius:50%;
+  background:#29dba1;
+  box-shadow:0 0 9px #29dba1;
+}
+
+
+/* =========================
+   ZUSTÄNDE
+========================= */
+
+.johann.active{
+  filter:
+    drop-shadow(0 0 35px rgba(55,205,255,.95))
+    drop-shadow(0 0 100px rgba(0,100,255,.55));
+}
+
+.johann.active .core{
+  animation:awake .7s ease-in-out infinite alternate;
+}
+
+.johann.active .arc{
+  animation-duration:2.8s;
+}
+
+.johann.holding .core{
+  box-shadow:
+    0 0 15px white,
+    0 0 35px #83eaff,
+    0 0 80px #0095ff,
+    0 0 140px #006cff;
+}
+
+.johann.holding .inner{
+  transform:scale(1.08);
+}
+
+
+/* =========================
+   ANIMATION
+========================= */
+
+@keyframes spin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+
+@keyframes spinBack{
+  from{transform:rotate(360deg)}
+  to{transform:rotate(0deg)}
+}
+
+@keyframes spinTilt{
+  from{transform:rotate(28deg)}
+  to{transform:rotate(388deg)}
+}
+
+@keyframes coreBreath{
+  0%,100%{transform:scale(.86);filter:brightness(.9)}
+  50%{transform:scale(1.12);filter:brightness(1.3)}
+}
+
+@keyframes awake{
+  from{transform:scale(.95)}
+  to{transform:scale(1.35)}
+}
+
+@keyframes innerBreath{
+  0%,100%{transform:scale(.96);opacity:.68}
+  50%{transform:scale(1.04);opacity:1}
+}
+
+@keyframes aura{
+  0%,100%{transform:scale(.92);opacity:.45}
+  50%{transform:scale(1.08);opacity:1}
+}
+
+@keyframes roomBreath{
+  0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.9)}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}
+}
+
+@keyframes reflection{
+  0%,100%{opacity:.38;transform:translateX(-50%) scaleX(.85)}
+  50%{opacity:.72;transform:translateX(-50%) scaleX(1.08)}
+}
+
+@keyframes particle1{
+  0%,100%{transform:translate(0,0);opacity:.2}
+  50%{transform:translate(18px,-25px);opacity:1}
+}
+
+@keyframes particle2{
+  0%,100%{transform:translate(0,0);opacity:.25}
+  50%{transform:translate(-28px,-12px);opacity:.9}
+}
+
+@keyframes particle3{
+  0%,100%{transform:translate(0,0);opacity:.25}
+  50%{transform:translate(12px,30px);opacity:1}
+}
+
+
+/* kleine Displays */
+
+@media(max-height:700px){
+  .brand{top:20px}
+  .stage{width:min(58vw,285px);top:47%}
+  .response{top:69%}
+  .reflection{top:64%}
+}
+</style>
 </head>
 
 <body>
 
-  <main class="page">
+<main class="room" id="room">
 
-    <div class="grid"></div>
-    <div class="glow"></div>
+  <div class="ceiling"></div>
+  <div class="wall-line"></div>
+  <div class="floor"></div>
+  <div class="room-light"></div>
 
-    <header class="brand">
-      <h1>JOHANN</h1>
-      <p>KI MIT HERZ</p>
-    </header>
+  <header class="brand">
+    <h1>JOH<span class="a">A</span>NN</h1>
+    <p>KI MIT HERZ</p>
+  </header>
 
-    <section class="eye-area">
-      <div class="eye-aura"></div>
-      <div class="eye"></div>
-    </section>
+  <div class="reflection"></div>
 
-    <section class="status">
+  <section class="stage" id="stage">
 
-      <div class="online">
-        <span class="dot"></span>
-        System online
-      </div>
+    <div class="johann" id="johann">
 
-      <div class="message">
-        Ich bin da.
-      </div>
+      <div class="aura"></div>
 
-      <div class="subline">
-        Ein persönlicher Assistent entsteht.
-      </div>
+      <div class="arc a1"></div>
+      <div class="arc a2"></div>
+      <div class="arc a3"></div>
+      <div class="arc a4"></div>
+      <div class="arc a5"></div>
 
-    </section>
+      <div class="inner"></div>
+      <div class="core"></div>
 
-    <footer class="footer">
-      JOHANN · 2026
-    </footer>
+      <i class="particle p1"></i>
+      <i class="particle p2"></i>
+      <i class="particle p3"></i>
+      <i class="particle p4"></i>
+      <i class="particle p5"></i>
+      <i class="particle p6"></i>
 
-  </main>
+    </div>
+
+  </section>
+
+  <section class="response">
+    <div id="message">Ich bin da.</div>
+    <div class="sub">Dein digitaler Butler</div>
+  </section>
+
+  <div class="online">
+    <span class="dot"></span>
+    JOHANN ONLINE
+  </div>
+
+</main>
+
+
+<script>
+const stage = document.getElementById("stage");
+const johann = document.getElementById("johann");
+const message = document.getElementById("message");
+
+let holdTimer = null;
+let holding = false;
+let startX = 0;
+let startY = 0;
+
+function positionEnergy(clientX, clientY) {
+  const rect = stage.getBoundingClientRect();
+
+  const x = clientX - (rect.left + rect.width / 2);
+  const y = clientY - (rect.top + rect.height / 2);
+
+  const moveX = Math.max(-14, Math.min(14, x * 0.09));
+  const moveY = Math.max(-14, Math.min(14, y * 0.09));
+
+  johann.style.setProperty("--x", moveX + "px");
+  johann.style.setProperty("--y", moveY + "px");
+}
+
+function wakeUp() {
+  johann.classList.add("active");
+  message.textContent = "Ja?";
+}
+
+function sleep() {
+  johann.classList.remove("active", "holding");
+
+  johann.style.setProperty("--x", "0px");
+  johann.style.setProperty("--y", "0px");
+  johann.style.setProperty("--energy", "1");
+
+  setTimeout(() => {
+    message.textContent = "Ich bin da.";
+  }, 900);
+}
+
+stage.addEventListener("pointerdown", (event) => {
+
+  startX = event.clientX;
+  startY = event.clientY;
+
+  wakeUp();
+  positionEnergy(event.clientX, event.clientY);
+
+  stage.setPointerCapture(event.pointerId);
+
+  holdTimer = setTimeout(() => {
+
+    holding = true;
+
+    johann.classList.add("holding");
+    johann.style.setProperty("--energy", "1.07");
+
+    message.textContent = "Ich höre dir zu.";
+
+  }, 550);
+
+});
+
+stage.addEventListener("pointermove", (event) => {
+
+  if (event.buttons || holding) {
+    positionEnergy(event.clientX, event.clientY);
+  }
+
+});
+
+stage.addEventListener("pointerup", (event) => {
+
+  clearTimeout(holdTimer);
+
+  if (!holding) {
+
+    const distance =
+      Math.hypot(
+        event.clientX - startX,
+        event.clientY - startY
+      );
+
+    if (distance < 18) {
+      message.textContent = "Ja?";
+    }
+
+  }
+
+  holding = false;
+
+  setTimeout(sleep, 650);
+
+});
+
+stage.addEventListener("pointercancel", () => {
+
+  clearTimeout(holdTimer);
+  holding = false;
+  sleep();
+
+});
+</script>
 
 </body>
 </html>
