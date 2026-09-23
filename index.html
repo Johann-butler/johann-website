@@ -1,675 +1,985 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#020711">
-<title>JOHANN — KI mit Herz</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#02060d">
+<title>JOHANN · KI MIT HERZ</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden}
-
 :root{
-  --x:0px;
-  --y:0px;
-  --energy:1;
-  --blue:#078cff;
-  --cyan:#67ddff;
+  --blue:#078dff;
+  --cyan:#55d9ff;
+  --white:#edf7ff;
+  --muted:#8da2b8;
+}
+
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#01040a;
+  color:var(--white);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
 body{
-  background:#02050b;
-  color:#eef8ff;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
   user-select:none;
   -webkit-user-select:none;
-  touch-action:none;
+  overscroll-behavior:none;
 }
 
-/* =========================
-   DER RAUM
-========================= */
+/* ---------- RAUM ---------- */
 
 .room{
-  position:relative;
-  width:100%;
-  height:100dvh;
+  position:fixed;
+  inset:0;
   overflow:hidden;
-
   background:
-    radial-gradient(ellipse at 50% 48%,
-      rgba(0,105,220,.18) 0%,
-      rgba(0,50,120,.07) 30%,
-      transparent 58%),
-    linear-gradient(#06101d 0%,#02060c 67%,#010308 100%);
+    radial-gradient(ellipse at 50% 48%,rgba(0,76,160,.16),transparent 38%),
+    linear-gradient(180deg,#020914 0%,#020811 58%,#01040a 100%);
 }
 
-.ceiling{
+/* linke dunkle Wand / Pflanzenecke */
+.left-wall{
   position:absolute;
-  inset:0 0 42% 0;
-  opacity:.42;
+  inset:0 67% 0 0;
   background:
-    linear-gradient(90deg,
-      transparent 0 11%,
-      rgba(40,115,180,.12) 11.2% 11.5%,
-      transparent 11.7% 30%,
-      rgba(40,115,180,.12) 30.2% 30.5%,
-      transparent 30.7% 69%,
-      rgba(40,115,180,.12) 69.2% 69.5%,
-      transparent 69.7% 88%,
-      rgba(40,115,180,.12) 88.2% 88.5%,
-      transparent 88.7%),
-    linear-gradient(
-      rgba(80,145,200,.09) 1px,
-      transparent 1px);
-  background-size:auto,100% 76px;
+    linear-gradient(90deg,rgba(0,0,0,.7),rgba(3,10,19,.15));
 }
 
-.wall-line{
+.plant{
   position:absolute;
-  left:4%;
-  right:4%;
-  top:19%;
-  height:1px;
-  background:linear-gradient(90deg,
-    transparent,
-    rgba(70,155,225,.25),
-    transparent);
-  box-shadow:0 0 12px rgba(0,120,255,.16);
+  left:-3vw;
+  bottom:21vh;
+  width:30vw;
+  height:34vh;
+  opacity:.25;
+  filter:blur(5px);
 }
 
+.plant::before,
+.plant::after{
+  content:"";
+  position:absolute;
+  left:32%;
+  bottom:0;
+  width:25%;
+  height:38%;
+  background:linear-gradient(90deg,#061008,#102518,#050b07);
+  clip-path:polygon(20% 0,80% 0,100% 100%,0 100%);
+}
+
+.leaf{
+  position:absolute;
+  left:40%;
+  bottom:30%;
+  width:38%;
+  height:12%;
+  border-radius:100% 0 100% 0;
+  background:#15301d;
+  transform-origin:left center;
+}
+
+.leaf:nth-child(1){transform:rotate(-58deg) translateX(-40px)}
+.leaf:nth-child(2){transform:rotate(-25deg) translateX(-30px)}
+.leaf:nth-child(3){transform:rotate(18deg)}
+.leaf:nth-child(4){transform:rotate(52deg)}
+.leaf:nth-child(5){bottom:46%;transform:rotate(-42deg)}
+.leaf:nth-child(6){bottom:53%;transform:rotate(34deg)}
+
+/* Fenster rechts */
+.window{
+  position:absolute;
+  right:-2%;
+  top:0;
+  width:34%;
+  height:71%;
+  border-left:2px solid rgba(63,126,180,.11);
+  background:
+    linear-gradient(90deg,rgba(5,16,30,.7),rgba(5,20,38,.28)),
+    radial-gradient(circle at 60% 52%,rgba(15,76,130,.20),transparent 45%);
+  filter:blur(.2px);
+}
+
+.window::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg,transparent 48%,rgba(72,130,180,.11) 49%,rgba(72,130,180,.11) 50%,transparent 51%),
+    linear-gradient(180deg,transparent 48%,rgba(72,130,180,.08) 49%,rgba(72,130,180,.08) 50%,transparent 51%);
+}
+
+.city{
+  position:absolute;
+  right:0;
+  bottom:28%;
+  width:35%;
+  height:22%;
+  opacity:.20;
+  filter:blur(5px);
+  background:
+    radial-gradient(circle at 8% 72%,#ffd891 0 2px,transparent 3px),
+    radial-gradient(circle at 22% 54%,#8bc9ff 0 2px,transparent 3px),
+    radial-gradient(circle at 36% 80%,#ffd891 0 2px,transparent 3px),
+    radial-gradient(circle at 54% 63%,#a8d8ff 0 2px,transparent 3px),
+    radial-gradient(circle at 70% 76%,#ffd891 0 2px,transparent 3px),
+    radial-gradient(circle at 87% 50%,#7cc6ff 0 2px,transparent 3px);
+}
+
+/* Boden wie im Referenzbild – keine Tron-Kacheln */
 .floor{
   position:absolute;
-  left:-35%;
-  width:170%;
-  height:52%;
-  bottom:-16%;
-  transform:perspective(520px) rotateX(61deg);
-  transform-origin:center top;
-
+  left:0;
+  right:0;
+  bottom:0;
+  height:36%;
   background:
-    linear-gradient(rgba(34,110,180,.10) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(34,110,180,.10) 1px,transparent 1px),
-    radial-gradient(ellipse at 50% 4%,
-      rgba(0,120,255,.16),
-      transparent 45%);
-
-  background-size:75px 75px,75px 75px,auto;
-  border-top:1px solid rgba(50,145,220,.18);
+    radial-gradient(ellipse at 50% 0%,rgba(0,107,220,.15),transparent 46%),
+    linear-gradient(180deg,rgba(3,11,20,.55),#01040a 78%);
+  border-top:1px solid rgba(45,119,185,.09);
 }
 
-.room-light{
+.floor::after{
+  content:"";
   position:absolute;
-  left:50%;
-  top:49%;
-  width:520px;
-  height:520px;
-  transform:translate(-50%,-50%);
-  border-radius:50%;
-
-  background:radial-gradient(circle,
-    rgba(0,125,255,.14),
-    rgba(0,65,170,.06) 40%,
-    transparent 68%);
-
-  filter:blur(40px);
-  animation:roomBreath 5s ease-in-out infinite;
+  left:24%;
+  right:24%;
+  top:-1px;
+  height:78%;
+  background:linear-gradient(180deg,rgba(10,123,255,.12),transparent);
+  clip-path:polygon(35% 0,65% 0,100% 100%,0 100%);
+  filter:blur(24px);
 }
 
+/* ---------- UI ---------- */
 
-/* =========================
-   JOHANN SCHRIFTZUG
-========================= */
+.clock{
+  position:absolute;
+  z-index:20;
+  left:max(5vw,22px);
+  top:max(4vh,env(safe-area-inset-top));
+}
+
+.time{
+  font-size:clamp(42px,8vw,72px);
+  font-weight:200;
+  letter-spacing:.01em;
+  line-height:1;
+}
+
+.date{
+  margin-top:8px;
+  color:#b6c2ce;
+  font-size:clamp(13px,2.2vw,19px);
+  font-weight:300;
+}
+
+.greeting{
+  margin-top:34px;
+  max-width:230px;
+  font-size:clamp(16px,2.6vw,23px);
+  line-height:1.4;
+  font-weight:300;
+}
+
+.greeting::after{
+  content:"";
+  display:block;
+  width:45px;
+  height:2px;
+  margin-top:15px;
+  background:#18a9ff;
+  box-shadow:0 0 10px rgba(0,169,255,.5);
+}
 
 .brand{
   position:absolute;
   z-index:20;
-  top:max(38px,env(safe-area-inset-top));
-  left:0;
-  right:0;
+  top:max(5vh,env(safe-area-inset-top));
+  left:50%;
+  transform:translateX(-50%);
   text-align:center;
-  pointer-events:none;
+  white-space:nowrap;
 }
 
-.brand h1{
-  font-size:clamp(2.7rem,11vw,5.5rem);
-  font-weight:280;
-  letter-spacing:.25em;
-  margin-left:.25em;
-  text-shadow:0 0 30px rgba(0,120,255,.12);
+.logo{
+  font-size:clamp(26px,5vw,48px);
+  font-weight:250;
+  letter-spacing:.32em;
+  margin-left:.32em;
 }
 
-.brand .a{
-  color:#1a9dff;
-  text-shadow:
-    0 0 8px #168cff,
-    0 0 25px rgba(0,145,255,.7);
+.logo .a{
+  color:#159eff;
+  text-shadow:0 0 18px rgba(0,145,255,.65);
 }
 
-.brand p{
+.tagline{
   margin-top:8px;
-  margin-left:.55em;
-  color:#70bfff;
-  font-size:.62rem;
-  letter-spacing:.55em;
+  margin-left:.42em;
+  color:#42aef7;
+  font-size:clamp(8px,1.2vw,12px);
+  letter-spacing:.48em;
 }
 
+.weather{
+  position:absolute;
+  z-index:20;
+  right:max(5vw,22px);
+  top:max(5vh,env(safe-area-inset-top));
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+}
 
-/* =========================
-   JOHANN
-========================= */
+.cloud{
+  width:43px;
+  height:23px;
+  margin-top:9px;
+  border:2px solid #b9d7f5;
+  border-radius:20px;
+  position:relative;
+  opacity:.9;
+}
 
-.stage{
+.cloud::before{
+  content:"";
+  position:absolute;
+  width:19px;
+  height:19px;
+  left:7px;
+  top:-11px;
+  border:2px solid #b9d7f5;
+  border-bottom:0;
+  border-radius:50% 50% 0 0;
+  background:#06101d;
+}
+
+.temp{
+  font-size:clamp(29px,5vw,48px);
+  font-weight:250;
+  line-height:1;
+}
+
+.weatherText{
+  margin-top:5px;
+  color:#c5d0dc;
+  font-size:13px;
+  line-height:1.3;
+}
+
+/* ---------- JOHANN ---------- */
+
+.johann-wrap{
   position:absolute;
   z-index:10;
   left:50%;
   top:49%;
-  transform:translate(-50%,-50%);
-  width:min(78vw,390px);
+  width:min(62vw,620px);
   aspect-ratio:1;
+  transform:translate(-50%,-50%);
+  touch-action:none;
 }
 
-.johann{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  transform:
-    translate(var(--x),var(--y))
-    scale(var(--energy));
-
-  transition:
-    transform .16s ease-out,
-    filter .5s ease;
-
+#energy{
+  width:100%;
+  height:100%;
+  display:block;
   filter:
-    drop-shadow(0 0 22px rgba(0,135,255,.65))
-    drop-shadow(0 0 65px rgba(0,80,255,.28));
+    drop-shadow(0 0 12px rgba(0,132,255,.35))
+    drop-shadow(0 0 36px rgba(0,85,255,.18));
 }
-
-
-/* große Aura */
-
-.aura{
-  position:absolute;
-  width:115%;
-  height:115%;
-  border-radius:50%;
-
-  background:radial-gradient(circle,
-    transparent 35%,
-    rgba(0,140,255,.10) 53%,
-    transparent 72%);
-
-  filter:blur(17px);
-  animation:aura 4.5s ease-in-out infinite;
-}
-
-
-/* unregelmäßige Energiebahnen */
-
-.arc{
-  position:absolute;
-  border-radius:50%;
-  border-style:solid;
-  border-color:
-    rgba(75,205,255,.8)
-    rgba(0,105,255,.10)
-    rgba(0,125,255,.45)
-    rgba(60,195,255,.15);
-
-  box-shadow:
-    0 0 7px rgba(35,175,255,.8),
-    inset 0 0 12px rgba(0,110,255,.25);
-}
-
-.a1{
-  width:91%;height:83%;
-  border-width:2px 1px 1px 2px;
-  animation:spin 12s linear infinite;
-}
-
-.a2{
-  width:76%;height:96%;
-  border-width:1px 2px 2px 1px;
-  animation:spinBack 9s linear infinite;
-}
-
-.a3{
-  width:95%;height:57%;
-  border-width:2px 1px 1px 1px;
-  animation:spin 7.5s linear infinite;
-}
-
-.a4{
-  width:65%;height:88%;
-  border-width:1px 1px 2px 2px;
-  animation:spinBack 14s linear infinite;
-}
-
-.a5{
-  width:86%;height:70%;
-  border-width:1px 2px 1px 1px;
-  animation:spinTilt 10s linear infinite;
-}
-
-
-/* inneres Energiefeld */
-
-.inner{
-  position:absolute;
-  width:57%;
-  height:57%;
-  border-radius:50%;
-
-  background:
-    radial-gradient(circle,
-      rgba(80,210,255,.12),
-      rgba(0,90,220,.06) 48%,
-      transparent 70%);
-
-  border:1px solid rgba(90,210,255,.55);
-
-  box-shadow:
-    0 0 14px rgba(50,200,255,.7),
-    0 0 38px rgba(0,120,255,.4),
-    inset 0 0 30px rgba(0,135,255,.28);
-
-  animation:innerBreath 3.7s ease-in-out infinite;
-}
-
-
-/* Kern */
-
-.core{
-  position:absolute;
-  width:15%;
-  height:15%;
-  border-radius:50%;
-
-  background:radial-gradient(circle,
-    #fff 0 7%,
-    #d8f9ff 8% 13%,
-    #78e4ff 18%,
-    #16aaff 36%,
-    #006cff 58%,
-    rgba(0,80,255,.18) 72%,
-    transparent 76%);
-
-  box-shadow:
-    0 0 9px #fff,
-    0 0 20px #65e1ff,
-    0 0 45px #008cff,
-    0 0 85px rgba(0,100,255,.9);
-
-  animation:coreBreath 2.8s ease-in-out infinite;
-}
-
-
-/* Partikel */
-
-.particle{
-  position:absolute;
-  width:3px;
-  height:3px;
-  border-radius:50%;
-  background:#a9edff;
-  box-shadow:0 0 7px #37c7ff;
-  opacity:.75;
-}
-
-.p1{left:8%;top:35%;animation:particle1 5s ease-in-out infinite}
-.p2{left:22%;top:74%;animation:particle2 7s ease-in-out infinite}
-.p3{left:73%;top:19%;animation:particle3 6s ease-in-out infinite}
-.p4{left:89%;top:56%;animation:particle1 8s ease-in-out infinite reverse}
-.p5{left:59%;top:91%;animation:particle2 5.5s ease-in-out infinite reverse}
-.p6{left:35%;top:9%;animation:particle3 7.5s ease-in-out infinite}
-
-
-/* Bodenreflexion */
 
 .reflection{
   position:absolute;
-  z-index:4;
+  z-index:7;
   left:50%;
-  top:68%;
-  width:min(62vw,300px);
-  height:120px;
-  transform:translateX(-50%);
-
-  background:radial-gradient(ellipse,
-    rgba(35,175,255,.35),
-    rgba(0,90,255,.13) 35%,
-    transparent 68%);
-
-  filter:blur(17px);
-  opacity:.65;
-  animation:reflection 3.5s ease-in-out infinite;
-}
-
-
-/* =========================
-   TEXT / STATUS
-========================= */
-
-.response{
-  position:absolute;
-  z-index:20;
-  left:20px;
-  right:20px;
   top:72%;
-  text-align:center;
-  pointer-events:none;
+  width:min(48vw,470px);
+  height:12vh;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse,
+      rgba(49,183,255,.30) 0%,
+      rgba(0,107,255,.12) 25%,
+      rgba(0,64,150,.04) 47%,
+      transparent 70%);
+  filter:blur(15px);
+  opacity:.7;
+  animation:reflect 4s ease-in-out infinite;
 }
 
-#message{
-  font-size:clamp(1.15rem,4.8vw,1.55rem);
-  font-weight:300;
-  letter-spacing:.06em;
-  min-height:32px;
-  transition:opacity .25s ease;
+.floor-point{
+  position:absolute;
+  z-index:8;
+  left:50%;
+  top:70.8%;
+  width:5px;
+  height:5px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:#bdf7ff;
+  box-shadow:
+    0 0 8px #fff,
+    0 0 22px #21bfff,
+    0 0 60px #007fff;
 }
 
-.sub{
-  margin-top:12px;
-  color:#667c93;
-  font-size:.60rem;
-  letter-spacing:.28em;
-  text-transform:uppercase;
-}
+/* ---------- UNTEN ---------- */
 
-.online{
+.motto{
   position:absolute;
   z-index:20;
-  bottom:max(24px,env(safe-area-inset-bottom));
   left:0;
   right:0;
+  bottom:11.5vh;
+  text-align:center;
+  color:#72869b;
+  font-size:clamp(8px,1.1vw,12px);
+  letter-spacing:.36em;
+}
 
+.motto span{color:#27aaff}
+
+.command{
+  position:absolute;
+  z-index:30;
+  left:4vw;
+  right:4vw;
+  bottom:max(3vh,env(safe-area-inset-bottom));
   display:flex;
-  justify-content:center;
+  align-items:center;
+  gap:14px;
+}
+
+.mic,
+.more{
+  flex:0 0 52px;
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  border:1px solid rgba(16,153,255,.58);
+  background:rgba(1,12,25,.56);
+  box-shadow:inset 0 0 20px rgba(0,91,180,.08);
+  color:#1caaff;
+  display:grid;
+  place-items:center;
+  font-size:23px;
+  backdrop-filter:blur(12px);
+}
+
+.input{
+  flex:1;
+  height:52px;
+  border-radius:28px;
+  border:1px solid rgba(20,126,215,.43);
+  background:rgba(1,9,20,.48);
+  color:#8fa5ba;
+  display:flex;
+  align-items:center;
+  padding:0 22px;
+  font-size:14px;
+  font-weight:300;
+  backdrop-filter:blur(14px);
+  box-shadow:
+    inset 0 0 25px rgba(0,91,180,.06),
+    0 0 22px rgba(0,72,150,.04);
+}
+
+.status{
+  display:flex;
   align-items:center;
   gap:9px;
-
-  color:#62778d;
-  font-size:.55rem;
-  letter-spacing:.25em;
+  white-space:nowrap;
+  margin-left:8px;
+  color:#d2dae2;
+  font-size:9px;
+  letter-spacing:.28em;
 }
 
-.dot{
-  width:6px;height:6px;
+.green{
+  width:10px;
+  height:10px;
   border-radius:50%;
-  background:#29dba1;
-  box-shadow:0 0 9px #29dba1;
+  background:#00e99a;
+  box-shadow:0 0 13px #00e99a;
 }
 
-
-/* =========================
-   ZUSTÄNDE
-========================= */
-
-.johann.active{
-  filter:
-    drop-shadow(0 0 35px rgba(55,205,255,.95))
-    drop-shadow(0 0 100px rgba(0,100,255,.55));
+@keyframes reflect{
+  0%,100%{opacity:.48;transform:translateX(-50%) scaleX(.88)}
+  50%{opacity:.76;transform:translateX(-50%) scaleX(1.05)}
 }
 
-.johann.active .core{
-  animation:awake .7s ease-in-out infinite alternate;
+/* ---------- HANDY ---------- */
+
+@media(max-width:700px){
+  .clock{
+    top:max(3.3vh,env(safe-area-inset-top));
+  }
+
+  .time{font-size:34px}
+  .date{font-size:11px}
+
+  .greeting{
+    margin-top:20px;
+    font-size:13px;
+    max-width:125px;
+  }
+
+  .brand{
+    top:max(4vh,env(safe-area-inset-top));
+  }
+
+  .logo{font-size:24px}
+  .tagline{font-size:7px}
+
+  .weather{
+    top:max(4vh,env(safe-area-inset-top));
+    gap:7px;
+  }
+
+  .cloud{
+    transform:scale(.7);
+    transform-origin:right top;
+  }
+
+  .temp{font-size:25px}
+  .weatherText{font-size:9px}
+
+  .johann-wrap{
+    top:47%;
+    width:min(91vw,470px);
+  }
+
+  .reflection{
+    top:66%;
+    width:70vw;
+  }
+
+  .floor-point{top:65.5%}
+
+  .motto{
+    bottom:12.5vh;
+    font-size:7px;
+  }
+
+  .command{
+    left:14px;
+    right:14px;
+  }
+
+  .mic,.more{
+    width:45px;
+    height:45px;
+    flex-basis:45px;
+  }
+
+  .input{
+    height:45px;
+    font-size:11px;
+    padding:0 15px;
+  }
+
+  .status{
+    display:none;
+  }
 }
 
-.johann.active .arc{
-  animation-duration:2.8s;
-}
-
-.johann.holding .core{
-  box-shadow:
-    0 0 15px white,
-    0 0 35px #83eaff,
-    0 0 80px #0095ff,
-    0 0 140px #006cff;
-}
-
-.johann.holding .inner{
-  transform:scale(1.08);
-}
-
-
-/* =========================
-   ANIMATION
-========================= */
-
-@keyframes spin{
-  from{transform:rotate(0deg)}
-  to{transform:rotate(360deg)}
-}
-
-@keyframes spinBack{
-  from{transform:rotate(360deg)}
-  to{transform:rotate(0deg)}
-}
-
-@keyframes spinTilt{
-  from{transform:rotate(28deg)}
-  to{transform:rotate(388deg)}
-}
-
-@keyframes coreBreath{
-  0%,100%{transform:scale(.86);filter:brightness(.9)}
-  50%{transform:scale(1.12);filter:brightness(1.3)}
-}
-
-@keyframes awake{
-  from{transform:scale(.95)}
-  to{transform:scale(1.35)}
-}
-
-@keyframes innerBreath{
-  0%,100%{transform:scale(.96);opacity:.68}
-  50%{transform:scale(1.04);opacity:1}
-}
-
-@keyframes aura{
-  0%,100%{transform:scale(.92);opacity:.45}
-  50%{transform:scale(1.08);opacity:1}
-}
-
-@keyframes roomBreath{
-  0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.9)}
-  50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}
-}
-
-@keyframes reflection{
-  0%,100%{opacity:.38;transform:translateX(-50%) scaleX(.85)}
-  50%{opacity:.72;transform:translateX(-50%) scaleX(1.08)}
-}
-
-@keyframes particle1{
-  0%,100%{transform:translate(0,0);opacity:.2}
-  50%{transform:translate(18px,-25px);opacity:1}
-}
-
-@keyframes particle2{
-  0%,100%{transform:translate(0,0);opacity:.25}
-  50%{transform:translate(-28px,-12px);opacity:.9}
-}
-
-@keyframes particle3{
-  0%,100%{transform:translate(0,0);opacity:.25}
-  50%{transform:translate(12px,30px);opacity:1}
-}
-
-
-/* kleine Displays */
-
-@media(max-height:700px){
-  .brand{top:20px}
-  .stage{width:min(58vw,285px);top:47%}
-  .response{top:69%}
-  .reflection{top:64%}
+@media(max-height:720px){
+  .greeting{display:none}
+  .johann-wrap{width:min(68vh,88vw)}
+  .motto{display:none}
 }
 </style>
 </head>
 
 <body>
 
-<main class="room" id="room">
+<main class="room">
 
-  <div class="ceiling"></div>
-  <div class="wall-line"></div>
+  <div class="left-wall"></div>
+
+  <div class="plant">
+    <i class="leaf"></i><i class="leaf"></i><i class="leaf"></i>
+    <i class="leaf"></i><i class="leaf"></i><i class="leaf"></i>
+  </div>
+
+  <div class="window"></div>
+  <div class="city"></div>
   <div class="floor"></div>
-  <div class="room-light"></div>
+
+  <section class="clock">
+    <div class="time" id="time">19:24</div>
+    <div class="date" id="date">Mi, 22. Januar 2025</div>
+    <div class="greeting">„Schön, dass<br>du da bist, Björn.“</div>
+  </section>
 
   <header class="brand">
-    <h1>JOH<span class="a">A</span>NN</h1>
-    <p>KI MIT HERZ</p>
+    <div class="logo">JOH<span class="a">A</span>NN</div>
+    <div class="tagline">KI MIT HERZ</div>
   </header>
 
-  <div class="reflection"></div>
-
-  <section class="stage" id="stage">
-
-    <div class="johann" id="johann">
-
-      <div class="aura"></div>
-
-      <div class="arc a1"></div>
-      <div class="arc a2"></div>
-      <div class="arc a3"></div>
-      <div class="arc a4"></div>
-      <div class="arc a5"></div>
-
-      <div class="inner"></div>
-      <div class="core"></div>
-
-      <i class="particle p1"></i>
-      <i class="particle p2"></i>
-      <i class="particle p3"></i>
-      <i class="particle p4"></i>
-      <i class="particle p5"></i>
-      <i class="particle p6"></i>
-
+  <section class="weather">
+    <div class="cloud"></div>
+    <div>
+      <div class="temp">4°</div>
+      <div class="weatherText">Bochum<br>Bewölkt</div>
     </div>
-
   </section>
 
-  <section class="response">
-    <div id="message">Ich bin da.</div>
-    <div class="sub">Dein digitaler Butler</div>
-  </section>
-
-  <div class="online">
-    <span class="dot"></span>
-    JOHANN ONLINE
+  <div class="johann-wrap" id="touchArea">
+    <canvas id="energy"></canvas>
   </div>
+
+  <div class="reflection"></div>
+  <div class="floor-point"></div>
+
+  <div class="motto">
+    <span>ZUHAUSE.</span> INTELLIGENTER. GEMEINSAM.
+  </div>
+
+  <section class="command">
+    <button class="mic" aria-label="Johann aktivieren">◉</button>
+    <div class="input" id="message">Sag einfach, was du brauchst ...</div>
+    <button class="more" aria-label="Mehr">•••</button>
+    <div class="status">ALLES GUT <i class="green"></i></div>
+  </section>
 
 </main>
 
-
 <script>
-const stage = document.getElementById("stage");
-const johann = document.getElementById("johann");
+/* ==========================================================
+   UHR
+========================================================== */
+
+function updateClock(){
+  const now = new Date();
+
+  document.getElementById("time").textContent =
+    now.toLocaleTimeString("de-DE",{
+      hour:"2-digit",
+      minute:"2-digit"
+    });
+
+  document.getElementById("date").textContent =
+    now.toLocaleDateString("de-DE",{
+      weekday:"short",
+      day:"2-digit",
+      month:"long",
+      year:"numeric"
+    });
+}
+
+updateClock();
+setInterval(updateClock,1000);
+
+
+/* ==========================================================
+   JOHANN CANVAS
+========================================================== */
+
+const canvas = document.getElementById("energy");
+const ctx = canvas.getContext("2d");
+const touchArea = document.getElementById("touchArea");
 const message = document.getElementById("message");
 
-let holdTimer = null;
-let holding = false;
-let startX = 0;
-let startY = 0;
+let W=0,H=0,cx=0,cy=0;
+let dpr=Math.min(window.devicePixelRatio || 1,2);
 
-function positionEnergy(clientX, clientY) {
-  const rect = stage.getBoundingClientRect();
+let pointerX=0;
+let pointerY=0;
+let targetX=0;
+let targetY=0;
 
-  const x = clientX - (rect.left + rect.width / 2);
-  const y = clientY - (rect.top + rect.height / 2);
+let energy=0;
+let targetEnergy=0;
 
-  const moveX = Math.max(-14, Math.min(14, x * 0.09));
-  const moveY = Math.max(-14, Math.min(14, y * 0.09));
+let touching=false;
+let holding=false;
+let holdTimer=null;
 
-  johann.style.setProperty("--x", moveX + "px");
-  johann.style.setProperty("--y", moveY + "px");
+const stars=[];
+const trails=[];
+
+
+/* ---------- GRÖSSE ---------- */
+
+function resize(){
+  const rect=canvas.getBoundingClientRect();
+
+  W=rect.width;
+  H=rect.height;
+
+  canvas.width=W*dpr;
+  canvas.height=H*dpr;
+
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  cx=W/2;
+  cy=H/2;
+
+  createParticles();
 }
 
-function wakeUp() {
-  johann.classList.add("active");
-  message.textContent = "Ja?";
+window.addEventListener("resize",resize);
+
+
+/* ---------- PARTIKEL ---------- */
+
+function createParticles(){
+  stars.length=0;
+
+  const count=Math.max(90,Math.floor(W*.32));
+
+  for(let i=0;i<count;i++){
+    const angle=Math.random()*Math.PI*2;
+    const radius=W*(.17+Math.random()*.29);
+
+    stars.push({
+      angle,
+      radius,
+      speed:(Math.random()*.0016+.00025)*
+        (Math.random()>.5?1:-1),
+
+      size:Math.random()*1.35+.25,
+      alpha:Math.random()*.75+.15,
+      wobble:Math.random()*Math.PI*2
+    });
+  }
+
+  trails.length=0;
+
+  for(let i=0;i<18;i++){
+    trails.push({
+      radius:W*(.25+Math.random()*.14),
+      squash:.48+Math.random()*.42,
+      rotation:Math.random()*Math.PI,
+      speed:(.00018+Math.random()*.00055)*
+        (Math.random()>.5?1:-1),
+      width:.35+Math.random()*1.1,
+      alpha:.12+Math.random()*.34,
+      phase:Math.random()*Math.PI*2,
+      length:.7+Math.random()*2.5
+    });
+  }
 }
 
-function sleep() {
-  johann.classList.remove("active", "holding");
 
-  johann.style.setProperty("--x", "0px");
-  johann.style.setProperty("--y", "0px");
-  johann.style.setProperty("--energy", "1");
+/* ---------- ENERGIEBAHN ---------- */
 
-  setTimeout(() => {
-    message.textContent = "Ich bin da.";
-  }, 900);
+function drawTrail(t,time){
+
+  const rotation=t.rotation+time*t.speed;
+
+  ctx.save();
+
+  ctx.translate(
+    cx+pointerX*.18,
+    cy+pointerY*.18
+  );
+
+  ctx.rotate(rotation);
+  ctx.scale(1,t.squash);
+
+  ctx.beginPath();
+
+  const start=t.phase+Math.sin(time*.0003+t.phase)*.3;
+
+  ctx.arc(
+    0,0,
+    t.radius*(1+energy*.025),
+    start,
+    start+t.length
+  );
+
+  const glow=
+    t.alpha+
+    energy*.15;
+
+  ctx.strokeStyle=`rgba(38,161,255,${glow})`;
+  ctx.lineWidth=t.width*(1+energy*.5);
+
+  ctx.shadowColor="rgba(0,139,255,.85)";
+  ctx.shadowBlur=5+energy*11;
+
+  ctx.stroke();
+
+  ctx.restore();
 }
 
-stage.addEventListener("pointerdown", (event) => {
 
-  startX = event.clientX;
-  startY = event.clientY;
+/* ---------- ZENTRUM ---------- */
 
-  wakeUp();
-  positionEnergy(event.clientX, event.clientY);
+function drawCore(time){
 
-  stage.setPointerCapture(event.pointerId);
+  const pulse=
+    1+
+    Math.sin(time*.0023)*.045+
+    energy*.18;
 
-  holdTimer = setTimeout(() => {
+  const x=cx+pointerX*.38;
+  const y=cy+pointerY*.38;
 
-    holding = true;
+  const halo=ctx.createRadialGradient(
+    x,y,0,
+    x,y,W*.22*pulse
+  );
 
-    johann.classList.add("holding");
-    johann.style.setProperty("--energy", "1.07");
+  halo.addColorStop(0,
+    `rgba(215,250,255,${.90+energy*.1})`);
 
-    message.textContent = "Ich höre dir zu.";
+  halo.addColorStop(.025,
+    "rgba(110,225,255,.96)");
 
-  }, 550);
+  halo.addColorStop(.08,
+    "rgba(0,149,255,.75)");
 
+  halo.addColorStop(.22,
+    "rgba(0,94,255,.20)");
+
+  halo.addColorStop(.55,
+    "rgba(0,65,200,.045)");
+
+  halo.addColorStop(1,
+    "rgba(0,40,140,0)");
+
+  ctx.fillStyle=halo;
+
+  ctx.beginPath();
+  ctx.arc(x,y,W*.22*pulse,0,Math.PI*2);
+  ctx.fill();
+
+
+  /* winziger heller Kern */
+
+  const core=ctx.createRadialGradient(
+    x,y,0,
+    x,y,10+energy*6
+  );
+
+  core.addColorStop(0,"white");
+  core.addColorStop(.15,"#dfffff");
+  core.addColorStop(.38,"#52d9ff");
+  core.addColorStop(.7,"rgba(0,137,255,.65)");
+  core.addColorStop(1,"rgba(0,110,255,0)");
+
+  ctx.fillStyle=core;
+  ctx.beginPath();
+  ctx.arc(x,y,11+energy*7,0,Math.PI*2);
+  ctx.fill();
+}
+
+
+/* ---------- PARTIKEL ---------- */
+
+function drawParticles(time){
+
+  for(const p of stars){
+
+    p.angle+=p.speed*(1+energy*2);
+
+    const wobble=
+      Math.sin(time*.001+p.wobble)*7;
+
+    const x=
+      cx+
+      Math.cos(p.angle)*
+      (p.radius+wobble)+
+      pointerX*.13;
+
+    const y=
+      cy+
+      Math.sin(p.angle)*
+      (p.radius*.72+wobble*.3)+
+      pointerY*.13;
+
+    ctx.beginPath();
+
+    ctx.fillStyle=
+      `rgba(93,199,255,${p.alpha})`;
+
+    ctx.shadowColor="#159fff";
+    ctx.shadowBlur=4;
+
+    ctx.arc(
+      x,y,
+      p.size*(1+energy*.45),
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+  }
+}
+
+
+/* ---------- EIN PAAR HELLE LICHTSTRÖME ---------- */
+
+function drawBrightStreams(time){
+
+  for(let i=0;i<5;i++){
+
+    const rot=
+      time*(.00010+i*.000018)+
+      i*1.21;
+
+    ctx.save();
+    ctx.translate(
+      cx+pointerX*.22,
+      cy+pointerY*.22
+    );
+
+    ctx.rotate(rot);
+
+    ctx.scale(
+      1,
+      .62+i*.035
+    );
+
+    ctx.beginPath();
+
+    const radius=W*(.285+i*.011);
+
+    ctx.arc(
+      0,0,
+      radius,
+      .2+i*.53,
+      1.65+i*.53
+    );
+
+    ctx.strokeStyle=
+      `rgba(65,194,255,${.27+energy*.22})`;
+
+    ctx.lineWidth=
+      .75+energy*.65;
+
+    ctx.shadowColor="#008fff";
+    ctx.shadowBlur=10+energy*10;
+
+    ctx.stroke();
+
+    ctx.restore();
+  }
+}
+
+
+/* ---------- FRAME ---------- */
+
+function animate(time){
+
+  ctx.clearRect(0,0,W,H);
+
+  pointerX+=(targetX-pointerX)*.065;
+  pointerY+=(targetY-pointerY)*.065;
+  energy+=(targetEnergy-energy)*.055;
+
+  ctx.globalCompositeOperation="lighter";
+
+  drawCore(time);
+
+  for(const t of trails){
+    drawTrail(t,time);
+  }
+
+  drawBrightStreams(time);
+  drawParticles(time);
+
+  ctx.globalCompositeOperation="source-over";
+
+  requestAnimationFrame(animate);
+}
+
+
+/* ==========================================================
+   BERÜHRUNG
+========================================================== */
+
+function moveTarget(event){
+
+  const r=touchArea.getBoundingClientRect();
+
+  const px=
+    event.clientX-(r.left+r.width/2);
+
+  const py=
+    event.clientY-(r.top+r.height/2);
+
+  targetX=
+    Math.max(-26,Math.min(26,px*.12));
+
+  targetY=
+    Math.max(-26,Math.min(26,py*.12));
+}
+
+
+touchArea.addEventListener("pointerdown",event=>{
+
+  touching=true;
+  holding=false;
+
+  touchArea.setPointerCapture(event.pointerId);
+
+  moveTarget(event);
+
+  targetEnergy=.75;
+
+  message.textContent="Ja?";
+
+  holdTimer=setTimeout(()=>{
+
+    holding=true;
+    targetEnergy=1.45;
+
+    message.textContent="Ich höre.";
+
+  },550);
 });
 
-stage.addEventListener("pointermove", (event) => {
 
-  if (event.buttons || holding) {
-    positionEnergy(event.clientX, event.clientY);
+touchArea.addEventListener("pointermove",event=>{
+
+  if(touching){
+    moveTarget(event);
   }
 
 });
 
-stage.addEventListener("pointerup", (event) => {
+
+function release(){
 
   clearTimeout(holdTimer);
 
-  if (!holding) {
+  touching=false;
+  holding=false;
 
-    const distance =
-      Math.hypot(
-        event.clientX - startX,
-        event.clientY - startY
-      );
+  targetX=0;
+  targetY=0;
+  targetEnergy=0;
 
-    if (distance < 18) {
-      message.textContent = "Ja?";
+  setTimeout(()=>{
+    if(!touching){
+      message.textContent=
+        "Sag einfach, was du brauchst ...";
     }
+  },850);
+}
 
-  }
 
-  holding = false;
+touchArea.addEventListener("pointerup",release);
+touchArea.addEventListener("pointercancel",release);
 
-  setTimeout(sleep, 650);
 
-});
+/* ---------- START ---------- */
 
-stage.addEventListener("pointercancel", () => {
+resize();
+requestAnimationFrame(animate);
 
-  clearTimeout(holdTimer);
-  holding = false;
-  sleep();
-
-});
 </script>
 
 </body>
