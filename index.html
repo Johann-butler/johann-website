@@ -153,7 +153,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 <div class="slogan"><span>ZUHAUSE.</span> INTELLIGENTER. GEMEINSAM.</div>
 <section class="controls">
 <a class="round support-round" id="johannButton" href="https://www.paypal.me/JohannButler" target="_blank" rel="noopener noreferrer" aria-label="Johanns Kaffeekasse bei PayPal öffnen" title="Johanns Kaffeekasse">☕</a>
-<div class="command-wrap"><input class="command" id="command" type="text" autocomplete="off" enterkeyhint="send" placeholder="Sag einfach, was du brauchst ..." aria-label="Mit Johann sprechen"><button class="send" id="sendButton" aria-label="Senden">➤</button></div>
+<button class="round" id="voiceButton" type="button" aria-label="Sprachaufnahme starten" title="Mit Johann sprechen">🎙️</button><div class="command-wrap"><input class="command" id="command" type="text" autocomplete="off" enterkeyhint="send" placeholder="Sag einfach, was du brauchst ..." aria-label="Mit Johann sprechen"><button class="send" id="sendButton" aria-label="Senden">➤</button></div>
 <button class="round dots" id="moreButton" aria-label="Kommandozentrale öffnen">•••</button>
 </section>
 
@@ -258,7 +258,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
       <p id="analyticsStatus" class="analytics-status" role="status">Die Statistik benötigt noch die Analytics-Erweiterung im Worker.</p>
     </div>
   </section>
-  <section class="panel-section" id="view-status"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Systemstatus</h2><p>🌤️ Wetter: <span id="statusWeather">Wird geprüft</span></p><p>🧠 KI: Über den bestehenden Cloudflare-Worker angebunden</p><p>🧩 Sudoku: Im Browser spielbar</p><p>💾 Sudoku-Spielstände: Auf diesem Gerät</p><p>💙 Wunschbox: Aktiv – Nachrichten werden in D1 gespeichert; E-Mail-Versand über Resend eingerichtet (Zustellung nicht live geprüft)</p><p>🔒 Admin-Gedächtnis: Im Worker aktiv und durch Admin-Schlüssel geschützt; persönliche Benutzerkonten fehlen noch.</p><p>📊 Analytics: Aktiv nach freiwilliger Einwilligung; Admin-Auswertung über das ⓘ-Symbol.</p><p>📚 Johann Kids: Aktiv – Geschichten über den Cloudflare-Worker.</p><p>🏠 Heimserver &amp; Sprachsteuerung: Später</p></div></section>
+  <section class="panel-section" id="view-status"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Systemstatus</h2><p>🌤️ Wetter: <span id="statusWeather">Wird geprüft</span></p><p>🧠 KI: Über den bestehenden Cloudflare-Worker angebunden</p><p>🧩 Sudoku: Im Browser spielbar</p><p>💾 Sudoku-Spielstände: Auf diesem Gerät</p><p>💙 Wunschbox: Aktiv – Nachrichten werden in D1 gespeichert; E-Mail-Versand über Resend eingerichtet (Zustellung nicht live geprüft)</p><p>🔒 Admin-Gedächtnis: Im Worker aktiv und durch Admin-Schlüssel geschützt; persönliche Benutzerkonten fehlen noch.</p><p>📊 Analytics: Aktiv nach freiwilliger Einwilligung; Admin-Auswertung über das ⓘ-Symbol.</p><p>📚 Johann Kids: Aktiv – Geschichten über den Cloudflare-Worker.</p><p>🎙️ Sprachmodus: Mikrofon und KI-Stimme (benötigt V16-Worker). 🏠 Heimserver: Später</p></div></section>
  </div>
 </div>
 
@@ -473,6 +473,7 @@ function showAssistantReply(question,result){
  if(Array.isArray(result.sources)&&result.sources.length){const sources=document.createElement('div');sources.className='mini';sources.textContent='Quellen: ';result.sources.slice(0,5).forEach((item,i)=>{try{const url=new URL(item.url);if(!['https:','http:'].includes(url.protocol))return;const link=document.createElement('a');link.href=url.href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=item.title||url.hostname;sources.append(i?' · ':'',link)}catch{}});block.append(sources)}
  clearTimeout(speechTimer);speech.classList.remove('show');
  chatMessages.prepend(block);while(chatMessages.children.length>6)chatMessages.lastElementChild.remove();chatArchive.classList.add('show');chatArchive.scrollTop=0;
+ if(window.johannVoiceAwaiting){window.johannVoiceAwaiting=false;window.johannSpeakReply?.(reply);}
 }
 const localRead=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}};
 const localWrite=(key,data)=>{try{localStorage.setItem(key,JSON.stringify(data));return true}catch{return false}};
@@ -768,6 +769,67 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
  el('analyticsLock').onclick=()=>{adminKey='';el('analyticsContent').classList.add('hidden');el('analyticsLogin').classList.remove('hidden');status('Gesperrt.')};
  el('analyticsRefresh').onclick=load;el('analyticsPeriod').onchange=load;
  window.johannAnalyticsOpened=()=>{if(adminKey)load()};
+})();
+</script>
+<style>
+#voiceButton{font-size:23px;transition:background .2s,box-shadow .2s}
+#voiceButton.recording{background:#a21c38;color:#fff;border-color:#ff879c;box-shadow:0 0 0 5px #f0456033;animation:voicePulse 1s infinite}
+#voiceButton.busy{opacity:.65}
+@keyframes voicePulse{50%{box-shadow:0 0 0 11px #f0456011}}
+@media(max-width:400px){.controls{gap:7px}.controls .round{width:40px;height:40px;flex-basis:40px}.command{padding-left:12px}}
+</style>
+<script>
+/* V16.1: Sprache nur nach bewusstem Tippen. Keine Hintergrundaufnahme. */
+(()=>{
+ const button=document.getElementById('voiceButton');
+ const url='https://johann-ki.bjornkorczak.workers.dev/';
+ let recorder=null,stream=null,chunks=[],busy=false,player=null;
+ function label(text){button.title=text;button.setAttribute('aria-label',text)}
+ function reset(){button.classList.remove('recording','busy');button.textContent='🎙️';label('Sprachaufnahme starten');busy=false}
+ function stopTracks(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+ function base64ToBlob(base64,type){const bytes=atob(base64),array=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)array[i]=bytes.charCodeAt(i);return new Blob([array],{type})}
+ window.johannSpeakReply=async(text)=>{
+  try{
+   const plain=String(text||'').replace(/https?:\/\/\S+/g,'').replace(/[*#_`]/g,'').slice(0,2200);
+   say('🔊 Johann spricht …',15000);
+   const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'voice_speak',text:plain})});
+   const data=await r.json();if(!r.ok)throw Error(data.error||'Sprachausgabe nicht erreichbar');
+   if(player){player.pause();URL.revokeObjectURL(player.src)}
+   const objectUrl=URL.createObjectURL(base64ToBlob(data.audio,'audio/mpeg'));
+   player=new Audio(objectUrl);player.onended=()=>URL.revokeObjectURL(objectUrl);
+   await player.play();
+  }catch(e){say('Die Textantwort ist da, aber die Sprachausgabe klappt gerade nicht: '+safeText(e.message),8000)}
+ };
+ button.addEventListener('click',async()=>{
+  if(recorder&&recorder.state==='recording'){recorder.stop();button.classList.remove('recording');button.classList.add('busy');button.textContent='⌛';label('Johann verarbeitet deine Aufnahme');return}
+  if(busy)return;
+  if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){say('Dein Browser unterstützt die Aufnahme leider nicht.',7000);return}
+  if(player){player.pause();player=null}
+  busy=true;
+  try{
+   stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+   const types=['audio/mp4','audio/webm;codecs=opus','audio/webm'];
+   const mime=types.find(t=>MediaRecorder.isTypeSupported(t));
+   recorder=new MediaRecorder(stream,mime?{mimeType:mime}:undefined);chunks=[];
+   recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+   recorder.onerror=()=>{stopTracks();reset();say('Aufnahme fehlgeschlagen.',6000)};
+   recorder.onstop=async()=>{
+    stopTracks();
+    const blob=new Blob(chunks,{type:recorder.mimeType||'audio/mp4'});
+    if(blob.size>4*1024*1024){reset();say('Die Aufnahme ist zu lang. Bitte höchstens etwa 20 Sekunden sprechen.',8000);return}
+    try{
+     const form=new FormData();form.append('action','voice_transcribe');form.append('audio',blob,blob.type.includes('webm')?'aufnahme.webm':'aufnahme.mp4');
+     const r=await fetch(url,{method:'POST',body:form});const data=await r.json();if(!r.ok)throw Error(data.error||'Spracherkennung fehlgeschlagen');
+     const heard=String(data.text||'').trim();if(!heard)throw Error('Ich habe nichts verstanden.');
+     document.getElementById('command').value=heard;
+     window.johannVoiceAwaiting=true;
+     reset();submit();
+    }catch(e){window.johannVoiceAwaiting=false;reset();say('Johann konnte dich nicht verstehen: '+safeText(e.message),8000)}
+   };
+   recorder.start();button.classList.add('recording');button.textContent='⏹';label('Aufnahme beenden und an Johann senden');say('Ich höre zu, Meister. Zum Senden erneut auf das Mikrofon tippen.',12000);
+   setTimeout(()=>{if(recorder?.state==='recording')recorder.stop()},20000);
+  }catch(e){stopTracks();reset();say('Mikrofon nicht verfügbar. Bitte Berechtigung prüfen.',7500)}
+ });
 })();
 </script>
 </body>
