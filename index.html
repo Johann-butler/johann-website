@@ -131,6 +131,34 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 .vfl-center{position:absolute;z-index:2;left:50%;top:47%;transform:translate(-50%,-50%);width:min(94vw,720px);text-align:center;text-shadow:0 3px 24px #001c44;animation:vflPop .8s both}.vfl-pretitle{font-size:clamp(12px,3vw,21px);font-weight:700;letter-spacing:.33em;color:#a8ddff}.vfl-number{font-size:clamp(95px,25vw,220px);font-weight:900;line-height:1;letter-spacing:-.09em;padding-right:.09em;color:#fff;filter:drop-shadow(0 0 24px #168cff);animation:vflBeat 1.848s ease-in-out infinite}.vfl-message{font-size:clamp(19px,5vw,38px);font-weight:850;letter-spacing:.12em;color:#e9f7ff}.vfl-sub{margin:18px auto 0;font-size:clamp(12px,3vw,19px);color:#c4e7ff;max-width:80%;line-height:1.5}.vfl-particle{position:absolute;z-index:1;bottom:-12vh;font-size:clamp(22px,6vw,44px);animation:vflRise var(--dur) linear var(--delay) infinite;left:var(--x);opacity:.9;filter:drop-shadow(0 0 8px #258dff)}.vfl-ring{position:absolute;left:50%;top:47%;width:min(88vw,620px);aspect-ratio:1;border:4px solid #7ed3ff;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 30px #278bff,inset 0 0 50px #1a6dbb;animation:vflRing 2.3s ease-out infinite}.vfl-ring:nth-child(2){animation-delay:1.15s}#vflShow .vfl-close{position:absolute;z-index:5;right:18px;top:max(18px,env(safe-area-inset-top));pointer-events:auto;border:1px solid #a3dfff;border-radius:99px;padding:10px 15px;color:white;background:#153e68;font-size:14px}#vflShow.countdown .vfl-number{font-size:clamp(80px,22vw,180px)}#vflShow.countdown .vfl-ring{animation-duration:1s}
 @keyframes vflArrival{from{opacity:0}to{opacity:1}}@keyframes vflPop{from{opacity:0;transform:translate(-50%,-43%) scale(.65)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}@keyframes vflSpin{to{transform:rotate(360deg)}}@keyframes vflBeat{50%{transform:scale(1.055);filter:drop-shadow(0 0 46px #4bbdff)}}@keyframes vflRing{0%{opacity:.8;transform:translate(-50%,-50%) scale(.35)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.55)}}@keyframes vflRise{0%{transform:translateY(0) rotate(0);opacity:0}12%{opacity:1}85%{opacity:1}100%{transform:translateY(-120vh) rotate(600deg);opacity:0}}
 @media(prefers-reduced-motion:reduce){#vflShow *,#vflShow::before,#vflShow::after{animation:none!important}}
+
+
+/* V18 – Johanns diskrete Kaffeepause / Fensterdienst. Keine Bilddateien, keine API. */
+#butlerVisit{position:fixed;left:0;bottom:clamp(110px,21vh,210px);z-index:24;width:116px;height:166px;pointer-events:none;opacity:0;contain:layout style;will-change:transform;transform:translate3d(calc(100vw + 140px),0,0)}
+#butlerVisit.active{opacity:1;animation:butlerJourney 10s linear both}
+#butlerVisit .butlerArt{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 7px #0009)}
+#butlerVisit .legL{transform-origin:54px 120px;animation:butlerLeg .47s ease-in-out infinite alternate}
+#butlerVisit .legR{transform-origin:73px 120px;animation:butlerLeg .47s ease-in-out infinite alternate-reverse}
+#butlerVisit .armL{transform-origin:48px 76px;animation:butlerArm .47s ease-in-out infinite alternate-reverse}
+#butlerVisit .armR{transform-origin:77px 77px;animation:butlerArm .47s ease-in-out infinite alternate}
+#butlerVisit .coffeeArm,#butlerVisit .wipeArm,#butlerVisit .coffeeProps,#butlerVisit .wipeProps{display:none}
+#butlerVisit.coffee .coffeeArm,#butlerVisit.coffee .coffeeProps,#butlerVisit.wipe .wipeArm,#butlerVisit.wipe .wipeProps{display:block}
+#butlerVisit.coffee .armR,#butlerVisit.wipe .armR{display:none}
+#butlerVisit.coffee .coffeeArm{transform-origin:77px 77px;animation:butlerSip 10s ease-in-out both}
+#butlerVisit.wipe .wipeArm{transform-origin:77px 77px;animation:butlerWipe .72s ease-in-out infinite alternate}
+#butlerVisit .steam{animation:butlerSteam 1.6s ease-in-out infinite}
+#butlerVisit .steam.two{animation-delay:.7s}
+#butlerVisit .foam{animation:butlerFoam 1.8s ease-in-out infinite alternate}
+#butlerVisit .visitCaption{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);width:max-content;max-width:min(250px,76vw);padding:8px 12px;margin-bottom:2px;border:1px solid #51b8fa77;border-radius:13px;background:#061525ed;color:#e9f8ff;font-size:12px;line-height:1.4;text-align:center;white-space:normal;box-shadow:0 5px 20px #0008}
+@keyframes butlerJourney{0%{transform:translate3d(calc(100vw + 140px),0,0)}23%{transform:translate3d(calc(53vw - 55px),0,0)}68%{transform:translate3d(calc(53vw - 55px),0,0)}100%{transform:translate3d(-180px,0,0)}}
+@keyframes butlerLeg{to{transform:rotate(19deg)}}
+@keyframes butlerArm{to{transform:rotate(16deg)}}
+@keyframes butlerSip{0%,22%,64%,100%{transform:rotate(0)}36%,53%{transform:rotate(-34deg)}}
+@keyframes butlerWipe{to{transform:rotate(-29deg)}}
+@keyframes butlerSteam{0%{opacity:0;transform:translateY(3px)}45%{opacity:.9}100%{opacity:0;transform:translateY(-9px)}}
+@keyframes butlerFoam{to{opacity:.25}}
+@media(max-width:600px){#butlerVisit{width:84px;height:122px;bottom:clamp(108px,20vh,155px)}#butlerVisit .visitCaption{font-size:11px}}
+@media(prefers-reduced-motion:reduce){#butlerVisit.active{animation:none;opacity:1;transform:translate3d(calc(50vw - 55px),0,0)}#butlerVisit .legL,#butlerVisit .legR,#butlerVisit .armL,#butlerVisit .armR,#butlerVisit .coffeeArm,#butlerVisit .wipeArm,#butlerVisit .steam,#butlerVisit .foam{animation:none!important}}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#061322">
@@ -142,6 +170,35 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 </head>
 <body>
 <div id="vflShow" role="status" aria-live="polite" aria-label="Johanns 18:48 VfL-Spektakel"><div class="vfl-ring"></div><div class="vfl-ring"></div><div class="vfl-center"><div class="vfl-pretitle" id="vflPretitle">DAS REVIER ZÄHLT RUNTER</div><div class="vfl-number" id="vflNumber">18:48</div><div class="vfl-message" id="vflMessage">BOCHUM. HEIMAT. VfL.</div><div class="vfl-sub" id="vflSub">Blau und Weiß – ein Leben lang. 💙🤍</div></div><div id="vflParticles"></div><button type="button" class="vfl-close" id="vflClose" aria-label="Animation schließen">Schließen ×</button></div>
+
+<!-- V18: Leichter SVG-Butler, erscheint nur alle zwei Stunden bei geöffneter Seite. -->
+<div id="butlerVisit" aria-hidden="true">
+  <div class="visitCaption" id="butlerCaption"></div>
+  <svg class="butlerArt" viewBox="0 0 120 166" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <ellipse cx="63" cy="158" rx="30" ry="5" fill="#020916" opacity=".55"/>
+    <g class="legL"><path d="M52 116L49 146" stroke="#0a1b30" stroke-width="12" stroke-linecap="round"/><path d="M47 145l-8 6h23" stroke="#10151d" stroke-width="9" stroke-linecap="round"/></g>
+    <g class="legR"><path d="M73 116L76 146" stroke="#0a1b30" stroke-width="12" stroke-linecap="round"/><path d="M74 145l-6 6h23" stroke="#10151d" stroke-width="9" stroke-linecap="round"/></g>
+    <g class="armL"><path d="M48 77L34 100" stroke="#103b65" stroke-width="13" stroke-linecap="round"/><circle cx="34" cy="100" r="6" fill="#e7b58e"/></g>
+    <path d="M48 67Q61 61 77 68L84 120Q61 129 41 119Z" fill="#102b4c" stroke="#5a9ad1" stroke-width="1.5"/>
+    <path d="M54 68L62 102L72 68" fill="#e9f5ff"/><path d="M61 76l-5 8 7 23 7-23-6-8Z" fill="#086cbb"/>
+    <path d="M43 70L56 88L60 117L43 116Z" fill="#174f86"/><path d="M80 70L68 88L64 117L83 116Z" fill="#174f86"/>
+    <circle cx="62" cy="93" r="1.8" fill="#ccefff"/><circle cx="62" cy="104" r="1.8" fill="#ccefff"/>
+    <g class="armR"><path d="M77 77L91 102" stroke="#103b65" stroke-width="13" stroke-linecap="round"/><circle cx="91" cy="102" r="6" fill="#e7b58e"/></g>
+    <g class="coffeeArm"><path d="M77 77L91 98L97 78" fill="none" stroke="#154d80" stroke-width="12" stroke-linecap="round"/><circle cx="97" cy="78" r="6" fill="#e7b58e"/></g>
+    <g class="wipeArm"><path d="M77 77L94 58L103 34" fill="none" stroke="#154d80" stroke-width="12" stroke-linecap="round"/><circle cx="103" cy="34" r="6" fill="#e7b58e"/></g>
+    <g class="coffeeProps"><path d="M90 65h19l-2 19H92Z" fill="#e6f4ff" stroke="#6aa7d3" stroke-width="1.5"/><path d="M108 68q13 0 2 11h-3" fill="none" stroke="#e6f4ff" stroke-width="4"/><path class="steam" d="M95 60q-5-6 0-12" stroke="#d9f6ff" stroke-width="2" fill="none"/><path class="steam two" d="M102 60q5-6 0-12" stroke="#d9f6ff" stroke-width="2" fill="none"/></g>
+    <g class="wipeProps"><path d="M103 32L107 10" stroke="#c5d5e0" stroke-width="4" stroke-linecap="round"/><path d="M93 10h27" stroke="#4ed2f6" stroke-width="6" stroke-linecap="round"/><circle class="foam" cx="110" cy="19" r="3" fill="#c7f8ff"/><circle class="foam" cx="118" cy="30" r="4" fill="#c7f8ff"/></g>
+    <path d="M55 60v12q8 7 15 0V60" fill="#e7b58e"/>
+    <ellipse cx="62" cy="43" rx="23" ry="26" fill="#e7b58e"/>
+    <ellipse cx="39" cy="45" rx="5" ry="8" fill="#d99f78"/><ellipse cx="85" cy="45" rx="5" ry="8" fill="#d99f78"/>
+    <path d="M42 40q4-22 22-22 19 0 22 22-10-5-17-12-13 12-27 12" fill="#1a222e"/>
+    <path d="M46 42q5-3 10 0M69 42q5-3 10 0" stroke="#382a27" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="52" cy="45" r="2" fill="#1c2630"/><circle cx="74" cy="45" r="2" fill="#1c2630"/>
+    <path d="M59 56q5 4 10-1" fill="none" stroke="#8c5044" stroke-width="2" stroke-linecap="round"/>
+    <path d="M39 27h47l-5-7H44Z" fill="#0d1728"/><path d="M47 19L48 3h30l2 16Z" fill="#142840"/><path d="M48 16h31" stroke="#1685ce" stroke-width="3"/>
+  </svg>
+</div>
+
 <main class="scene" id="scene">
 <section class="clock"><div class="time" id="time">--:--</div><div class="date" id="date"></div></section>
 <header class="brand"><div class="logo">JOH<span class="a">A</span>NN</div><div class="tag">KI MIT HERZ</div></header>
@@ -158,7 +215,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 </section>
 
 <button class="info-button" id="infoButton" aria-label="Info und Kontakt">ⓘ</button>
-<div class="info-box" id="infoBox"><div class="info-title">JOHANN · KONTAKT</div><div class="info-text">Fragen, Ideen oder einfach mal Johann Hallo sagen?</div><a href="mailto:machmal@johann-butler.de">machmal@johann-butler.de</a><div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(90,170,225,.22);text-align:right"><button id="infoPrivacyLink" type="button" style="border:0;background:none;color:#b8d9f2;font-size:11px;cursor:pointer;padding:5px;margin-right:12px">Datenschutz</button><button id="vflPreview" type="button" style="border:0;background:none;color:#b8d9f2;font-size:11px;cursor:pointer;padding:5px;margin-right:8px">💙 18:48 Vorschau</button><button id="infoAdminLink" type="button" style="border:0;background:none;color:#88a6bd;font-size:11px;cursor:pointer;padding:5px">Admin ↗</button></div></div>
+<div class="info-box" id="infoBox"><div class="info-title">JOHANN · KONTAKT</div><div class="info-text">Fragen, Ideen oder einfach mal Johann Hallo sagen?</div><a href="mailto:machmal@johann-butler.de">machmal@johann-butler.de</a><div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(90,170,225,.22);text-align:right"><button id="infoPrivacyLink" type="button" style="border:0;background:none;color:#b8d9f2;font-size:11px;cursor:pointer;padding:5px;margin-right:12px">Datenschutz</button><button id="butlerPreview" type="button" style="border:0;background:none;color:#b8d9f2;font-size:11px;cursor:pointer;padding:5px;margin-right:8px">☕ Butler-Vorschau</button><button id="vflPreview" type="button" style="border:0;background:none;color:#b8d9f2;font-size:11px;cursor:pointer;padding:5px;margin-right:8px">💙 18:48 Vorschau</button><button id="infoAdminLink" type="button" style="border:0;background:none;color:#88a6bd;font-size:11px;cursor:pointer;padding:5px">Admin ↗</button></div></div>
 </main>
 <div class="panel-backdrop" id="dashboard" role="dialog" aria-modal="true" aria-label="Johanns Kommandozentrale">
  <div class="panel">
@@ -899,6 +956,58 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     if(recorder?.state==='recording'){clearRecordingTimers();recorder.stop();button.classList.remove('recording');button.classList.add('busy');button.textContent='⌛';label('Johann verarbeitet deine Aufnahme')}
    },45000);
   }catch(e){clearRecordingTimers();stopTracks();reset();say('Mikrofon nicht verfügbar. Bitte Berechtigung prüfen.',7500)}
+ });
+})();
+</script>
+
+<script>
+/* V18: einmal pro zwei Stunden, nur bei sichtbarer, freier Startseite. */
+(()=>{
+ const el=document.getElementById('butlerVisit'),caption=document.getElementById('butlerCaption');
+ const KEY='johann_butler_last_visit_v18',INTERVAL=2*60*60*1000,DURATION=10000;
+ const lines={coffee:[
+  'Kaffeepause, Meister. Der Prozessor läuft schließlich nicht mit Liebe.',
+  'Ich prüfe nur kurz die Qualität der Bohnen. Rein wissenschaftlich.',
+  'Auch ein digitaler Butler braucht mal einen Schluck Ruhe.',
+  'Wer hat eigentlich beschlossen, dass ich keinen Kaffee trinken darf?',
+  'Ich bin gleich wieder da. Der Kaffee ruft.'],wipe:[
+  'Fingerabdrücke auf meinem Bildschirm? Nicht mit mir.',
+  'Einmal durchwischen. Die Pixel sollen schließlich glänzen.',
+  'Meister, das ist eine Website. Kein Touchscreen-Museum.',
+  'Fenster putzen kann ich. Für den Rest brauche ich noch Arme.',
+  'So. Jetzt sieht man das Bergbau-Museum wieder.']} ;
+ let running=false,finishTimer=null,lastKind='wipe',lastLine=-1;
+ function stamp(){try{return Number(localStorage.getItem(KEY))||0}catch{return window.__johannButlerLast||0}}
+ function save(t){try{localStorage.setItem(KEY,String(t))}catch{window.__johannButlerLast=t}}
+ if(!stamp())save(Date.now()); // Kein unerwarteter Besuch direkt beim ersten Laden.
+ function occupied(){
+  if(document.visibilityState!=='visible'||running)return true;
+  if(document.getElementById('dashboard')?.classList.contains('open'))return true;
+  if(document.getElementById('vflShow')?.classList.contains('active'))return true;
+  if(document.getElementById('chatArchive')?.classList.contains('show'))return true;
+  if(document.getElementById('voiceButton')?.classList.contains('recording')||document.getElementById('voiceButton')?.classList.contains('busy'))return true;
+  if(document.activeElement===document.getElementById('command'))return true;
+  return false;
+ }
+ function visit(preview=false){
+  if(occupied())return false;
+  running=true;
+  const kind=lastKind==='coffee'?'wipe':'coffee';lastKind=kind;
+  const options=lines[kind];let index=Math.floor(Math.random()*options.length);
+  if(index===lastLine)index=(index+1)%options.length;lastLine=index;
+  caption.textContent=options[index];el.className=kind;
+  void el.offsetWidth;el.classList.add('active');
+  if(!preview)save(Date.now());
+  const duration=window.matchMedia('(prefers-reduced-motion: reduce)').matches?4500:DURATION;
+  finishTimer=setTimeout(()=>{el.classList.remove('active');el.className='';running=false;finishTimer=null},duration);
+  return true;
+ }
+ function check(){if(Date.now()-stamp()>=INTERVAL)visit()}
+ setInterval(check,60000);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden&&running){clearTimeout(finishTimer);el.className='';running=false;}else if(!document.hidden)check()});
+ document.getElementById('butlerPreview')?.addEventListener('click',()=>{
+  document.getElementById('infoBox')?.classList.remove('show');
+  if(!visit(true)&&typeof say==='function')say('Johann ist gerade beschäftigt. Schließ kurz die Kommandozentrale oder beende die Aufnahme.',5000);
  });
 })();
 </script>
