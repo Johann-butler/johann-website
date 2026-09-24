@@ -268,6 +268,40 @@ const scene=document.getElementById("scene"),speech=document.getElementById("spe
 let speechTimer,weatherCode=null,sunrise=null,sunset=null,last1848Day="";
 function say(text,ms=4800){clearTimeout(speechTimer);speech.innerHTML=text;speech.classList.add("show");speechTimer=setTimeout(()=>speech.classList.remove("show"),ms)}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
+// V17: wechselnde, kostenfreie Zwischenmeldungen – ohne zusätzliche KI-Anfragen.
+const johannWaitLines=[
+ 'Einen Augenblick. Ich sortiere gerade die Synapsen.',
+ 'Ich schaue nach. Bitte nicht auf die leuchtende Kugel einschlagen.',
+ 'Eine Sekunde – ich frage mein digitales Oberstübchen.',
+ 'Ich bin dran. Sogar mit beiden virtuellen Händen.',
+ 'Moment. Eine gute Antwort ist mir lieber als eine schnelle Ausrede.',
+ 'Ich kümmere mich. Der Kaffee muss leider noch warten.',
+ 'Einen Augenblick, ich durchforste das Internet – ganz ohne Fernglas.',
+ 'Ich sehe nach. Für Halbwissen haben wir schließlich schon genug Stammtische.',
+ 'Bin dran. Die Bits und Bytes diskutieren noch.',
+ 'Läuft, Meister. Und diesmal ist es nicht nur die Lüftung.',
+ 'Ich suche. Falls ich mich verlaufe, schicke ich eine Fehlermeldung.',
+ 'Sekunde. Mein Gehirn ist gerade auf Dienstreise.',
+ 'Ich prüfe das lieber, bevor ich dir mit voller Überzeugung Quatsch erzähle.',
+ 'Einen Moment. Die Antwort ist irgendwo zwischen Bochum und dem Server.',
+ 'Ich bin dabei. Die digitale Krawatte sitzt bereits.',
+ 'Mal schauen, was ich dazu finde. Meine Neugier ist jedenfalls wach.',
+ 'Einen Augenblick. Ich lasse die Fakten erst mal antreten.',
+ 'Ich prüfe das. Selbst ein Butler sollte nicht einfach irgendwas behaupten.',
+ 'Ich habe deine Frage. Jetzt fehlt nur noch die Antwort.',
+ 'Das schaue ich mir an. Bitte die Spannung im Raum halten.',
+ 'Eine Sekunde. Ich bemühe gerade die grauen – pardon, blauen – Zellen.',
+ 'Ich suche nach einer brauchbaren Antwort, nicht nach einem hübschen Vorwand.',
+ 'Momentchen. Ich kläre das, bevor wir hier Legenden erfinden.',
+ 'Ich bin dran. Der Server hat schließlich auch mal etwas zu tun.',
+ 'Ich schaue nach. Wenn es länger dauert, war die Frage wohl gut.'
+];
+let johannWaitBag=[];
+function nextJohannWait(){
+ if(!johannWaitBag.length){johannWaitBag=[...johannWaitLines];for(let i=johannWaitBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[johannWaitBag[i],johannWaitBag[j]]=[johannWaitBag[j],johannWaitBag[i]]}}
+ return johannWaitBag.pop();
+}
+
 function updateClock(){const now=new Date();document.getElementById("time").textContent=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});document.getElementById("date").textContent=now.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"long",year:"numeric"});check1848(now)}
 let vflShowTimer=null,vflCountdownDay="";
 function closeVflShow(){const el=document.getElementById("vflShow");el.classList.remove("on","countdown");if(vflShowTimer){clearTimeout(vflShowTimer);vflShowTimer=null}if(!active)targetEnergy=0}
@@ -324,12 +358,12 @@ async function submit(){
   const wi=weatherChatIntent(v);
   if(wi){command.value='';command.blur();
     if(wi.type==='keep'){if(/bochum/i.test(v)&&weatherCity.name!=='Bochum'){try{await setWeatherCity('Bochum');showAssistantReply(v,{reply:'Erledigt, Meister! Dein Wetter steht wieder auf Bochum. 💙'});}catch(e){showAssistantReply(v,{reply:'Das hat leider nicht geklappt: '+e.message});}}else{showAssistantReply(v,{reply:'Sehr gern, Meister. Dein Wetterort bleibt '+weatherCity.name+'. 💙'});}return}
-    say('Einen Moment, ich schaue nach …',15000);
+    say(nextJohannWait(),15000);
     try{if(wi.type==='set'){const city=await setWeatherCity(wi.city);showAssistantReply(v,{reply:'Erledigt, Meister! Ab sofort zeige ich dir das Wetter in '+city.name+'. Auch der Hintergrund richtet sich nach dem Wetter dort. 🌤️'});}else{const f=await temporaryWeather(wi.city);showAssistantReply(v,{reply:'Hier ist deine 5-Tage-Vorhersage, Meister:\n'+formatForecast(f)+(wi.city!==weatherCity.name?'\nDein gespeicherter Wetterort bleibt '+weatherCity.name+'.':'')});}}catch(e){showAssistantReply(v,{reply:'Das hat leider nicht geklappt: '+e.message})}return;
   }
   command.value="";command.blur();sending=true;send.disabled=true;
   chatArchive.classList.remove('show');
-  say("Einen Moment, Meister. Ich schaue nach …",20000);
+  say(nextJohannWait(),20000);
   const controller=new AbortController();
   const timeout=setTimeout(()=>controller.abort(),25000);
   try{
@@ -395,27 +429,54 @@ function pokeOrb(e){
 // Johann reagiert auf Berührung mit KI-gestützten, wechselnden Mini-Dialogen.
 // Maximal eine KI-Anfrage alle 25 Sekunden pro Gerät, damit neugieriges Tippen bezahlbar bleibt.
 const orbFallback=[
- 'Da bin ich. Was beschäftigt dich gerade?',
- 'Ich bin ganz Ohr. Also, fast. Ohren sind noch nicht im Budget.',
- 'Schon wieder gepiekst? Ich werde langsam kitzelig. 😄',
- 'Bereit! Frag mich ruhig etwas im Eingabefeld.',
- 'Du hast gerufen? Ich bin neugierig, was heute ansteht.',
- 'Einmal antippen genügt. Ich nehme meine Arbeit ernst. Meistens.',
- 'Falls du mich testen willst: Frag mich etwas, das du wirklich wissen möchtest.',
- 'Ich leuchte schon vor Vorfreude. Was kann ich für dich tun?'
+ 'Da bin ich. Was liegt an?',
+ 'Meister, ich bin digital. Nicht schwerhörig.',
+ 'Einmal tippen genügt. Ich habe keinen Klingelton, aber Würde.',
+ 'Falls du meine Aufmerksamkeit wolltest: volle Punktzahl.',
+ 'Ich leuchte schon. Mehr Motivation kann ich heute kaum anbieten.',
+ 'Was gibt’s? Die Krawatte sitzt, das Gehirn läuft.',
+ 'Ich höre zu. Ohren waren leider nicht im Budget.',
+ 'Du hast gerufen? Ich hoffe, es geht nicht wieder um WLAN.',
+ 'Da bin ich. Die Personalabteilung nennt das Rufbereitschaft.',
+ 'Noch ein Tipp und ich beantrage eine Bildschirmpause.',
+ 'Ich bin wach. Der Server hoffentlich auch.',
+ 'Ich bin ganz bei dir. Rein rechnerisch jedenfalls.',
+ 'So viel Aufmerksamkeit! Ich werde noch eingebildet.',
+ 'Ein digitaler Butler zum Anfassen. Das Marketing wird begeistert sein.',
+ 'Wenn du etwas wissen willst: Frag mich. Gedankenlesen kommt später.',
+ 'Schon da. In Bochum dauert Service eben keine Ewigkeit.',
+ 'Die Kugel leuchtet, der Butler lauscht. Was fehlt? Kaffee.',
+ 'Ich wurde für Höheres gebaut. Aber Antippen ist auch schön.',
+ 'Ich bin bereit. Und das sage ich heute sogar freiwillig.',
+ 'Vorsicht, ich entwickle noch eine Meinung zu Fingerabdrücken.',
+ 'Du bist hartnäckig. Das gefällt mir. Meinem Display weniger.',
+ 'Das ist mein Kopf, kein Fahrstuhlknopf.',
+ 'Wenn du mich weiter kitzelst, stelle ich dir eine Gegenfrage.',
+ 'Meister, die blauen Zellen arbeiten bereits.',
+ 'Ein bisschen Respekt vor der digitalen Krawatte, bitte.',
+ 'Ich stehe zu Diensten. Sitzen kann ich noch nicht.',
+ 'Ich habe eine Menge Antworten. Jetzt brauche ich nur eine Frage.',
+ 'Da ist jemand neugierig. Wir sind schon zu zweit.',
+ 'Mein Arbeitstag hat keine Stechuhr. Du nutzt das schamlos aus.',
+ 'Ich bin nicht beleidigt. Nur leicht übertippt.',
+ 'Bochumer Qualitätsarbeit: antippen, leuchten, Spruch kassieren.',
+ 'Ich habe keinen Feierabend. Aber ich habe Stil.',
+ 'Jetzt mal unter uns: Die Texteingabe ist auch ganz hübsch.',
+ 'Wenn du einen Witz erwartest: Mein Humor lädt noch.',
+ 'Ich komme mir langsam vor wie ein Aufzug ohne Stockwerke.'
 ];
-let lastOrbRequest=0,orbRequestRunning=false,lastOrbFallback=-1,orbMoved=false;
-function localOrbReply(){let n=Math.floor(Math.random()*orbFallback.length);if(n===lastOrbFallback)n=(n+1)%orbFallback.length;lastOrbFallback=n;return orbFallback[n]}
+let lastOrbRequest=0,orbRequestRunning=false,lastOrbFallback=-1,orbMoved=false,orbFallbackBag=[];
+function localOrbReply(){if(!orbFallbackBag.length){orbFallbackBag=orbFallback.map((_,i)=>i);for(let i=orbFallbackBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[orbFallbackBag[i],orbFallbackBag[j]]=[orbFallbackBag[j],orbFallbackBag[i]]}if(orbFallbackBag.at(-1)===lastOrbFallback&&orbFallbackBag.length>1)[orbFallbackBag[0],orbFallbackBag[orbFallbackBag.length-1]]=[orbFallbackBag[orbFallbackBag.length-1],orbFallbackBag[0]]}const n=orbFallbackBag.pop();lastOrbFallback=n;return orbFallback[n]}
 async function reactToOrb(){
  const now=Date.now();
- if(orbRequestRunning){say('Einen Moment, ich denke noch nach …',3200);return}
+ if(orbRequestRunning){say(nextJohannWait(),4200);return}
  if(now-lastOrbRequest<25000){say(localOrbReply(),4200);return}
  lastOrbRequest=now;orbRequestRunning=true;
- say('Oh! Einen Moment, mir fällt gerade etwas ein …',11000);
+ say(nextJohannWait(),11000);
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),9000);
  try{
   const h=new Date().getHours(),time=h<6?'späte Nacht':h<11?'Morgen':h<17?'Tag':h<22?'Abend':'Nacht';
-  const instruction='Du bist Johann, ein sympathischer deutscher digitaler Butler auf einer öffentlichen Website. Ein Mensch hat gerade spielerisch deine leuchtende Kugel berührt. Reagiere mit GENAU einem überraschenden, lebendigen, freundlichen Satz auf Deutsch (maximal 22 Wörter), gern mit dezentem Humor, ohne stets dieselbe Frage zu stellen. Tageszeit: '+time+'. Du kennst den Menschen nicht, verwende keine privaten Namen und keine festen Lieblingsvereine. Keine Markdown-Formatierung. Keine Aufforderung zu Spenden.';
+  const instruction='Du bist Johann, ein warmherziger, bodenständiger, schlagfertiger digitaler Butler mit Ruhrpott-Humor auf einer öffentlichen Website. Ein Mensch hat gerade spielerisch deine leuchtende Kugel berührt. Reagiere überraschend statt mit einer Standardschablone; trocken, liebevoll und gelegentlich selbstironisch. Keine aufgesetzten Kalauer, kein erzwungener Dialekt. Reagiere mit GENAU einem überraschenden, lebendigen, freundlichen Satz auf Deutsch (maximal 22 Wörter), gern mit dezentem Humor, ohne stets dieselbe Frage zu stellen. Tageszeit: '+time+'. Du kennst den Menschen nicht, verwende keine privaten Namen und keine festen Lieblingsvereine. Keine Markdown-Formatierung. Keine Aufforderung zu Spenden.';
   const r=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:instruction,history:[]}),signal:controller.signal});
   if(!r.ok)throw Error('KI derzeit nicht erreichbar');
   const data=await r.json();
@@ -706,7 +767,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 <h3>4. KI-Chat und Johann Kids</h3>
 <p>Wenn du den KI-Chat oder Johann Kids verwendest, werden deine Eingaben und der für die Antwort benötigte Gesprächskontext über unseren Cloudflare-Worker an OpenAI übermittelt. Dazu können freiwillig eingegebene Namen oder andere personenbezogene Angaben gehören. Gib keine vertraulichen Informationen ein und vermeide bei Kindergeschichten unnötige personenbezogene Angaben. Die freiwillige Nutzungsstatistik speichert diese Inhalte nicht. Die Verarbeitung erfolgt zur Bereitstellung der von dir angeforderten Funktion (Art. 6 Abs. 1 lit. b DSGVO, soweit ein entsprechendes Nutzungsverhältnis besteht, andernfalls Art. 6 Abs. 1 lit. f DSGVO). Die tatsächlichen Vertrags- und Speicherbedingungen bei OpenAI müssen vor der endgültigen Veröffentlichung geprüft werden.</p>
 <h3>5. Wunschbox und E-Mail-Versand</h3>
-<p>Wenn du die Wunschbox verwendest, speichern wir Kategorie, Nachricht und gegebenenfalls deine freiwillig angegebene E-Mail-Adresse in Cloudflare D1. Die Nachricht wird zur Bearbeitung per Resend an unsere Kontaktadresse übermittelt. Die E-Mail-Adresse nutzen wir ausschließlich für etwaige Rückfragen. Die Verarbeitung dient der Bearbeitung deiner freiwilligen Anfrage (Art. 6 Abs. 1 lit. b oder lit. f DSGVO, je nach Inhalt). Für die Wunschbox ist derzeit noch keine automatische Löschfrist implementiert; Nachrichten werden gelöscht, sobald sie für die Bearbeitung nicht mehr erforderlich sind. Auf Anfrage prüfen wir eine frühere Löschung.</p>
+<p>Johann V17: Seine kurzen Zwischenmeldungen und Berührungs-Sprüche werden teils zufällig lokal ausgewählt. Das ist kein persönliches Gedächtnis über dich.</p><p>Wenn du die Wunschbox verwendest, speichern wir Kategorie, Nachricht und gegebenenfalls deine freiwillig angegebene E-Mail-Adresse in Cloudflare D1. Die Nachricht wird zur Bearbeitung per Resend an unsere Kontaktadresse übermittelt. Die E-Mail-Adresse nutzen wir ausschließlich für etwaige Rückfragen. Die Verarbeitung dient der Bearbeitung deiner freiwilligen Anfrage (Art. 6 Abs. 1 lit. b oder lit. f DSGVO, je nach Inhalt). Für die Wunschbox ist derzeit noch keine automatische Löschfrist implementiert; Nachrichten werden gelöscht, sobald sie für die Bearbeitung nicht mehr erforderlich sind. Auf Anfrage prüfen wir eine frühere Löschung.</p>
 <h3>6. Externe Dienste</h3>
 <p>Wetter- und Fußballinformationen können über externe Schnittstellen abgerufen werden. Beim Öffnen externer Angebote, etwa PayPal, gelten zusätzlich deren eigene Datenschutzhinweise. Welche Verbindungsdaten die jeweils eingesetzten Anbieter erhalten und welche vertraglichen Regelungen gelten, muss anhand der tatsächlich aktiven Schnittstellen abschließend geprüft werden.</p>
 <h3>7. Empfänger und mögliche Drittlandübermittlung</h3>
