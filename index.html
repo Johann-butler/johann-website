@@ -779,13 +779,14 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 @media(max-width:400px){.controls{gap:7px}.controls .round{width:40px;height:40px;flex-basis:40px}.command{padding-left:12px}}
 </style>
 <script>
-/* V16.1: Sprache nur nach bewusstem Tippen. Keine Hintergrundaufnahme. */
+/* V16.2: Sprache nur nach bewusstem Tippen, maximal 45 Sekunden. */
 (()=>{
  const button=document.getElementById('voiceButton');
  const url='https://johann-ki.bjornkorczak.workers.dev/';
- let recorder=null,stream=null,chunks=[],busy=false,player=null;
+ let recorder=null,stream=null,chunks=[],busy=false,player=null,recordingTimer=null,countdownTimer=null;
+ function clearRecordingTimers(){if(recordingTimer!==null){clearTimeout(recordingTimer);recordingTimer=null}if(countdownTimer!==null){clearInterval(countdownTimer);countdownTimer=null}}
  function label(text){button.title=text;button.setAttribute('aria-label',text)}
- function reset(){button.classList.remove('recording','busy');button.textContent='🎙️';label('Sprachaufnahme starten');busy=false}
+ function reset(){clearRecordingTimers();button.classList.remove('recording','busy');button.textContent='🎙️';label('Sprachaufnahme starten');busy=false}
  function stopTracks(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
  function base64ToBlob(base64,type){const bytes=atob(base64),array=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)array[i]=bytes.charCodeAt(i);return new Blob([array],{type})}
  window.johannSpeakReply=async(text)=>{
@@ -801,7 +802,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   }catch(e){say('Die Textantwort ist da, aber die Sprachausgabe klappt gerade nicht: '+safeText(e.message),8000)}
  };
  button.addEventListener('click',async()=>{
-  if(recorder&&recorder.state==='recording'){recorder.stop();button.classList.remove('recording');button.classList.add('busy');button.textContent='⌛';label('Johann verarbeitet deine Aufnahme');return}
+  if(recorder&&recorder.state==='recording'){clearRecordingTimers();recorder.stop();button.classList.remove('recording');button.classList.add('busy');button.textContent='⌛';label('Johann verarbeitet deine Aufnahme');return}
   if(busy)return;
   if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){say('Dein Browser unterstützt die Aufnahme leider nicht.',7000);return}
   if(player){player.pause();player=null}
@@ -812,11 +813,11 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
    const mime=types.find(t=>MediaRecorder.isTypeSupported(t));
    recorder=new MediaRecorder(stream,mime?{mimeType:mime}:undefined);chunks=[];
    recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
-   recorder.onerror=()=>{stopTracks();reset();say('Aufnahme fehlgeschlagen.',6000)};
+   recorder.onerror=()=>{clearRecordingTimers();stopTracks();reset();say('Aufnahme fehlgeschlagen.',6000)};
    recorder.onstop=async()=>{
-    stopTracks();
+    clearRecordingTimers();stopTracks();
     const blob=new Blob(chunks,{type:recorder.mimeType||'audio/mp4'});
-    if(blob.size>4*1024*1024){reset();say('Die Aufnahme ist zu lang. Bitte höchstens etwa 20 Sekunden sprechen.',8000);return}
+    if(blob.size>4*1024*1024){reset();say('Die Aufnahme ist zu lang. Bitte höchstens 45 Sekunden sprechen oder die Aufnahme früher abschicken.',8000);return}
     try{
      const form=new FormData();form.append('action','voice_transcribe');form.append('audio',blob,blob.type.includes('webm')?'aufnahme.webm':'aufnahme.mp4');
      const r=await fetch(url,{method:'POST',body:form});const data=await r.json();if(!r.ok)throw Error(data.error||'Spracherkennung fehlgeschlagen');
@@ -827,8 +828,16 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     }catch(e){window.johannVoiceAwaiting=false;reset();say('Johann konnte dich nicht verstehen: '+safeText(e.message),8000)}
    };
    recorder.start();button.classList.add('recording');button.textContent='⏹';label('Aufnahme beenden und an Johann senden');say('Ich höre zu, Meister. Zum Senden erneut auf das Mikrofon tippen.',12000);
-   setTimeout(()=>{if(recorder?.state==='recording')recorder.stop()},20000);
-  }catch(e){stopTracks();reset();say('Mikrofon nicht verfügbar. Bitte Berechtigung prüfen.',7500)}
+   const startedAt=Date.now();
+   countdownTimer=setInterval(()=>{
+    if(recorder?.state!=='recording'){clearRecordingTimers();return}
+    const remaining=Math.ceil((45000-(Date.now()-startedAt))/1000);
+    if(remaining<=5&&remaining>0){button.textContent=String(remaining);label('Noch '+remaining+' Sekunden – zum vorzeitigen Senden tippen')}
+   },200);
+   recordingTimer=setTimeout(()=>{
+    if(recorder?.state==='recording'){clearRecordingTimers();recorder.stop();button.classList.remove('recording');button.classList.add('busy');button.textContent='⌛';label('Johann verarbeitet deine Aufnahme')}
+   },45000);
+  }catch(e){clearRecordingTimers();stopTracks();reset();say('Mikrofon nicht verfügbar. Bitte Berechtigung prüfen.',7500)}
  });
 })();
 </script>
