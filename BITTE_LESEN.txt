@@ -1,0 +1,6 @@
+1. index.html ersetzt die bisherige index.html auf GitHub/Cloudflare Pages.
+2. worker.js ersetzt den gesamten Code im Cloudflare Worker johann-ki.
+3. In Cloudflare Worker > Settings > Triggers einen Cron Trigger fuer jeden Tag hinzufuegen: 0 3 * * * (UTC).
+4. Bestehende Secrets und D1-Binding DB unveraendert lassen.
+5. Datenschutzerklaerung: Anbieter-Vertraege, Speicherfristen der Dienstleister und Impressum noch pruefen.
+6. Browser-/PWA-Cache ggf. aktualisieren.
