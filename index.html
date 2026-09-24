@@ -497,6 +497,42 @@ function johannLocalAction(message){const q=message.toLowerCase();
  return null;
 }
 
+// V25: Natürliche Rezeptwünsche direkt aus Johanns Hauptchat in die Kochecke.
+// Nur die bereits vorhandene V24-Rezept-API wird benutzt; der Worker bleibt unverändert.
+let johannCookingContext=null;
+function johannCookingIntent(message){
+ const q=message.trim();
+ const explicit=/(?:rezept|kochen|backen|auflauf|pasta|nudel|lasagne|pizza|suppe|eintopf|kuchen|pfannkuchen|schnitzel|salat|risotto|curry|brokkoli|kartoffelgratin|essen machen)/i.test(q);
+ const desire=/(?:lust auf|appetit auf|möchte|will|hätte gern|haette gern|was koch|was kann ich|mach mir|zeig mir|such(?:e)? mir|gib mir)/i.test(q);
+ if(explicit && desire && !/(?:öffne|oeffne|zeig mir die kochecke|rezeptbuch öffnen)/i.test(q))return {wish:q,followup:false};
+ if(johannCookingContext && Date.now()-johannCookingContext.at<20*60*1000){
+  if(/(?:mach (?:das|es)|für|fuer|personen|portionen|ohne|statt|habe kein|hab kein|habe noch|hab noch|mit mehr|mit weniger|vegetarisch|vegan|laktosefrei|glutenfrei|wie sieht es|geht das auch|was fehlt|einkaufsliste)/i.test(q)&&q.length<240){
+   if(/(?:einkaufsliste|was fehlt)/i.test(q))return {shopping:true};
+   return {wish:johannCookingContext.wish+'; ÄNDERUNGSWUNSCH: '+q,followup:true};
+  }
+ }
+ return null;
+}
+async function johannCookingRequest(message,intent){
+ command.value='';command.blur();sending=true;send.disabled=true;
+ say('Einen Moment, ich schaue, was wir Leckeres zaubern können … 🍳',18000);
+ try{
+  if(intent.shopping){openDashboard('kitchen');kitchenTab('shopping');showAssistantReply(message,{reply:'Ich öffne deine Einkaufsliste. Die fehlenden Zutaten kannst du direkt aus der Rezeptkarte übernehmen. 🛒'});return}
+  const portionsMatch=message.match(/(?:für|fuer)\s+(\d+)\s*(?:personen|portionen|leute)?/i);
+  const portions=portionsMatch?Math.max(1,Math.min(12,Number(portionsMatch[1]))):Number($('kitchenPortions').value)||3;
+  const payload={action:'kitchen_recipes',pantry:kPantry(),wish:intent.wish,preferences:$('kitchenPreferences').value,portions,minutes:Number($('kitchenTime').value)||60,mode:'normal',kidsAge:$('kitchenKidsAge').value};
+  const j=await kApi(payload);
+  if(!Array.isArray(j.recipes)||!j.recipes.length)throw Error('Keine passenden Rezeptkarten erhalten.');
+  kitchenCurrentResults=j.recipes;
+  kResultsRender(j.recipes);
+  johannCookingContext={wish:intent.wish,at:Date.now()};
+  showAssistantReply(message,{reply:(intent.followup?'Hab ich angepasst! ':'Gute Idee! ')+ 'Ich habe '+j.recipes.length+' Rezeptkarte'+(j.recipes.length===1?'':'n')+' für dich vorbereitet. In der Kochecke findest du Bilder, Zutaten, Zubereitung und was noch auf die Einkaufsliste muss. 🍳',uiAction:'kitchen'});
+  kitchenTab('ideas');
+  // Der normale Chat darf nicht verschwinden, nur weil die Kochecke geöffnet wurde.
+  chatArchive.classList.add('show');
+ }catch(e){showAssistantReply(message,{reply:'Mit der Rezeptkarte hat es gerade nicht geklappt: '+e.message+' Versuch es bitte gleich noch einmal.'})}
+ finally{sending=false;send.disabled=false}
+}
 function safeText(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 async function submit(){
   if(sending)return;
@@ -504,6 +540,7 @@ async function submit(){
   if(!v){say("Was möchten Sie wissen, Meister? 😄");return}
   if(v.length>1000){say("Maximal 1000 Zeichen auf einmal, Meister.");return}
   const localAction=johannLocalAction(v);if(localAction){command.value='';showAssistantReply(v,localAction);return}
+  const cookingIntent=johannCookingIntent(v);if(cookingIntent){await johannCookingRequest(v,cookingIntent);return}
   const wi=weatherChatIntent(v)||weatherFollowupIntent(v);
   if(wi){command.value='';command.blur();
     if(wi.type==='keep'){if(/bochum/i.test(v)&&weatherCity.name!=='Bochum'){try{await setWeatherCity('Bochum');showAssistantReply(v,{reply:'Erledigt, Meister! Dein Wetter steht wieder auf Bochum. 💙'});}catch(e){showAssistantReply(v,{reply:'Das hat leider nicht geklappt: '+e.message});}}else{showAssistantReply(v,{reply:'Sehr gern, Meister. Dein Wetterort bleibt '+weatherCity.name+'. 💙'});}return}
