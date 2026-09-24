@@ -229,6 +229,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
     <button class="tile" data-view="weather"><span class="tile-icon">🌤️</span><span class="tile-title">Wetter</span><div class="tile-sub">Aktuelles Wetter und 5-Tage-Vorschau</div></button>
     <button class="tile" data-view="notes"><span class="tile-icon">💙</span><span class="tile-title">Sag es Johann!</span><div class="tile-sub">Ideen, Wünsche und Verbesserungsvorschläge</div></button>
     <button class="tile" data-view="reminders"><span class="tile-icon">🔔</span><span class="tile-title">Erinnerungen</span><div class="tile-sub">Lokale Aufgaben und Termine</div></button>
+    <button class="tile" data-view="learning"><span class="tile-icon">🌱</span><span class="tile-title">Johann lernt</span><div class="tile-sub">Korrekturen vorschlagen · geprüftes Wissen</div></button>
     <button class="tile" data-view="memory"><span class="tile-icon">🧠</span><span class="tile-title">Gedächtnis</span><div class="tile-sub">Admin-Gedächtnis und Datenbank</div></button>
      <button class="tile" data-view="status"><span class="tile-icon">⚙️</span><span class="tile-title">Systemstatus</span><div class="tile-sub">Johanns Funktionen im Überblick</div></button>
    </div>
@@ -304,6 +305,16 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
     <p id="feedbackStatus" class="feedback-status" role="status" aria-live="polite"></p>
   </form></div></section>
   <section class="panel-section" id="view-reminders"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><label for="reminderText">Erinnerung</label><input class="field" id="reminderText" maxlength="180" placeholder="Was steht an?"><label for="reminderDate">Wann?</label><input class="field" id="reminderDate" type="datetime-local"><button class="primary" id="addReminder">Erinnerung speichern</button><p class="mini">Noch keine Push-Nachrichten: Fällige Erinnerungen erscheinen hier, wenn du die Seite öffnest. Aktive Benachrichtigungen folgen mit deinem Server.</p></div><div id="remindersList"></div></section>
+  <section class="panel-section" id="view-learning"><button class="backbtn" data-view="home">← Zurück</button>
+    <div class="glass"><span class="pill">🌱 JOHANN LERNT</span><h2>Bring Johann etwas bei</h2><p class="muted">Korrigiere eine Antwort freiwillig. Nur deine Frage und deine Korrektur werden zur Prüfung gespeichert – kein vollständiger Chatverlauf. Bitte keine Namen, Kontaktdaten oder privaten Erlebnisse eintragen. Noch lernt Johann nicht automatisch aus jedem Gespräch.</p>
+      <p class="mini">Frage: <strong id="learnQuestion">Noch keine Antwort ausgewählt. Nutze „Johann korrigieren“ unter einer Chatantwort.</strong></p>
+      <label for="learnAnswer">So wäre die richtige Antwort:</label><textarea class="field" id="learnAnswer" maxlength="900" rows="4" placeholder="Deine Korrektur …"></textarea>
+      <button class="primary" type="button" id="learnSend">Korrektur zur Prüfung senden</button><p class="mini" id="learnStatus" role="status"></p>
+    </div>
+    <div class="glass"><span class="pill">🔒 NUR FÜR DEN CHEF</span><h2>Lernvorschläge prüfen</h2><p class="muted">Johann übernimmt nichts ungeprüft. Nur freigegebene, allgemeine und zeitunabhängige Fragen können künftig ohne KI-Aufruf beantwortet werden.</p>
+      <input class="field" id="learnAdminKey" type="password" autocomplete="off" placeholder="Admin-Schlüssel"><button class="secondary" id="learnAdminLoad" type="button">Vorschläge laden</button><button class="secondary" id="learnFaqLoad" type="button">Gespeicherte Antworten</button><p class="mini" id="learnAdminStatus" role="status"></p><div id="learnAdminItems"></div>
+    </div>
+  </section>
   <section class="panel-section" id="view-memory"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Gedächtnis</h2><p class="muted">Das Admin-Gedächtnis ist im Worker eingerichtet. Diese öffentliche Ansicht zeigt keine gespeicherten Fakten. Persönliche Benutzerkonten und getrennte private Erinnerungen sind noch nicht verfügbar.</p><span class="pill">🔒 Admin-Zugriff geschützt</span></div></section>
   <section class="panel-section" id="view-analytics">
     <button class="backbtn" data-view="home">← Zurück</button>
@@ -315,7 +326,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
       <p id="analyticsStatus" class="analytics-status" role="status">Die Statistik benötigt noch die Analytics-Erweiterung im Worker.</p>
     </div>
   </section>
-  <section class="panel-section" id="view-status"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Systemstatus</h2><p>🌤️ Wetter: <span id="statusWeather">Wird geprüft</span></p><p>🧠 KI: Über den bestehenden Cloudflare-Worker angebunden</p><p>🧩 Sudoku: Im Browser spielbar</p><p>💾 Sudoku-Spielstände: Auf diesem Gerät</p><p>💙 Wunschbox: Aktiv – Nachrichten werden in D1 gespeichert; E-Mail-Versand über Resend eingerichtet (Zustellung nicht live geprüft)</p><p>🔒 Admin-Gedächtnis: Im Worker aktiv und durch Admin-Schlüssel geschützt; persönliche Benutzerkonten fehlen noch.</p><p>📊 Analytics: Aktiv nach freiwilliger Einwilligung; Admin-Auswertung über das ⓘ-Symbol.</p><p>📚 Johann Kids: Aktiv – Geschichten über den Cloudflare-Worker.</p><p>🎙️ Sprachmodus: Mikrofon und KI-Stimme (benötigt V16-Worker). 🏠 Heimserver: Später</p></div></section>
+  <section class="panel-section" id="view-status"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Systemstatus</h2><p>🌤️ Wetter: <span id="statusWeather">Wird geprüft</span></p><p>🧠 KI: Über den bestehenden Cloudflare-Worker angebunden</p><p>🧩 Sudoku: Im Browser spielbar</p><p>💾 Sudoku-Spielstände: Auf diesem Gerät</p><p>💙 Wunschbox: Aktiv – Nachrichten werden in D1 gespeichert; E-Mail-Versand über Resend eingerichtet (Zustellung nicht live geprüft)</p><p>🔒 Admin-Gedächtnis: Im Worker aktiv und durch Admin-Schlüssel geschützt; persönliche Benutzerkonten fehlen noch.</p><p>📊 Analytics: Aktiv nach freiwilliger Einwilligung; Admin-Auswertung über das ⓘ-Symbol.</p><p>📚 Johann Kids: Aktiv – Geschichten über den Cloudflare-Worker.</p><p>🎙️ Sprachmodus: Mikrofon und KI-Stimme (benötigt V16-Worker). 🏠 Dell-Heimserver: Geplant; V19 läuft vorerst in Cloudflare</p></div></section>
  </div>
 </div>
 
@@ -557,7 +568,7 @@ safeResize(true);requestAnimationFrame(animate);
 const $=id=>document.getElementById(id);
 const dash=$('dashboard');
 $('infoAdminLink').addEventListener('click',()=>{document.getElementById('infoBox').classList.remove('show');openDashboard('analytics')});
-const viewTitles={home:'Kommandozentrale',sudoku:'Sudoku',weather:'Wetter',notes:'Sag es Johann!',reminders:'Erinnerungen',memory:'Gedächtnis',status:'Systemstatus',football:'Fußball',kids:'Johann Kids',analytics:'Johann Analytics'};
+const viewTitles={home:'Kommandozentrale',sudoku:'Sudoku',weather:'Wetter',notes:'Sag es Johann!',reminders:'Erinnerungen',memory:'Gedächtnis',learning:'Johann lernt',status:'Systemstatus',football:'Fußball',kids:'Johann Kids',analytics:'Johann Analytics'};
 function openDashboard(view='home'){
  dash.classList.add('open');document.body.style.overflow='hidden';showView(view);
  $('closePanel').focus();
@@ -569,6 +580,7 @@ function showView(view){
  if(view==='sudoku')renderSudokuHome();
  if(view==='football')initFootball();
  if(view==='notes')$('feedbackStatus').textContent='';
+ if(view==='learning' && !window.johannCorrectionQuestion) $('learnQuestion').textContent='Noch keine Antwort ausgewählt. Nutze „Johann korrigieren“ unter einer Chatantwort.';
  if(view==='reminders')renderReminders();
  if(view==='weather')renderWeatherPanel();
  if(view==='analytics'&&window.johannAnalyticsOpened)window.johannAnalyticsOpened();
@@ -588,11 +600,30 @@ function showAssistantReply(question,result){
  const block=document.createElement('div');block.className='chat-line';
  const u=document.createElement('div');const label=document.createElement('strong');label.textContent='Du: ';u.append(label,document.createTextNode(question));
  const a=document.createElement('div');const al=document.createElement('strong');al.textContent='Johann: ';a.append(al,document.createTextNode(reply));block.append(u,a);
+ if(!result.learned){const correct=document.createElement('button');correct.type='button';correct.className='secondary';correct.style.cssText='margin-top:9px;font-size:12px;padding:7px 10px';correct.textContent='✏️ Johann korrigieren';correct.onclick=()=>{window.johannCorrectionQuestion=question;document.getElementById('learnQuestion').textContent=question;document.getElementById('learnAnswer').value='';document.getElementById('learnStatus').textContent='';openDashboard('learning')};block.append(correct)}
+ if(result.learned){const note=document.createElement('div');note.className='mini';note.textContent='🧠 Aus Johanns geprüftem Wissen · ohne KI-Anfrage';block.append(note)}
  if(Array.isArray(result.sources)&&result.sources.length){const sources=document.createElement('div');sources.className='mini';sources.textContent='Quellen: ';result.sources.slice(0,5).forEach((item,i)=>{try{const url=new URL(item.url);if(!['https:','http:'].includes(url.protocol))return;const link=document.createElement('a');link.href=url.href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=item.title||url.hostname;sources.append(i?' · ':'',link)}catch{}});block.append(sources)}
  clearTimeout(speechTimer);speech.classList.remove('show');
  chatMessages.prepend(block);while(chatMessages.children.length>6)chatMessages.lastElementChild.remove();chatArchive.classList.add('show');chatArchive.scrollTop=0;
  if(window.johannVoiceAwaiting){window.johannVoiceAwaiting=false;window.johannSpeakReply?.(reply);}
 }
+
+// V19 – Freiwillige Korrekturen und geschuetzte Freigabe.
+window.johannCorrectionQuestion='';
+async function learningCall(data){const r=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const j=await r.json();if(!r.ok)throw Error(j.error||'Verbindung fehlgeschlagen.');return j}
+$('learnSend').onclick=async()=>{const q=window.johannCorrectionQuestion,a=$('learnAnswer').value.trim(),s=$('learnStatus');if(!q){s.textContent='Bitte erst unter einer Chatantwort auf „Johann korrigieren“ tippen.';return}if(a.length<8){s.textContent='Bitte die Korrektur genauer beschreiben.';return}if(!confirm('Nur diese Frage und deine Korrektur werden für maximal 30 Tage zur Prüfung gespeichert. Keine privaten Daten eingeben. Jetzt senden?'))return;const b=$('learnSend');b.disabled=true;s.textContent='Ich leite es zur Prüfung weiter …';try{const j=await learningCall({action:'learn_suggest',question:q,answer:a});s.textContent=j.message;$('learnAnswer').value='';window.johannCorrectionQuestion=''}catch(e){s.textContent=e.message}finally{b.disabled=false}};
+let learningAdminKey='';
+async function loadLearning(mode='pending'){
+ const status=$('learnAdminStatus'),out=$('learnAdminItems');out.replaceChildren();status.textContent='Lade …';
+ try{const d=await learningCall({action:mode==='pending'?'learn_list':'learn_faq_list',adminKey:learningAdminKey});status.textContent=d.items.length+' Einträge';if(!d.items.length){out.textContent='Noch nichts vorhanden.';return}
+ d.items.forEach(item=>{const wrap=document.createElement('div');wrap.className='glass';wrap.style.marginTop='12px';const title=document.createElement('p');title.textContent='Frage: '+item.question;wrap.append(title);const area=document.createElement('textarea');area.className='field';area.rows=3;area.maxLength=900;area.value=mode==='pending'?item.suggested_answer:item.answer;wrap.append(area);
+ if(mode==='pending'){const q=document.createElement('input');q.className='field';q.maxLength=300;q.value=item.question;wrap.append(q);const yes=document.createElement('button');yes.className='primary';yes.textContent='✓ Geprüft freigeben';yes.onclick=async()=>{if(!confirm('Nur allgemeines, zeitunabhängiges Wissen ohne personenbezogene Angaben freigeben?'))return;try{await learningCall({action:'learn_review',adminKey:learningAdminKey,id:item.id,decision:'approve',question:q.value,answer:area.value});await loadLearning()}catch(e){status.textContent=e.message}};const no=document.createElement('button');no.className='secondary';no.textContent='Verwerfen';no.onclick=async()=>{try{await learningCall({action:'learn_review',adminKey:learningAdminKey,id:item.id,decision:'reject'});await loadLearning()}catch(e){status.textContent=e.message}};wrap.append(yes,no)}
+ else {area.readOnly=true;const del=document.createElement('button');del.className='secondary';del.textContent='Löschen';del.onclick=async()=>{if(!confirm('Diese gespeicherte Antwort wirklich löschen?'))return;try{await learningCall({action:'learn_faq_delete',adminKey:learningAdminKey,id:item.id});await loadLearning('faq')}catch(e){status.textContent=e.message}};wrap.append(del)}out.append(wrap)})
+ }catch(e){status.textContent=e.message}
+}
+$('learnAdminLoad').onclick=()=>{learningAdminKey=$('learnAdminKey').value.trim();$('learnAdminKey').value='';if(!learningAdminKey){$('learnAdminStatus').textContent='Admin-Schlüssel eingeben.';return}loadLearning()};
+$('learnFaqLoad').onclick=()=>{if(!learningAdminKey){$('learnAdminStatus').textContent='Zuerst Admin-Schlüssel eingeben.';return}loadLearning('faq')};
+
 const localRead=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}};
 const localWrite=(key,data)=>{try{localStorage.setItem(key,JSON.stringify(data));return true}catch{return false}};
 // Feedback is submitted only with explicit consent. Reminders remain local.
@@ -809,7 +840,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 <div id="privacyConsent" role="dialog" aria-modal="true" aria-labelledby="privacyHeading" hidden><div class="privacy-sheet"><h2 id="privacyHeading">💙 Datenschutz bei Johann</h2><p>Johann funktioniert auch ohne Statistik. Mit deiner freiwilligen Zustimmung speichern wir eine zufällige Besucherkennung auf diesem Gerät und erfassen Seitenaufrufe und verwendete Funktionen. Keine Chattexte, Kindergeschichten oder Sudoku-PINs in der Statistik. Die Statistikdaten werden nach 30 Tagen gelöscht. Du kannst jederzeit widerrufen.</p><button type="button" class="privacy-link" id="privacyDetails">Mehr zum Datenschutz</button><div class="privacy-actions"><button type="button" id="privacyReject">Nur notwendige Funktionen</button><button type="button" id="privacyAccept">Statistik erlauben</button></div></div></div>
 <div id="privacyPanel" role="dialog" aria-modal="true" aria-labelledby="privacyTitle" hidden><div class="privacy-document">
 <button class="privacy-link" id="privacyClose" type="button">← Schließen</button>
-<h2 id="privacyTitle">Datenschutzerklärung – Johann Butler</h2>
+<h2 id="privacyTitle">Datenschutzerklärung – Johann Butler</h2><h3>Freiwillige Lernkorrekturen (V19)</h3><p>Wenn du ausdrücklich „Johann korrigieren“ nutzt und das Senden bestätigst, speichern wir nur die zugehörige Frage und deine vorgeschlagene Antwort in unserer Cloudflare-D1-Datenbank. Keine vollständigen Chatverläufe, keine automatische Auswertung aller Gespräche. Offene Vorschläge werden spätestens nach 30 Tagen gelöscht. Nach Prüfung freigegebene, allgemeine Antworten können dauerhaft als FAQ gespeichert und von Johann ohne KI-Anfrage wiederverwendet werden. Bitte keine personenbezogenen Angaben in Korrekturen eintragen. Für eine Löschanfrage: machmal@johann-butler.de.</p>
 <p><strong>Stand: 24. September 2026.</strong> Hier erklären wir, welche Daten bei der Nutzung von Johann verarbeitet werden. Die freiwillige Nutzungsstatistik ist standardmäßig ausgeschaltet.</p>
 <h3>1. Verantwortlicher und Kontakt</h3>
 <p>Björn Korczak<br>Mittelstr. 13<br>44866 Bochum<br>E-Mail: <a href="mailto:machmal@johann-butler.de">machmal@johann-butler.de</a></p>
