@@ -124,6 +124,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 .forecast-day{padding:12px 4px;text-align:center;border:1px solid #4979a7;border-radius:13px;background:#102a46}
 .forecast-day .forecast-icon{font-size:26px;margin:9px 0}.forecast-day strong{display:block}.forecast-day small{color:#bfd8eb}
 @media(max-width:430px){.weather-forecast{gap:4px}.forecast-day{padding:10px 2px;font-size:12px}.forecast-day .forecast-icon{font-size:22px}}
+
+/* JOHANN 18:48 – eigenständiges, einmal tägliches VfL-Spektakel. Wetterkulisse bleibt unberührt. */
+#vflShow{position:fixed;inset:0;z-index:9990;pointer-events:none;display:none;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at center,rgba(0,83,171,.20),rgba(0,10,35,.74) 85%)}
+#vflShow.on{display:block;animation:vflArrival .65s both}#vflShow::before,#vflShow::after{content:"";position:absolute;inset:-55%;background:conic-gradient(from 0deg,transparent 0 8%,rgba(66,180,255,.23) 11%,transparent 15% 30%,rgba(255,255,255,.17) 34%,transparent 39% 52%,rgba(42,139,255,.27) 56%,transparent 60% 100%);animation:vflSpin 10s linear infinite;pointer-events:none}#vflShow::after{animation-direction:reverse;animation-duration:14s;opacity:.65}
+.vfl-center{position:absolute;z-index:2;left:50%;top:47%;transform:translate(-50%,-50%);width:min(94vw,720px);text-align:center;text-shadow:0 3px 24px #001c44;animation:vflPop .8s both}.vfl-pretitle{font-size:clamp(12px,3vw,21px);font-weight:700;letter-spacing:.33em;color:#a8ddff}.vfl-number{font-size:clamp(95px,25vw,220px);font-weight:900;line-height:1;letter-spacing:-.09em;padding-right:.09em;color:#fff;filter:drop-shadow(0 0 24px #168cff);animation:vflBeat 1.848s ease-in-out infinite}.vfl-message{font-size:clamp(19px,5vw,38px);font-weight:850;letter-spacing:.12em;color:#e9f7ff}.vfl-sub{margin:18px auto 0;font-size:clamp(12px,3vw,19px);color:#c4e7ff;max-width:80%;line-height:1.5}.vfl-particle{position:absolute;z-index:1;bottom:-12vh;font-size:clamp(22px,6vw,44px);animation:vflRise var(--dur) linear var(--delay) infinite;left:var(--x);opacity:.9;filter:drop-shadow(0 0 8px #258dff)}.vfl-ring{position:absolute;left:50%;top:47%;width:min(88vw,620px);aspect-ratio:1;border:4px solid #7ed3ff;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 30px #278bff,inset 0 0 50px #1a6dbb;animation:vflRing 2.3s ease-out infinite}.vfl-ring:nth-child(2){animation-delay:1.15s}#vflShow .vfl-close{position:absolute;z-index:5;right:18px;top:max(18px,env(safe-area-inset-top));pointer-events:auto;border:1px solid #a3dfff;border-radius:99px;padding:10px 15px;color:white;background:#153e68;font-size:14px}#vflShow.countdown .vfl-number{font-size:clamp(80px,22vw,180px)}#vflShow.countdown .vfl-ring{animation-duration:1s}
+@keyframes vflArrival{from{opacity:0}to{opacity:1}}@keyframes vflPop{from{opacity:0;transform:translate(-50%,-43%) scale(.65)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}@keyframes vflSpin{to{transform:rotate(360deg)}}@keyframes vflBeat{50%{transform:scale(1.055);filter:drop-shadow(0 0 46px #4bbdff)}}@keyframes vflRing{0%{opacity:.8;transform:translate(-50%,-50%) scale(.35)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.55)}}@keyframes vflRise{0%{transform:translateY(0) rotate(0);opacity:0}12%{opacity:1}85%{opacity:1}100%{transform:translateY(-120vh) rotate(600deg);opacity:0}}
+@media(prefers-reduced-motion:reduce){#vflShow *,#vflShow::before,#vflShow::after{animation:none!important}}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#061322">
@@ -134,6 +141,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 <link rel="icon" type="image/png" sizes="192x192" href="./johann-icon-192.png">
 </head>
 <body>
+<div id="vflShow" role="status" aria-live="polite" aria-label="Johanns 18:48 VfL-Spektakel"><div class="vfl-ring"></div><div class="vfl-ring"></div><div class="vfl-center"><div class="vfl-pretitle" id="vflPretitle">DAS REVIER ZÄHLT RUNTER</div><div class="vfl-number" id="vflNumber">18:48</div><div class="vfl-message" id="vflMessage">BOCHUM. HEIMAT. VfL.</div><div class="vfl-sub" id="vflSub">Blau und Weiß – ein Leben lang. 💙🤍</div></div><div id="vflParticles"></div><button type="button" class="vfl-close" id="vflClose" aria-label="Animation schließen">Schließen ×</button></div>
 <main class="scene" id="scene">
 <section class="clock"><div class="time" id="time">--:--</div><div class="date" id="date"></div></section>
 <header class="brand"><div class="logo">JOH<span class="a">A</span>NN</div><div class="tag">KI MIT HERZ</div></header>
@@ -150,7 +158,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 </section>
 
 <button class="info-button" id="infoButton" aria-label="Info und Kontakt">ⓘ</button>
-<div class="info-box" id="infoBox"><div class="info-title">JOHANN · KONTAKT</div><div class="info-text">Fragen, Ideen oder einfach mal Johann Hallo sagen?</div><a href="mailto:machmal@johann-butler.de">machmal@johann-butler.de</a><div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(90,170,225,.22);text-align:right"><button id="infoPrivacyLink" type="button" style="border:0;background:none;color:#b8d9f2;font-size:11px;cursor:pointer;padding:5px;margin-right:12px">Datenschutz</button><button id="infoAdminLink" type="button" style="border:0;background:none;color:#88a6bd;font-size:11px;cursor:pointer;padding:5px">Admin ↗</button></div></div>
+<div class="info-box" id="infoBox"><div class="info-title">JOHANN · KONTAKT</div><div class="info-text">Fragen, Ideen oder einfach mal Johann Hallo sagen?</div><a href="mailto:machmal@johann-butler.de">machmal@johann-butler.de</a><div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(90,170,225,.22);text-align:right"><button id="infoPrivacyLink" type="button" style="border:0;background:none;color:#b8d9f2;font-size:11px;cursor:pointer;padding:5px;margin-right:12px">Datenschutz</button><button id="vflPreview" type="button" style="border:0;background:none;color:#b8d9f2;font-size:11px;cursor:pointer;padding:5px;margin-right:8px">💙 18:48 Vorschau</button><button id="infoAdminLink" type="button" style="border:0;background:none;color:#88a6bd;font-size:11px;cursor:pointer;padding:5px">Admin ↗</button></div></div>
 </main>
 <div class="panel-backdrop" id="dashboard" role="dialog" aria-modal="true" aria-label="Johanns Kommandozentrale">
  <div class="panel">
@@ -261,7 +269,29 @@ let speechTimer,weatherCode=null,sunrise=null,sunset=null,last1848Day="";
 function say(text,ms=4800){clearTimeout(speechTimer);speech.innerHTML=text;speech.classList.add("show");speechTimer=setTimeout(()=>speech.classList.remove("show"),ms)}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
 function updateClock(){const now=new Date();document.getElementById("time").textContent=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});document.getElementById("date").textContent=now.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"long",year:"numeric"});check1848(now)}
-function check1848(now){const key=now.toLocaleDateString("de-DE");const on=now.getHours()===18&&now.getMinutes()===48;scene.classList.toggle("vfl1848",on);if(on&&last1848Day!==key){last1848Day=key;targetEnergy=1.35;say(pick(["18:48, Meister. 💙🤍 Mehr muss ich nicht sagen.","1848. Bochum. Heimat. 💙🤍","Meister, es ist 18:48. Zeit für ein wenig Blau und Weiß.","18:48. Selbst meine Schaltkreise sind gerade blau-weiß. 💙🤍"]),7000);setTimeout(()=>{if(!active)targetEnergy=0},3500)}}
+let vflShowTimer=null,vflCountdownDay="";
+function closeVflShow(){const el=document.getElementById("vflShow");el.classList.remove("on","countdown");if(vflShowTimer){clearTimeout(vflShowTimer);vflShowTimer=null}if(!active)targetEnergy=0}
+function vflShow(finale=false,preview=false){
+ const el=document.getElementById("vflShow"),number=document.getElementById("vflNumber"),pre=document.getElementById("vflPretitle"),message=document.getElementById("vflMessage"),sub=document.getElementById("vflSub");
+ if(vflShowTimer)clearTimeout(vflShowTimer);
+ el.classList.add("on");el.classList.toggle("countdown",!finale);
+ pre.textContent=finale?"SEIT 1848 · FÜR IMMER UNSER REVIER":"ACHTUNG, MEISTER · GLEICH IST ES SO WEIT";
+ number.textContent=finale?"1848":"18:48";
+ message.textContent=finale?"BOCHUM. HEIMAT. VfL.":"DAS REVIER ZÄHLT RUNTER";
+ sub.textContent=finale?"Blau und Weiß – ein Leben lang. 💙🤍":"Johann fährt gleich die blau-weißen Systeme hoch …";
+ const particles=document.getElementById("vflParticles");particles.replaceChildren();
+ if(finale){for(let i=0;i<32;i++){const span=document.createElement("span");span.className="vfl-particle";span.textContent=i%3===0?"🤍":i%3===1?"💙":"✦";span.style.setProperty("--x",(i*37%100)+"%");span.style.setProperty("--dur",(3+i%5)+"s");span.style.setProperty("--delay",(-i*.32)+"s");particles.append(span)}targetEnergy=1.9;flashTarget=1.5;vflShowTimer=setTimeout(closeVflShow,42000)}
+ else{targetEnergy=1.25;vflShowTimer=setTimeout(closeVflShow,14000)}
+}
+function check1848(now){
+ const key=now.toLocaleDateString("de-DE"),sec=now.getHours()*3600+now.getMinutes()*60+now.getSeconds(),start=18*3600+47*60+48,show=18*3600+48*60;
+ const on=now.getHours()===18&&now.getMinutes()===48;scene.classList.toggle("vfl1848",on);
+ if(sec>=start&&sec<show&&vflCountdownDay!==key){vflCountdownDay=key;vflShow(false)}
+ if(on&&last1848Day!==key){last1848Day=key;vflShow(true);say("18:48, Meister! Bochum. Heimat. VfL! 💙🤍",8000)}
+}
+document.getElementById("vflClose").addEventListener("click",closeVflShow);
+document.getElementById("vflPreview").addEventListener("click",()=>vflShow(true,true));
+
 updateClock();setInterval(updateClock,1000);
 function weatherDescription(c){if(c===0)return["Klar","☀"];if([1,2].includes(c))return["Leicht bewölkt","◒"];if(c===3)return["Bewölkt","☁"];if([45,48].includes(c))return["Nebel","≋"];if([51,53,55,56,57].includes(c))return["Nieselregen","☂"];if([61,63,65,66,67,80,81,82].includes(c))return["Regen","☂"];if([71,73,75,77,85,86].includes(c))return["Schnee","❄"];if([95,96,99].includes(c))return["Gewitter","ϟ"];return["Aktuell","◌"]}
 function weatherType(c){if([95,96,99].includes(c))return"gewitter";if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(c))return"regen";if([3,45,48,71,73,75,77,85,86].includes(c))return"bewoelkt";return"klar"}
