@@ -1,15 +1,15 @@
-JOHANN V11 – UPDATE-SYSTEM (auf Basis des vorhandenen V11-Startpakets)
+JOHANN V11 – NICLAS + SUDOKU – VERÖFFENTLICHUNG
 
-1. Bestehende Website und Cloudflare-Worker sichern.
-2. Alle Website-Dateien dieses Pakets zusammen hochladen (index.html, sw.js, manifest und Icons).
-3. Worker-Code aus johann-worker-v11.js NUR einsetzen, wenn V11 noch nicht eingerichtet ist. Für das Update-System selbst sind keine Worker-Änderungen nötig.
-4. Bei künftigen Releases den CACHE-Namen in sw.js ändern. So erkennt die PWA neue Versionen.
-5. Bei einem neuen Release erscheint nach Download ein Hinweis mit 'Später' und 'Jetzt aktualisieren'. Es erfolgt KEIN erzwungener Reload mitten in einem Gespräch.
+1. Vorhandene Website-Dateien und den aktuellen Cloudflare-Worker sichern.
+2. Alle Website-Dateien dieses Ordners gemeinsam auf der Website veröffentlichen: index.html, sw.js, manifest.webmanifest und die drei Icons.
+3. In Cloudflare Workers & Pages den Worker johann-ki öffnen und den Inhalt von johann-worker-v11.js als Worker-Code veröffentlichen (Deploy). Vorher die vorhandenen Secrets und Bindings nicht löschen.
+4. Prüfen: OPENAI_API_KEY (Secret), DB (D1-Binding); für die Wunschbox RESEND_API_KEY (Secret) und eine verifizierte Resend-Domain.
+5. Auf der Live-Website eine kurze Kindergeschichte erzeugen und Sudoku in Leicht sowie Mittel ausprobieren.
 
-HINWEISE:
-- Eine laufende Vorlesung wird nicht automatisch unterbrochen; vor 'Jetzt aktualisieren' bitte zu Ende hören.
-- Nicht gespeicherte Chatverläufe und laufende Sudoku-Partien sind NICHT vollständig gegen manuelle Aktualisierung gesichert. Entwürfe und die gerade sichtbare Kindergeschichte werden vor bestätigtem Update vorübergehend in sessionStorage gesichert. Das Bücherregal bleibt wie bisher lokal gespeichert.
-- Persönliche Cloud-Konten, tägliche Geschichten, Niclas als Erzähler und der universelle TV-Controller sind separate, noch nicht implementierte Schritte.
-- Livebetrieb auf johann-butler.de wurde nicht getestet.
+NEU: Niclas ist als subtiler Erzähler/Begleiter in JEDER neu erzeugten Geschichte verankert; auf der Geschichten-Seite steht eine kurze Widmung. Kein Anspruch, dass Geschichten echte Worte oder Erlebnisse von Niclas wiedergeben.
+SUDOKU: Leicht markiert Fehler sofort. Mittel/Schwer/Experte erst nach vollständiger Eingabe und Klick auf Einreichen.
+PWA: Neue Cache-Version. Updates werden angeboten, nicht mitten im Gespräch erzwungen.
 
-Sudoku-Update: Leicht zeigt Fehler sofort. Mittel/Schwer/Experte zeigen Fehler erst nach Einreichen eines vollständig ausgefüllten Rätsels. Der bestehende Worker bleibt unverändert.
+WICHTIG VOR ÖFFENTLICHER VERTEILUNG: Es gibt noch KEINE sicheren individuellen Benutzerkonten oder Cloud-Bücherregale. Geschichten werden auf dem jeweiligen Gerät gespeichert. Das bisherige johann_facts-Gedächtnis ist global: keine privaten personenbezogenen Fakten darin speichern, bevor die Benutzertrennung eingebaut ist. Bitte vor der Veröffentlichung mit Julia klären, ob die Widmung und die Verwendung von Niclas als fiktionaler Erzähler für sie und ihren Sohn in Ordnung sind.
+
+Live-Funktion nicht automatisch getestet.

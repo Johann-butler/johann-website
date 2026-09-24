@@ -1,1 +1,1 @@
-JOHANN V9: Alle Dateien im Hauptverzeichnis des GitHub-Repositories hochladen. index.html und sw.js ersetzen. Die vorhandenen Wetterbilder nicht loeschen. Der linke Button oeffnet PayPal; Antippen der Kugel erzeugt gelegentlich eine kurze KI-Reaktion (maximal einmal pro 25 Sekunden pro Geraet).
+Johann V11 – Releasepaket mit Niclas als dezentem Geschichtenerzähler, Sudoku-Einreichen und PWA-Update-System. Details: ANLEITUNG.txt

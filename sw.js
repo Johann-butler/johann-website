@@ -1,5 +1,5 @@
 // Cache-Version bei jedem Website-Release ändern. Kein sofortiges skipWaiting!
-const CACHE = 'johann-shell-v11-update-1';
+const CACHE = 'johann-shell-v11-niclas-sudoku-2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './johann-icon-192.png', './johann-icon-512.png', './johann-icon-180.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)));
