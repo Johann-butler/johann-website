@@ -166,6 +166,11 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 /* V22: Kompakte, fingerfreundliche Matchday-Karte im Chat. */
 .md-chat-card{margin:14px 0 2px;padding:14px;background:#12314e;border:1px solid #497ca7;border-radius:16px;max-width:100%;overflow-wrap:anywhere}
 .md-chat-card strong{font-size:16px}.md-chat-score{font-size:29px;font-weight:800;margin:8px 0;color:#fff}.md-chat-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.md-chat-actions button{min-height:44px;font-size:13px;padding:9px 12px}
+
+/* V22.2: Matchday PRO als eigenständiges, gut sichtbares Dashboard-Ziel. */
+.matchday-home-tile{grid-column:1/-1;text-align:left;border:2px solid #74c4ff!important;background:linear-gradient(125deg,rgba(20,89,143,.95),rgba(10,38,74,.97))!important;box-shadow:0 8px 28px rgba(24,114,207,.24)}
+.matchday-home-tile .tile-icon{font-size:35px}.matchday-home-tile .tile-title{font-weight:850;letter-spacing:.07em}.matchday-home-tile .tile-sub{color:#d3ebff}
+.matchday-home-tile:focus-visible{outline:3px solid #fff;outline-offset:3px}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#061322">
@@ -231,6 +236,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
    <p class="muted">Willkommen in meiner Kommandozentrale, Meister. Was darf es sein?</p>
    <div class="tiles">
     <button class="tile sudoku-tile" data-view="sudoku"><span class="tile-icon">🧩</span><span class="tile-title">Sudoku</span><div class="tile-sub">Achims Rätsel-Lounge · persönliche Spielstände</div></button>
+    <button class="tile matchday-home-tile" data-view="football" data-matchday-entry="true" aria-label="Matchday PRO – Prognosen und Analysen direkt öffnen"><span class="tile-icon">📊</span><span class="tile-title">MATCHDAY PRO</span><div class="tile-sub">Johanns Prognosen · Spieltagsanalyse · Tipp-Tagebuch →</div></button>
     <button class="tile" data-view="football"><span class="tile-icon">⚽</span><span class="tile-title">Fußball</span><div class="tile-sub">Dein Verein · 1.–3. Liga · The Haggens</div></button>
     <button class="tile" data-view="kids"><span class="tile-icon">📖</span><span class="tile-title">Johann Kids</span><div class="tile-sub">Märchen, große Gefühle und Gute-Nacht-Geschichten</div></button>
     <button class="tile" data-view="weather"><span class="tile-icon">🌤️</span><span class="tile-title">Wetter</span><div class="tile-sub">Aktuelles Wetter und 5-Tage-Vorschau</div></button>
@@ -433,6 +439,20 @@ function contextualReply(){const h=new Date().getHours(),w=weatherType(weatherCo
 function answerCommand(raw){const q=raw.trim().toLowerCase();if(!q)return say("Meister, Gedankenlesen ist für Version 2 vorgesehen. 😄");if(q.includes("wetter")||q.includes("temperatur")){const t=document.getElementById("temperature").textContent,w=document.getElementById("weatherText").textContent;return say(`In Bochum sind es aktuell ${t}. ${w}, Meister.`)}if(q.includes("vfl")||q.includes("bochum 1848")||q==="1848")return say(pick(["VfL Bochum 1848. Endlich eine vernünftige Eingabe, Meister. 💙🤍","1848, Meister. Bei diesem Thema arbeite ich sogar freiwillig Überstunden. 💙🤍","Blau und Weiß, Meister. Für Live-News brauche ich als Nächstes noch meine echte Nachrichtenanbindung."]));if(q.includes("kontakt")||q.includes("email")||q.includes("e-mail")||q.includes("mail"))return say('Sie erreichen mein noch menschliches Bodenpersonal unter <a href="mailto:machmal@johann-butler.de">machmal@johann-butler.de</a>. 😄',7000);if(q.includes("paypal")||q.includes("spende")||q.includes("kaffee")||q.includes("unterstütz"))return say('Sehr löblich, Meister. 😄 <a href="'+PAYPAL+'" target="_blank" rel="noopener noreferrer">Hier geht es zu Johanns Kaffeekasse.</a>',7000);if(q.includes("uhr")||q.includes("zeit"))return say(`Es ist ${document.getElementById("time").textContent} Uhr, Meister.`);if(q.includes("hallo")||q.includes("hi")||q.includes("moin")||q.includes("hey"))return say(pick(["Hallo, Meister.","Da bin ich, Meister.","Hallo. Johann meldet sich ordnungsgemäß zum Dienst.","Meister! Ich dachte schon, Sie reden heute nur mit echten Menschen."]));if(q.includes("wer bist")||q.includes("was bist"))return say("Ich bin Johann. Heute noch Website mit Größenwahn – später Ihr digitaler Butler, Meister. 😄",7000);if(q.includes("was kannst")||q.includes("hilfe"))return say("Aktuell kann ich Wetter, Zeit, ein bisschen Bochum, Kontakt und Kaffeekasse. Das ist die Oberfläche – mein Gehirn zieht später auf den Server, Meister.",7500);if(q.includes("danke"))return say(pick(["Sehr gerne, Meister.","Dafür wurde ich gebaut. Also… werde ich gebaut.","Immer zu Diensten, Meister."]));if(q.includes("nina"))return say("Bei Fragen zu Nina halte ich mich vorsichtshalber diplomatisch zurück, Meister. 😄");return say(pick([`„${raw.trim()}“ habe ich verstanden – beantworten kann ich es in dieser frühen Version noch nicht, Meister.`,`Das steht noch nicht in meinem kleinen Website-Gehirn, Meister. Mein richtiges Gehirn kommt später auf den Server.`,`Interessant, Meister. Dafür fehlen mir noch ein paar Synapsen. Geben Sie mir etwas Bauzeit. 😄`,`Notiert, Meister. Also bildlich gesprochen – speichern tue ich diese Eingabe noch nicht.`]),7000)}
 const command=document.getElementById("command"),send=document.getElementById("sendButton");const WORKER_URL="https://johann-ki.bjornkorczak.workers.dev/";
 let sending=false; const chatHistory=[];
+// V22.3: short-lived conversational weather context; only stored on this device.
+let lastWeatherReplyAt=0;
+function weatherFollowupIntent(message){
+  if(!lastWeatherReplyAt||Date.now()-lastWeatherReplyAt>3*60*1000)return null;
+  const last=chatHistory.at(-2);
+  if(!last||last.role!=='user'||!/(?:wetter|vorhersage|temperatur|wie (?:ist|wird) es)/i.test(last.content))return null;
+  if(/(?:fußball|fussball|bundesliga|spiel|tipp|prognose|matchday|tabelle|trainer|tor|kicktipp)/i.test(message))return null;
+  const q=message.trim();
+  const m=q.match(/^(?:(?:und|aber|okay|ok|gut|dann|bitte)\s+)?(?:(?:wie\s+(?:sieht\s+es|ist\s+es|wird\s+es)\s+(?:denn\s+)?(?:mit\s+)?|was\s+(?:ist|wird)\s+(?:mit\s+)?))?(?:in|für|fuer|mit)\s+([\p{L}][\p{L}\s-]{1,55}?)(?:\s+aus)?[.!?]*$/iu);
+  if(m)return {type:'forecast',city:m[1].trim()};
+  const short=q.match(/^(?:und\s+)?([\p{L}][\p{L}\s-]{1,40})[?!]*$/iu);
+  return short?{type:'forecast',city:short[1].trim()}:null;
+}
+
 // V22: Beim Tippen nur gespeicherte öffentliche Prognosen vorladen. Keine Entwürfe übertragen.
 let mdPrefetchTimer=null,mdPrefetchData=null,mdPrefetchAt=0;
 command.addEventListener('input',()=>{clearTimeout(mdPrefetchTimer);if(!/(?:dortmund|bvb|bundesliga|bayern|fußball|fussball|prognose|bochum|werder)/i.test(command.value))return;mdPrefetchTimer=setTimeout(async()=>{if(mdPrefetchData&&Date.now()-mdPrefetchAt<60000)return;try{const r=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'matchday_list'})});if(r.ok){mdPrefetchData=await r.json();mdPrefetchAt=Date.now()}}catch{}},350)});
@@ -454,12 +474,13 @@ async function submit(){
   if(!v){say("Was möchten Sie wissen, Meister? 😄");return}
   if(v.length>1000){say("Maximal 1000 Zeichen auf einmal, Meister.");return}
   const localAction=johannLocalAction(v);if(localAction){command.value='';showAssistantReply(v,localAction);return}
-  const wi=weatherChatIntent(v);
+  const wi=weatherChatIntent(v)||weatherFollowupIntent(v);
   if(wi){command.value='';command.blur();
     if(wi.type==='keep'){if(/bochum/i.test(v)&&weatherCity.name!=='Bochum'){try{await setWeatherCity('Bochum');showAssistantReply(v,{reply:'Erledigt, Meister! Dein Wetter steht wieder auf Bochum. 💙'});}catch(e){showAssistantReply(v,{reply:'Das hat leider nicht geklappt: '+e.message});}}else{showAssistantReply(v,{reply:'Sehr gern, Meister. Dein Wetterort bleibt '+weatherCity.name+'. 💙'});}return}
     say(nextJohannWait(),15000);
-    try{if(wi.type==='set'){const city=await setWeatherCity(wi.city);showAssistantReply(v,{reply:'Erledigt, Meister! Ab sofort zeige ich dir das Wetter in '+city.name+'. Auch der Hintergrund richtet sich nach dem Wetter dort. 🌤️'});}else{const f=await temporaryWeather(wi.city);showAssistantReply(v,{reply:'Hier ist deine 5-Tage-Vorhersage, Meister:\n'+formatForecast(f)+(wi.city!==weatherCity.name?'\nDein gespeicherter Wetterort bleibt '+weatherCity.name+'.':'')});}}catch(e){showAssistantReply(v,{reply:'Das hat leider nicht geklappt: '+e.message})}return;
+    try{if(wi.type==='set'){const city=await setWeatherCity(wi.city);showAssistantReply(v,{reply:'Erledigt, Meister! Ab sofort zeige ich dir das Wetter in '+city.name+'. Auch der Hintergrund richtet sich nach dem Wetter dort. 🌤️'});}else{const f=await temporaryWeather(wi.city);showAssistantReply(v,{reply:'Hier ist deine 5-Tage-Vorhersage, Meister:\n'+formatForecast(f)+(wi.city!==weatherCity.name?'\nDein gespeicherter Wetterort bleibt '+weatherCity.name+'.':'')});lastWeatherReplyAt=Date.now();}}catch(e){showAssistantReply(v,{reply:'Das hat leider nicht geklappt: '+e.message})}return;
   }
+  lastWeatherReplyAt=0;
   command.value="";command.blur();sending=true;send.disabled=true;
   chatArchive.classList.remove('show');
   say(nextJohannWait(),20000);
@@ -622,6 +643,8 @@ $('closePanel').addEventListener('click',closeDashboard);
 dash.addEventListener('click',e=>{if(e.target===dash)closeDashboard()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&dash.classList.contains('open'))closeDashboard()});
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+// Eigener Startseiten-Zugang: bestehende Matchday-Ansicht direkt öffnen, ohne Worker-Änderung.
+document.querySelector('[data-matchday-entry]').addEventListener('click',()=>{footballTab('matchday');mdRender();});
 const chatArchive=$('chatArchive'),chatMessages=$('chatMessages');
 $('closeChat').addEventListener('click',()=>chatArchive.classList.remove('show'));
 function showAssistantReply(question,result){
