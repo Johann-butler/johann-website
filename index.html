@@ -92,6 +92,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 .feedback-card{max-width:690px;margin:0 auto;background:linear-gradient(145deg,rgba(25,61,100,.87),rgba(7,25,47,.83));border-color:#5aa7dc}
 .feedback-card h2{font-size:clamp(26px,5vw,37px);margin:14px 0 5px}.feedback-card label{display:block;color:#e4f4ff;font-weight:650;margin-top:12px}
 .feedback-card select{appearance:auto}.feedback-card textarea{resize:vertical;min-height:135px}.feedback-consent{display:flex!important;align-items:flex-start;gap:10px;font-weight:400!important;font-size:13px;line-height:1.5;color:#d0e4f4!important}.feedback-consent input{margin-top:4px;flex:none;width:18px;height:18px}.feedback-honeypot{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}.feedback-status{min-height:22px;color:#b4e4ff;font-weight:600;line-height:1.5}
+
+/* Johann: unaufdringliche Update-Meldung */
+#johannUpdateNotice{position:fixed;z-index:9999;left:12px;right:12px;bottom:max(16px,env(safe-area-inset-bottom));max-width:470px;margin:auto;padding:17px;background:#102d49;color:#e9f5ff;border:1px solid #72b7e9;border-radius:18px;box-shadow:0 10px 40px #0009;font:15px/1.5 system-ui,sans-serif}
+#johannUpdateNotice[hidden]{display:none!important}
+#johannUpdateNotice .update-actions{display:flex;gap:10px;margin-top:12px}
+#johannUpdateNotice button{flex:1;border-radius:11px;border:1px solid #72b7e9;background:#215c8b;color:white;padding:12px;font-weight:700}
+#johannUpdateNotice button:last-child{background:#348cd2;border-color:#348cd2}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#061322">
@@ -128,6 +135,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
    <div class="tiles">
     <button class="tile sudoku-tile" data-view="sudoku"><span class="tile-icon">🧩</span><span class="tile-title">Sudoku</span><div class="tile-sub">Achims Rätsel-Lounge · persönliche Spielstände</div></button>
     <button class="tile" data-view="football"><span class="tile-icon">⚽</span><span class="tile-title">Fußball</span><div class="tile-sub">Dein Verein · 1.–3. Liga · The Haggens</div></button>
+    <button class="tile" data-view="kids"><span class="tile-icon">📖</span><span class="tile-title">Johann Kids</span><div class="tile-sub">Märchen, große Gefühle und Gute-Nacht-Geschichten</div></button>
     <button class="tile" data-view="weather"><span class="tile-icon">🌤️</span><span class="tile-title">Wetter</span><div class="tile-sub">Aktuell in Bochum</div></button>
     <button class="tile" data-view="notes"><span class="tile-icon">💙</span><span class="tile-title">Sag es Johann!</span><div class="tile-sub">Ideen, Wünsche und Verbesserungsvorschläge</div></button>
     <button class="tile" data-view="reminders"><span class="tile-icon">🔔</span><span class="tile-title">Erinnerungen</span><div class="tile-sub">Lokale Aufgaben und Termine</div></button>
@@ -166,8 +174,26 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
      <div class="glass"><h3>Wie knifflig darf es heute sein?</h3><div class="sudoku-options" id="difficultyOptions"><button class="difficulty" data-level="Leicht">🌱 Leicht</button><button class="difficulty" data-level="Mittel">✨ Mittel</button><button class="difficulty" data-level="Schwer">🔥 Schwer</button><button class="difficulty" data-level="Experte">😈 Experte</button></div><div class="row-actions"><button class="primary" id="startDaily">📅 Sudoku des Tages</button><button class="primary" id="startRandom">✨ Neues Sudoku</button><button class="secondary hidden" id="resumeGame">▶ Weiterspielen</button></div><p class="mini">Das Tagesrätsel bleibt pro Schwierigkeitsgrad jeden Tag gleich. Weitere Rätsel kannst du beliebig oft starten.</p></div>
      <div class="glass"><div class="row-actions" style="justify-content:space-between"><span id="playerStats">Noch keine Rätsel gelöst</span><button class="secondary" id="switchPlayer">Spieler wechseln</button></div></div>
     </div>
-    <div id="sudokuGame" class="hidden"><div class="game-top"><button class="backbtn" id="leaveGame">← Übersicht</button><span class="pill" id="gameDifficulty">Schwer</span><span id="gameClock" aria-label="Spielzeit">00:00</span></div><div id="expertLetter" class="expert-letter hidden"><div class="pill">💙 Nachricht von Björn</div><h3 id="expertText"></h3><button class="secondary" id="dismissExpert">Challenge angenommen! 😈</button></div><div class="sudoku-board" id="sudokuBoard" role="grid" aria-label="Sudoku mit neun mal neun Feldern"></div><div class="number-pad" id="numberPad"></div><div class="row-actions"><button class="secondary" id="eraseCell">⌫ Löschen</button><button class="secondary" id="hintCell">💡 Tipp</button><button class="secondary" id="checkGame">✓ Prüfen</button><button class="secondary" id="restartGame">↻ Neustart</button></div><div class="game-message" id="gameMessage" role="status">Wähle ein Feld und dann eine Zahl.</div><p class="mini">Dein Fortschritt wird auf diesem Gerät automatisch gespeichert.</p></div>
+    <div id="sudokuGame" class="hidden"><div class="game-top"><button class="backbtn" id="leaveGame">← Übersicht</button><span class="pill" id="gameDifficulty">Schwer</span><span id="gameClock" aria-label="Spielzeit">00:00</span></div><div id="expertLetter" class="expert-letter hidden"><div class="pill">💙 Nachricht von Björn</div><h3 id="expertText"></h3><button class="secondary" id="dismissExpert">Challenge angenommen! 😈</button></div><div class="sudoku-board" id="sudokuBoard" role="grid" aria-label="Sudoku mit neun mal neun Feldern"></div><div class="number-pad" id="numberPad"></div><div class="row-actions"><button class="secondary" id="eraseCell">⌫ Löschen</button><button class="secondary" id="hintCell">💡 Tipp</button><button class="primary" id="checkGame">✓ Einreichen</button><button class="secondary" id="restartGame">↻ Neustart</button></div><div class="game-message" id="gameMessage" role="status">Wähle ein Feld und dann eine Zahl.</div><p class="mini">Leicht: sofortige Fehleranzeige. Mittel, Schwer und Experte: Prüfung erst nach dem Einreichen. Dein Fortschritt wird auf diesem Gerät gespeichert.</p></div>
     <div id="sudokuWin" class="hidden"><div class="sudoku-intro"><div style="font-size:54px">🏆</div><h2 id="winTitle">Großartig, Achim!</h2><p id="winMessage"></p></div><div class="glass"><h3>Noch eine Runde?</h3><div class="sudoku-options" id="winDifficultyOptions"><button class="difficulty" data-level="Leicht">🌱 Leicht</button><button class="difficulty" data-level="Mittel">✨ Mittel</button><button class="difficulty" data-level="Schwer">🔥 Schwer</button><button class="difficulty" data-level="Experte">😈 Experte</button></div><div class="row-actions"><button class="primary" id="nextGame">Nächstes Sudoku →</button><button class="secondary" id="winHome">Zur Übersicht</button></div></div></div>
+   </div>
+  </section>
+  <section class="panel-section" id="view-kids">
+   <button class="backbtn" data-view="home">← Zurück</button>
+   <div class="glass" style="background:linear-gradient(135deg,#29264f,#122d4d)">
+    <span class="pill">✨ JOHANN KIDS</span><h2>Deine Geschichtenwelt</h2>
+    <p class="muted">Zauberhafte Abenteuer, Geschichten über große Gefühle und ganz persönliche Gute-Nacht-Geschichten.</p>
+    <label for="kidsAge">Alter des Kindes</label><select id="kidsAge" class="field"><option value="3">3 Jahre</option><option value="4">4 Jahre</option><option value="5" selected>5 Jahre</option><option value="6">6 Jahre</option><option value="7">7 Jahre</option><option value="8">8 Jahre</option><option value="9">9 Jahre</option><option value="10">10 Jahre</option><option value="11">11 Jahre</option><option value="12">12 Jahre</option></select>
+    <label for="kidsType">Welche Geschichte?</label><select id="kidsType" class="field"><option value="magic">🦄 Magie &amp; Märchen</option><option value="feelings">💛 Große Gefühle &amp; Wut</option><option value="bedtime">🌙 Gute Nacht</option></select>
+    <label for="kidsHero">Wer soll mitspielen? (freiwillig)</label><input id="kidsHero" class="field" maxlength="80" placeholder="Ein kleiner Drache, eine mutige Ritterin …">
+    <label for="kidsTheme">Worum soll es gehen? (freiwillig)</label><textarea id="kidsTheme" class="field" maxlength="300" rows="3" placeholder="Ein verwunschenes Schloss, ein verlorener Zauberstab …"></textarea>
+    <label for="kidsLength">Vorlesedauer</label><select id="kidsLength" class="field"><option value="short">3–5 Minuten</option><option value="medium" selected>5–7 Minuten</option><option value="long">10–12 Minuten</option></select>
+    <div class="row-actions"><button class="primary" id="kidsGenerate">✨ Geschichte erzählen</button><button class="secondary" id="kidsSurprise">🎲 Überrasch mich!</button></div>
+    <p id="kidsStatus" class="muted" role="status" aria-live="polite"></p>
+    <article id="kidsStory" class="glass hidden" style="white-space:pre-wrap;line-height:1.85;font-size:17px;overflow-wrap:anywhere"></article>
+    <div id="kidsStoryActions" class="row-actions hidden"><button class="secondary" id="kidsRead">🔊 Vorlesen</button><button class="secondary" id="kidsStop">■ Stopp</button><button class="secondary" id="kidsSave">📖 Auf diesem Gerät speichern</button></div>
+    <div class="glass"><h3>📚 Mein Bücherregal</h3><p class="mini">Vorerst nur auf diesem Gerät gespeichert. Sichere Familienkonten und private Cloud-Bücherregale folgen.</p><div id="kidsShelf"></div></div>
+    <p class="mini">Elternbereich im Aufbau. Bitte Geschichten bei jüngeren Kindern gemeinsam auswählen. Es werden hier noch keine Kinderkonten angelegt.</p>
    </div>
   </section>
   <section class="panel-section" id="view-weather"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><div class="dashboard-weather" id="dashboardWeather">Wetter in Bochum wird geladen …</div><p class="muted">Die Wetterdaten stammen von Open-Meteo und werden regelmäßig aktualisiert.</p></div></section>
@@ -330,7 +356,7 @@ safeResize(true);requestAnimationFrame(animate);
 // JOHANN · Dashboard, Browser-Sudoku und lokale Werkzeuge
 const $=id=>document.getElementById(id);
 const dash=$('dashboard');
-const viewTitles={home:'Kommandozentrale',sudoku:'Sudoku',weather:'Wetter',notes:'Sag es Johann!',reminders:'Erinnerungen',memory:'Gedächtnis',status:'Systemstatus',football:'Fußball'};
+const viewTitles={home:'Kommandozentrale',sudoku:'Sudoku',weather:'Wetter',notes:'Sag es Johann!',reminders:'Erinnerungen',memory:'Gedächtnis',status:'Systemstatus',football:'Fußball',kids:'Johann Kids'};
 function openDashboard(view='home'){
  dash.classList.add('open');document.body.style.overflow='hidden';showView(view);
  $('closePanel').focus();
@@ -418,13 +444,13 @@ $('leaveGame').onclick=()=>{pauseGame();showView('sudoku')};
 $('winHome').onclick=()=>showView('sudoku');
 $('nextGame').onclick=()=>newGame(false);
 function pauseGame(){if(game&&!game.completed){game.elapsed+=Math.max(0,Date.now()-(game.lastTick||Date.now()));game.lastTick=Date.now();saveGame()}clearInterval(clockHandle)}
-function showGame(){if(!game)return;$('sudokuLogin').classList.add('hidden');$('sudokuLobby').classList.add('hidden');$('sudokuWin').classList.add('hidden');$('sudokuGame').classList.remove('hidden');$('gameDifficulty').textContent=game.difficulty+(game.daily?' · Tagesrätsel':'');$('expertLetter').classList.add('hidden');game.lastTick=Date.now();renderBoard();updateClockGame();clearInterval(clockHandle);clockHandle=setInterval(updateClockGame,1000);$('gameMessage').textContent='Wähle ein Feld und dann eine Zahl.';dash.querySelector('.panel').scrollTop=0}
+function showGame(){if(!game)return;$('sudokuLogin').classList.add('hidden');$('sudokuLobby').classList.add('hidden');$('sudokuWin').classList.add('hidden');$('sudokuGame').classList.remove('hidden');$('gameDifficulty').textContent=game.difficulty+(game.daily?' · Tagesrätsel':'');$('expertLetter').classList.add('hidden');game.lastTick=Date.now();game.revealErrors=false;renderBoard();updateClockGame();clearInterval(clockHandle);clockHandle=setInterval(updateClockGame,1000);$('gameMessage').textContent=game.difficulty==='Leicht'?'Wähle ein Feld. Falsche Zahlen werden sofort rot markiert.':'Fülle alle Felder aus und drücke anschließend Einreichen. Vorher gibt es keine Fehleranzeige.';dash.querySelector('.panel').scrollTop=0}
 function updateClockGame(){if(!game||game.completed)return;const sec=Math.floor((game.elapsed+Date.now()-game.lastTick)/1000);$('gameClock').textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')}
-function renderBoard(){const board=$('sudokuBoard');board.replaceChildren();if(!game)return;game.entries.forEach((n,i)=>{const b=document.createElement('button');b.className='cell';const row=Math.floor(i/9),col=i%9;if((Math.floor(row/3)+Math.floor(col/3))%2)b.classList.add('block-alt');if(col===2||col===5)b.classList.add('block-right');if(row===2||row===5)b.classList.add('block-bottom');if(col===8)b.classList.add('col-end');if(row===8)b.classList.add('row-end');b.type='button';b.setAttribute('role','gridcell');b.setAttribute('aria-label',`Zeile ${Math.floor(i/9)+1}, Spalte ${i%9+1}, ${n||'leer'}`);b.textContent=n||'';if(game.puzzle[i])b.classList.add('given');if(i===selected)b.classList.add('selected');else if(selected>=0&&(Math.floor(i/9)===Math.floor(selected/9)||i%9===selected%9||(Math.floor(i/27)===Math.floor(selected/27)&&Math.floor(i%9/3)===Math.floor(selected%9/3))))b.classList.add('peer');if(selected>=0&&n&&n===game.entries[selected]&&i!==selected)b.classList.add('same');if(n&&!game.puzzle[i]&&n!==game.solution[i])b.classList.add('error');b.onclick=()=>{selected=i;renderBoard()};board.append(b)});const pad=$('numberPad');pad.replaceChildren();for(let n=1;n<=9;n++){const b=document.createElement('button');b.textContent=n;b.setAttribute('aria-label','Zahl '+n);b.onclick=()=>putNumber(n);pad.append(b)}}
-function putNumber(n){if(!game||game.completed||selected<0||game.puzzle[selected])return;game.entries[selected]=n;saveGame();renderBoard();if(game.entries.every((v,i)=>v===game.solution[i]))winGame();else $('gameMessage').textContent=n===game.solution[selected]?'Gut gemacht! Weiter so.':'Diese Zahl passt hier noch nicht.'}
-$('eraseCell').onclick=()=>{if(game&&selected>=0&&!game.puzzle[selected]){game.entries[selected]=0;saveGame();renderBoard()}};
-$('hintCell').onclick=()=>{if(!game)return;let pos=selected;if(pos<0||game.puzzle[pos]||game.entries[pos]===game.solution[pos])pos=game.entries.findIndex((v,i)=>!game.puzzle[i]&&v!==game.solution[i]);if(pos<0)return;selected=pos;game.entries[pos]=game.solution[pos];saveGame();renderBoard();$('gameMessage').textContent='Johann hat dir ein Feld verraten. 💙';if(game.entries.every((v,i)=>v===game.solution[i]))winGame()};
-$('checkGame').onclick=()=>{if(!game)return;const wrong=game.entries.filter((v,i)=>v&&v!==game.solution[i]).length,missing=game.entries.filter(v=>!v).length;$('gameMessage').textContent=wrong?`${wrong} Feld${wrong===1?' ist':'er sind'} noch nicht richtig.`:missing?`Bisher alles richtig! Noch ${missing} freie Felder.`:'Alles richtig!';if(!wrong&&!missing)winGame()};
+function renderBoard(){const board=$('sudokuBoard');board.replaceChildren();if(!game)return;game.entries.forEach((n,i)=>{const b=document.createElement('button');b.className='cell';const row=Math.floor(i/9),col=i%9;if((Math.floor(row/3)+Math.floor(col/3))%2)b.classList.add('block-alt');if(col===2||col===5)b.classList.add('block-right');if(row===2||row===5)b.classList.add('block-bottom');if(col===8)b.classList.add('col-end');if(row===8)b.classList.add('row-end');b.type='button';b.setAttribute('role','gridcell');b.setAttribute('aria-label',`Zeile ${Math.floor(i/9)+1}, Spalte ${i%9+1}, ${n||'leer'}`);b.textContent=n||'';if(game.puzzle[i])b.classList.add('given');if(i===selected)b.classList.add('selected');else if(selected>=0&&(Math.floor(i/9)===Math.floor(selected/9)||i%9===selected%9||(Math.floor(i/27)===Math.floor(selected/27)&&Math.floor(i%9/3)===Math.floor(selected%9/3))))b.classList.add('peer');if(selected>=0&&n&&n===game.entries[selected]&&i!==selected)b.classList.add('same');if(n&&!game.puzzle[i]&&n!==game.solution[i]&&(game.difficulty==='Leicht'||game.revealErrors))b.classList.add('error');b.onclick=()=>{selected=i;renderBoard()};board.append(b)});const pad=$('numberPad');pad.replaceChildren();for(let n=1;n<=9;n++){const b=document.createElement('button');b.textContent=n;b.setAttribute('aria-label','Zahl '+n);b.onclick=()=>putNumber(n);pad.append(b)}}
+function putNumber(n){if(!game||game.completed||selected<0||game.puzzle[selected])return;game.entries[selected]=n;game.revealErrors=false;saveGame();renderBoard();if(game.difficulty==='Leicht'&&game.entries.every((v,i)=>v===game.solution[i]))winGame();else $('gameMessage').textContent=game.difficulty==='Leicht'?(n===game.solution[selected]?'Gut gemacht! Weiter so.':'Diese Zahl passt hier noch nicht.'):'Zahl eingetragen. Wenn du fertig bist, drücke Einreichen.'}
+$('eraseCell').onclick=()=>{if(game&&selected>=0&&!game.puzzle[selected]){game.entries[selected]=0;game.revealErrors=false;saveGame();renderBoard()}};
+$('hintCell').onclick=()=>{if(!game)return;let pos=selected;if(pos<0||game.puzzle[pos]||game.entries[pos]===game.solution[pos])pos=game.entries.findIndex((v,i)=>!game.puzzle[i]&&v!==game.solution[i]);if(pos<0)return;selected=pos;game.entries[pos]=game.solution[pos];game.revealErrors=false;saveGame();renderBoard();$('gameMessage').textContent='Johann hat dir ein Feld verraten. 💙';if(game.difficulty==='Leicht'&&game.entries.every((v,i)=>v===game.solution[i]))winGame()};
+$('checkGame').onclick=()=>{if(!game)return;const missing=game.entries.filter(v=>!v).length;if(missing){$('gameMessage').textContent=`Noch ${missing} freie Felder. Fülle erst alle aus, bevor du einreichst.`;return}const wrong=game.entries.filter((v,i)=>v!==game.solution[i]).length;if(wrong){game.revealErrors=true;renderBoard();$('gameMessage').textContent=`Noch ${wrong} ${wrong===1?'Fehler':'Fehler'} im Rätsel. Die betreffenden Felder sind jetzt rot markiert. Du kannst sie korrigieren und erneut einreichen.`;return}winGame()};
 $('restartGame').onclick=()=>{if(game&&confirm('Dieses Sudoku wirklich von vorne beginnen?')){game.entries=game.puzzle.slice();game.elapsed=0;game.lastTick=Date.now();selected=-1;saveGame();showGame()}};
 function winGame(){pauseGame();game.completed=true;saveGame();const st=localRead(statsKey(),{solved:0});st.solved=(st.solved||0)+1;localWrite(statsKey(),st);$('sudokuGame').classList.add('hidden');$('sudokuWin').classList.remove('hidden');$('winTitle').textContent='Großartig, '+player.name+'! 🏆';$('winMessage').textContent=game.difficulty==='Experte'?'Verdammt, Papa! Ich hatte gehofft, du sitzt bis Weihnachten daran. Respekt! 😂❤️ Dein Björn.':nextRotating('win:'+playerId(player.name),['Das war richtig stark! Johann zieht den Hut.','Sauber gelöst! Bereit für die nächste Runde?','Die Zahlen hatten heute keine Chance gegen dich!']);setLevel(game.difficulty);dash.querySelector('.panel').scrollTop=0}
 $('sudokuBoard').addEventListener('keydown',e=>{if(/^[1-9]$/.test(e.key))putNumber(+e.key);if(e.key==='Backspace'||e.key==='Delete')$('eraseCell').click()});
@@ -448,11 +474,128 @@ function footballTab(tab){footballPane=tab;document.querySelectorAll('[data-foot
 function initFootball(){if(!footballInitialized){footballInitialized=true;document.querySelectorAll('[data-football-tab]').forEach(b=>b.addEventListener('click',()=>footballTab(b.dataset.footballTab)));document.querySelectorAll('[data-football-league]').forEach(b=>b.addEventListener('click',()=>footballTable(b.dataset.footballLeague)));document.getElementById('footballLeagueSelect').addEventListener('change',footballTeams);
 document.getElementById('quickWattenscheid').addEventListener('click',()=>footballSave({...LOWER_CLUBS.wattenscheid}));
 document.getElementById('quickRWE').addEventListener('click',async()=>{const pref={...LOWER_CLUBS.rwe};footballSave(pref);try{const teams=await footballFetch('/getavailableteams/bl3/'+FOOTBALL_SEASON);const team=teams.find(t=>/rot.?weiss essen/i.test(footballName(t)));if(team&&footballPreference()?.name===pref.name)footballSave({...pref,teamId:team.teamId||team.teamInfoId||null})}catch(e){console.info('RWE: offizieller Spielplan als Alternative verfügbar')}});document.getElementById('footballRefresh').addEventListener('click',()=>{delete footballCache['/getbltable/'+footballLeague+'/'+FOOTBALL_SEASON];footballTable()});document.getElementById('footballSaveCustom').addEventListener('click',()=>{const n=document.getElementById('footballCustomClubName').value.trim(),l=document.getElementById('footballCustomClubLeague').value.trim();if(!n){document.getElementById('footballCustomClubName').focus();return}footballSave({name:n,league:'other',customLeague:l})});document.getElementById('footballClubSettings').addEventListener('toggle',e=>{if(e.target.open)footballTeams()})}footballTab(footballPane);renderFootballFavorite()}
+
+
+// JOHANN KIDS V11 – keine privaten Kinderdaten in der Cloud ohne Benutzerkonten.
+let kidsCurrentStory = '';
+function kidsShelfRender(){
+ const el=$('kidsShelf');el.replaceChildren();
+ let stories=[];try{stories=JSON.parse(localStorage.getItem('johann-kids-stories')||'[]')}catch{}
+ if(!Array.isArray(stories)||!stories.length){el.textContent='Noch keine gespeicherten Geschichten.';return;}
+ stories.slice().reverse().forEach((item)=>{
+  const btn=document.createElement('button');btn.className='secondary';btn.style.cssText='display:block;width:100%;text-align:left;margin:8px 0';
+  btn.textContent=(item.title||'Meine Geschichte')+' · '+(item.date||'');
+  btn.addEventListener('click',()=>{kidsCurrentStory=item.story;$('kidsStory').textContent=item.story;$('kidsStory').classList.remove('hidden');$('kidsStoryActions').classList.remove('hidden');$('kidsStatus').textContent='Aus deinem Bücherregal.'});el.appendChild(btn);
+ });
+}
+async function kidsGenerate(){
+ const btn=$('kidsGenerate');if(btn.disabled)return;
+ const type=$('kidsType').value,age=Number($('kidsAge').value),length=$('kidsLength').value,hero=$('kidsHero').value.trim(),theme=$('kidsTheme').value.trim();
+ btn.disabled=true;$('kidsStatus').textContent='Johann schreibt deine Geschichte … ✨';$('kidsStory').classList.add('hidden');$('kidsStoryActions').classList.add('hidden');
+ const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),90000);
+ try{
+  const r=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'kids_story',type,age,length,hero,theme}),signal:ctrl.signal});
+  const d=await r.json();if(!r.ok||!d.story)throw Error(d.error||'Keine Geschichte erhalten.');
+  kidsCurrentStory=d.story;$('kidsStory').textContent=d.story;$('kidsStory').classList.remove('hidden');$('kidsStoryActions').classList.remove('hidden');$('kidsStatus').textContent='Deine Geschichte ist fertig. Viel Spaß beim Vorlesen!';
+ }catch(e){$('kidsStatus').textContent=e.name==='AbortError'?'Das dauert gerade zu lange. Bitte noch einmal versuchen.':e.message||'Gerade klappt es leider nicht.'}
+ finally{clearTimeout(timer);btn.disabled=false}
+}
+$('kidsGenerate').addEventListener('click',kidsGenerate);
+$('kidsSurprise').addEventListener('click',()=>{$('kidsHero').value='';$('kidsTheme').value='';kidsGenerate()});
+$('kidsRead').addEventListener('click',()=>{if(!('speechSynthesis'in window)){ $('kidsStatus').textContent='Vorlesen wird von diesem Browser nicht unterstützt.';return;}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(kidsCurrentStory);u.lang='de-DE';u.rate=.87;speechSynthesis.speak(u)});
+$('kidsStop').addEventListener('click',()=>{if('speechSynthesis'in window)speechSynthesis.cancel()});
+$('kidsSave').addEventListener('click',()=>{if(!kidsCurrentStory)return;let stories=[];try{stories=JSON.parse(localStorage.getItem('johann-kids-stories')||'[]')}catch{}if(!Array.isArray(stories))stories=[];const title=kidsCurrentStory.split('\n').find(x=>x.trim())?.slice(0,75)||'Meine Geschichte';stories.push({title,story:kidsCurrentStory,date:new Date().toLocaleDateString('de-DE')});try{localStorage.setItem('johann-kids-stories',JSON.stringify(stories.slice(-15)));$('kidsStatus').textContent='In deinem lokalen Bücherregal gespeichert.';kidsShelfRender()}catch{$('kidsStatus').textContent='Auf diesem Gerät ist nicht genug Speicher frei.'}});
+kidsShelfRender();
 </script>
 <script>
+// Ein Update wird im Hintergrund heruntergeladen, aber nie mitten in einem Gespräch aktiviert.
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  window.addEventListener('load', async () => {
+    const notice = document.getElementById('johannUpdateNotice');
+    const later = document.getElementById('johannUpdateLater');
+    const now = document.getElementById('johannUpdateNow');
+    let waitingWorker = null;
+    let userApprovedReload = false;
+    let postponed = false;
+    let registration;
+
+    function showWaiting(worker) {
+      if (!worker || postponed) return;
+      waitingWorker = worker;
+      notice.hidden = false;
+    }
+    function preserveDrafts() {
+      // Nur kurzfristige Entwürfe sichern, keine privaten Daten an einen Server senden.
+      try {
+        const ids = ['userInput','chatInput','kidsHero','kidsTheme','feedbackMessage','reminderText'];
+        const values = {};
+        for (const id of ids) {
+          const field = document.getElementById(id);
+          if (field && typeof field.value === 'string') values[id] = field.value;
+        }
+        const story = document.getElementById('kidsStory');
+        if (story && !story.classList.contains('hidden')) values.kidsStory = story.textContent;
+        sessionStorage.setItem('johann-update-drafts', JSON.stringify(values));
+      } catch (_) {}
+    }
+    function restoreDrafts() {
+      try {
+        const raw = sessionStorage.getItem('johann-update-drafts');
+        if (!raw) return;
+        sessionStorage.removeItem('johann-update-drafts');
+        const values = JSON.parse(raw);
+        for (const [id, value] of Object.entries(values)) {
+          if (id === 'kidsStory') {
+            const story = document.getElementById('kidsStory');
+            if (story && value) {
+              story.textContent = value;
+              story.classList.remove('hidden');
+              document.getElementById('kidsStoryActions')?.classList.remove('hidden');
+              if (typeof kidsCurrentStory !== 'undefined') kidsCurrentStory = value;
+            }
+          } else {
+            const field = document.getElementById(id);
+            if (field && typeof value === 'string') field.value = value;
+          }
+        }
+      } catch (_) {}
+    }
+    restoreDrafts();
+    later.addEventListener('click', () => { postponed = true; notice.hidden = true; });
+    now.addEventListener('click', () => {
+      if (!waitingWorker) return;
+      preserveDrafts();
+      userApprovedReload = true;
+      now.disabled = true;
+      now.textContent = 'Wird geladen …';
+      waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+    });
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (userApprovedReload) location.reload();
+    });
+    try {
+      registration = await navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' });
+      if (registration.waiting && navigator.serviceWorker.controller) showWaiting(registration.waiting);
+      registration.addEventListener('updatefound', () => {
+        const worker = registration.installing;
+        if (!worker) return;
+        worker.addEventListener('statechange', () => {
+          if (worker.state === 'installed' && navigator.serviceWorker.controller) showWaiting(registration.waiting || worker);
+        });
+      });
+      // Sichtbare App und höchstens stündlich auf Updates prüfen.
+      const check = () => { if (document.visibilityState === 'visible' && navigator.onLine) registration.update().catch(() => {}); };
+      document.addEventListener('visibilitychange', check);
+      setInterval(check, 60 * 60 * 1000);
+      check();
+    } catch (error) { console.warn('Johann-Updateprüfung nicht verfügbar.'); }
+  });
 }
 </script>
+
+<aside id="johannUpdateNotice" role="status" aria-live="polite" hidden>
+ <strong>✨ Johann hat ein Update!</strong><div>Die neue Version ist bereit. Du entscheidest, wann sie geladen wird.</div>
+ <div class="update-actions"><button type="button" id="johannUpdateLater">Später</button><button type="button" id="johannUpdateNow">Jetzt aktualisieren</button></div>
+</aside>
 </body>
 </html>
