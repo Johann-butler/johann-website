@@ -99,6 +99,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 #johannUpdateNotice .update-actions{display:flex;gap:10px;margin-top:12px}
 #johannUpdateNotice button{flex:1;border-radius:11px;border:1px solid #72b7e9;background:#215c8b;color:white;padding:12px;font-weight:700}
 #johannUpdateNotice button:last-child{background:#348cd2;border-color:#348cd2}
+
+/* Johann Analytics V1 – private Ansicht */
+.analytics-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.analytics-stat{padding:18px;border:1px solid #42749f;border-radius:16px;background:rgba(14,49,80,.75)}.analytics-stat strong{display:block;font-size:29px;color:#9bd7ff;margin:8px 0}.analytics-stat span{color:#c5dbee;font-size:13px}.analytics-bars{display:grid;gap:13px;margin-top:16px}.analytics-bar{height:11px;background:#1d3854;border-radius:9px;overflow:hidden}.analytics-bar>i{display:block;height:100%;background:#399be8;border-radius:9px}.analytics-label{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:6px}.analytics-status{min-height:23px;color:#b9dfff;font-size:13px;line-height:1.5}@media(max-width:440px){.analytics-stat{padding:13px}.analytics-stat strong{font-size:25px}}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#061322">
@@ -125,7 +128,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 </section>
 
 <button class="info-button" id="infoButton" aria-label="Info und Kontakt">ⓘ</button>
-<div class="info-box" id="infoBox"><div class="info-title">JOHANN · KONTAKT</div><div class="info-text">Fragen, Ideen oder einfach mal Johann Hallo sagen?</div><a href="mailto:machmal@johann-butler.de">machmal@johann-butler.de</a></div>
+<div class="info-box" id="infoBox"><div class="info-title">JOHANN · KONTAKT</div><div class="info-text">Fragen, Ideen oder einfach mal Johann Hallo sagen?</div><a href="mailto:machmal@johann-butler.de">machmal@johann-butler.de</a><div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(90,170,225,.22);text-align:right"><button id="infoAdminLink" type="button" style="border:0;background:none;color:#88a6bd;font-size:11px;cursor:pointer;padding:5px">Admin ↗</button></div></div>
 </main>
 <div class="panel-backdrop" id="dashboard" role="dialog" aria-modal="true" aria-label="Johanns Kommandozentrale">
  <div class="panel">
@@ -140,7 +143,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
     <button class="tile" data-view="notes"><span class="tile-icon">💙</span><span class="tile-title">Sag es Johann!</span><div class="tile-sub">Ideen, Wünsche und Verbesserungsvorschläge</div></button>
     <button class="tile" data-view="reminders"><span class="tile-icon">🔔</span><span class="tile-title">Erinnerungen</span><div class="tile-sub">Lokale Aufgaben und Termine</div></button>
     <button class="tile" data-view="memory"><span class="tile-icon">🧠</span><span class="tile-title">Gedächtnis</span><div class="tile-sub">Datenbankanbindung vorbereiten</div></button>
-    <button class="tile" data-view="status"><span class="tile-icon">⚙️</span><span class="tile-title">Systemstatus</span><div class="tile-sub">Johanns Funktionen im Überblick</div></button>
+     <button class="tile" data-view="status"><span class="tile-icon">⚙️</span><span class="tile-title">Systemstatus</span><div class="tile-sub">Johanns Funktionen im Überblick</div></button>
    </div>
    <aside class="support-card" aria-label="Johanns Kaffeekasse">
     <div class="support-icon" aria-hidden="true">☕</div>
@@ -215,6 +218,16 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
   </form></div></section>
   <section class="panel-section" id="view-reminders"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><label for="reminderText">Erinnerung</label><input class="field" id="reminderText" maxlength="180" placeholder="Was steht an?"><label for="reminderDate">Wann?</label><input class="field" id="reminderDate" type="datetime-local"><button class="primary" id="addReminder">Erinnerung speichern</button><p class="mini">Noch keine Push-Nachrichten: Fällige Erinnerungen erscheinen hier, wenn du die Seite öffnest. Aktive Benachrichtigungen folgen mit deinem Server.</p></div><div id="remindersList"></div></section>
   <section class="panel-section" id="view-memory"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Gedächtnis</h2><p class="muted">Deine D1-Datenbank ist vorbereitet. Damit hier Erinnerungen sicher verwaltet werden können, ergänzen wir im nächsten Schritt den Worker um geschützte Admin-Funktionen. Bis dahin zeigt dieses Menü bewusst keine privaten Daten an.</p><span class="pill">🔒 Admin-Bereich in Vorbereitung</span></div></section>
+  <section class="panel-section" id="view-analytics">
+    <button class="backbtn" data-view="home">← Zurück</button>
+    <div class="glass"><span class="pill">🔒 PRIVAT</span><h2>Johann Analytics</h2>
+      <div id="analyticsLogin"><p class="muted">Bitte Admin-Schlüssel eingeben.</p><input class="field" id="analyticsKey" type="password" autocomplete="off" placeholder="Admin-Schlüssel"><button class="primary" id="analyticsUnlock">Dashboard öffnen</button></div>
+      <div id="analyticsContent" class="hidden"><div class="row-actions"><label for="analyticsPeriod">Zeitraum</label><select class="field" id="analyticsPeriod" style="width:auto;margin:0"><option value="1">Heute</option><option value="7" selected>7 Tage</option><option value="30">30 Tage</option></select><button class="secondary" id="analyticsRefresh">↻ Aktualisieren</button><button class="secondary" id="analyticsLock">🔒 Sperren</button></div>
+      <div class="analytics-grid" style="margin-top:18px"><div class="analytics-stat"><span>Besucher</span><strong id="aVisitors">–</strong></div><div class="analytics-stat"><span>Seitenaufrufe</span><strong id="aViews">–</strong></div><div class="analytics-stat"><span>KI-Nachrichten</span><strong id="aChats">–</strong></div><div class="analytics-stat"><span>Sudoku gestartet</span><strong id="aSudoku">–</strong></div><div class="analytics-stat"><span>Sudoku gelöst</span><strong id="aSolved">–</strong></div><div class="analytics-stat"><span>Kindergeschichten</span><strong id="aStories">–</strong></div></div>
+      <h3>Genutzte Funktionen</h3><div id="analyticsBars" class="analytics-bars"></div><h3>Besucher pro Tag</h3><div id="analyticsDays" class="analytics-bars"></div></div>
+      <p id="analyticsStatus" class="analytics-status" role="status">Die Statistik benötigt noch die Analytics-Erweiterung im Worker.</p>
+    </div>
+  </section>
   <section class="panel-section" id="view-status"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Systemstatus</h2><p>🌤️ Wetter: <span id="statusWeather">Wird geprüft</span></p><p>🧠 KI: Über den bestehenden Cloudflare-Worker angebunden</p><p>🧩 Sudoku: Im Browser spielbar</p><p>💾 Sudoku-Spielstände: Auf diesem Gerät</p><p>💙 Wunschbox: Versand nach Einrichtung des Workers</p><p>🔒 Geschütztes Gedächtnis: Noch nicht freigeschaltet</p><p>🏠 Heimserver &amp; Sprachsteuerung: Später</p></div></section>
  </div>
 </div>
@@ -356,7 +369,8 @@ safeResize(true);requestAnimationFrame(animate);
 // JOHANN · Dashboard, Browser-Sudoku und lokale Werkzeuge
 const $=id=>document.getElementById(id);
 const dash=$('dashboard');
-const viewTitles={home:'Kommandozentrale',sudoku:'Sudoku',weather:'Wetter',notes:'Sag es Johann!',reminders:'Erinnerungen',memory:'Gedächtnis',status:'Systemstatus',football:'Fußball',kids:'Johann Kids'};
+$('infoAdminLink').addEventListener('click',()=>{document.getElementById('infoBox').classList.remove('show');openDashboard('analytics')});
+const viewTitles={home:'Kommandozentrale',sudoku:'Sudoku',weather:'Wetter',notes:'Sag es Johann!',reminders:'Erinnerungen',memory:'Gedächtnis',status:'Systemstatus',football:'Fußball',kids:'Johann Kids',analytics:'Johann Analytics'};
 function openDashboard(view='home'){
  dash.classList.add('open');document.body.style.overflow='hidden';showView(view);
  $('closePanel').focus();
@@ -370,6 +384,7 @@ function showView(view){
  if(view==='notes')$('feedbackStatus').textContent='';
  if(view==='reminders')renderReminders();
  if(view==='weather')$('dashboardWeather').textContent=`Bochum: ${$('temperature').textContent} · ${$('weatherText').textContent}`;
+ if(view==='analytics'&&window.johannAnalyticsOpened)window.johannAnalyticsOpened();
  if(view==='status')$('statusWeather').textContent=$('weatherText').textContent;
  dash.querySelector('.panel').scrollTop=0;
 }
@@ -597,5 +612,36 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
  <strong>✨ Johann hat ein Update!</strong><div>Die neue Version ist bereit. Du entscheidest, wann sie geladen wird.</div>
  <div class="update-actions"><button type="button" id="johannUpdateLater">Später</button><button type="button" id="johannUpdateNow">Jetzt aktualisieren</button></div>
 </aside>
+
+<script>
+/* Johann Analytics: keine personenbezogenen Inhalte und kein Speichern des Admin-Schlüssels. */
+(()=>{
+ const endpoint='https://johann-ki.bjornkorczak.workers.dev/';
+ let adminKey='';const el=id=>document.getElementById(id);
+ const allowed=new Set(['page_view','chat_message','sudoku_start','sudoku_solved','kids_story','feedback_sent','feature_open']);
+ let visitorId='';try{visitorId=localStorage.getItem('johann-anon-visitor-v1')||'';if(!/^[a-f0-9-]{36}$/.test(visitorId)){visitorId=crypto.randomUUID();localStorage.setItem('johann-anon-visitor-v1',visitorId)}}catch{visitorId=crypto.randomUUID()}
+ function track(event,feature=''){if(!allowed.has(event))return;fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'analytics_event',event,feature:String(feature).slice(0,30),visitorId}),keepalive:true}).catch(()=>{});}
+ window.johannTrack=track;
+ track('page_view');
+ // Anonyme Ereignisse: nur bei erfolgreicher Benutzeraktion.
+ el('sendButton')?.addEventListener('click',()=>{if(el('command')?.value.trim())track('chat_message')},{capture:true});
+ el('command')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.value.trim())track('chat_message')},{capture:true});
+ el('startDaily')?.addEventListener('click',()=>track('sudoku_start','daily'));
+ el('startRandom')?.addEventListener('click',()=>track('sudoku_start','random'));
+ el('nextGame')?.addEventListener('click',()=>track('sudoku_start','next'));
+ // Erfolgssignale werden vom bestehenden Spielcode nur nach Abschluss ausgelöst.
+ const oldWin=window.winGame;if(typeof oldWin==='function'){window.winGame=function(...args){const result=oldWin.apply(this,args);track('sudoku_solved',window.game?.difficulty||'');return result}}
+ el('kidsGenerate')?.addEventListener('click',()=>{const status=el('kidsStatus');if(!status)return;const observer=new MutationObserver(()=>{if(status.textContent.includes('Geschichte ist fertig')){observer.disconnect();track('kids_story',el('kidsType')?.value||'')}});observer.observe(status,{childList:true,characterData:true,subtree:true});setTimeout(()=>observer.disconnect(),100000)});
+ el('feedbackForm')?.addEventListener('submit',()=>{const status=el('feedbackStatus');if(!status)return;const observer=new MutationObserver(()=>{if(/gespeichert|angekommen|danke/i.test(status.textContent)){observer.disconnect();track('feedback_sent')}});observer.observe(status,{childList:true,characterData:true,subtree:true});setTimeout(()=>observer.disconnect(),25000)});
+ document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.view!=='analytics'&&b.dataset.view!=='home')track('feature_open',b.dataset.view)}));
+ const status=t=>el('analyticsStatus').textContent=t;
+ async function load(){if(!adminKey)return;status('Lade echte Nutzungsdaten …');try{const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'analytics_report',adminKey,days:Number(el('analyticsPeriod').value)})});const d=await r.json();if(!r.ok)throw Error(d.error||'Zugriff verweigert.');const totals=d.totals||{};for(const [id,key] of Object.entries({aVisitors:'visitors',aViews:'page_view',aChats:'chat_message',aSudoku:'sudoku_start',aSolved:'sudoku_solved',aStories:'kids_story'}))el(id).textContent=Number(totals[key]||0).toLocaleString('de-DE');const feats=d.features||[];const max=Math.max(1,...feats.map(x=>x.count||0));el('analyticsBars').replaceChildren(...feats.map(x=>bar(x.name,x.count,max)));const days=d.daily||[];const dayMax=Math.max(1,...days.map(x=>x.visitors||0));el('analyticsDays').replaceChildren(...days.map(x=>bar(x.day,x.visitors,dayMax)));status('Stand: '+new Date().toLocaleString('de-DE'))}catch(e){status(e.message+' Falls die Erfassung noch nicht im Worker eingebaut ist, bitte zuerst den Worker ergänzen.')}}
+ function bar(name,count,max){const wrap=document.createElement('div'),lab=document.createElement('div'),track=document.createElement('div'),fill=document.createElement('i'),a=document.createElement('span'),b=document.createElement('strong');lab.className='analytics-label';a.textContent=String(name);b.textContent=String(count||0);lab.append(a,b);track.className='analytics-bar';fill.style.width=(100*(count||0)/max)+'%';track.append(fill);wrap.append(lab,track);return wrap}
+ el('analyticsUnlock').onclick=()=>{adminKey=el('analyticsKey').value.trim();el('analyticsKey').value='';if(!adminKey){status('Bitte deinen Admin-Schlüssel eingeben.');return}el('analyticsLogin').classList.add('hidden');el('analyticsContent').classList.remove('hidden');load()};
+ el('analyticsLock').onclick=()=>{adminKey='';el('analyticsContent').classList.add('hidden');el('analyticsLogin').classList.remove('hidden');status('Gesperrt.')};
+ el('analyticsRefresh').onclick=load;el('analyticsPeriod').onchange=load;
+ window.johannAnalyticsOpened=()=>{if(adminKey)load()};
+})();
+</script>
 </body>
 </html>
