@@ -109,6 +109,16 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 .privacy-sheet{background:#11263b;color:#f0f7ff;border:1px solid #5187b5;border-radius:22px;padding:22px;max-width:560px;width:100%;box-shadow:0 14px 55px #0009;line-height:1.55}
 .privacy-sheet h2{font-size:22px;margin:0 0 8px}.privacy-sheet p{font-size:14px;color:#d1e1ee}.privacy-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.privacy-actions button{flex:1;min-width:120px;border-radius:12px;padding:13px 12px;background:#204769;border:1px solid #6398c7;color:#fff;font:inherit;cursor:pointer}.privacy-actions button:focus-visible,.privacy-link:focus-visible{outline:3px solid #a5dfff}
 #privacyPanel{position:fixed;z-index:99999;inset:0;overflow-y:auto;background:rgba(3,10,22,.93);padding:24px 14px;color:#eaf5ff}.privacy-document{max-width:650px;margin:auto;background:#10253b;border:1px solid #5583ac;border-radius:20px;padding:23px;line-height:1.6}.privacy-document h2{font-size:23px}.privacy-document h3{font-size:17px;margin-top:22px}.privacy-document p,.privacy-document li{font-size:14px;color:#d5e4f0}.privacy-link{border:0;background:none;color:#9ed5ff;text-decoration:underline;cursor:pointer;font:inherit;padding:5px}
+
+/* Sudoku: kontraststarke 3x3-Trennlinien auch auf Samsung/kleinen Displays.
+   Nur das Spielfeld wird angepasst; Hintergrund, Wetter und Logik bleiben gleich. */
+#sudokuBoard{border:5px solid #071b30!important;background:#071b30!important;border-radius:4px}
+#sudokuBoard .cell{border-right:1px solid #91a5b8;border-bottom:1px solid #91a5b8}
+#sudokuBoard .cell.block-right{border-right:5px solid #071b30!important}
+#sudokuBoard .cell.block-bottom{border-bottom:5px solid #071b30!important}
+#sudokuBoard .cell.col-end{border-right:0!important}
+#sudokuBoard .cell.row-end{border-bottom:0!important}
+@media(max-width:600px){#sudokuBoard{border-width:4px!important}#sudokuBoard .cell.block-right{border-right-width:4px!important}#sudokuBoard .cell.block-bottom{border-bottom-width:4px!important}}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#061322">
