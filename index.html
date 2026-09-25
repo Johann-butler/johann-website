@@ -155,6 +155,11 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 .kitchen-home-tile{border-color:rgba(247,182,100,.7)!important;background:linear-gradient(135deg,rgba(108,60,25,.58),rgba(13,38,61,.85))!important}
 .kitchen-hero{border:1px solid #a67b48;border-radius:18px;padding:20px;margin:12px 0;background:linear-gradient(125deg,#40301f,#15324b);line-height:1.55}.kitchen-hero h2{font-size:27px;margin:12px 0 5px}.kitchen-hero p{color:#e6d6c5;margin:0}
 .kitchen-tabs{display:flex;gap:8px;overflow-x:auto;padding:8px 0 14px;scrollbar-width:thin}.kitchen-tabs button{flex:0 0 auto;border:1px solid #55758d;border-radius:18px;background:#142d43;color:#d6e8f7;padding:11px 14px;font-size:13px}.kitchen-tabs button.selected{background:#bd8348;color:#0d1824;border-color:#e8bc7f;font-weight:700}.kitchen-pane{display:none}.kitchen-pane.active{display:block}.kitchen-pane .glass{margin:10px 0 15px}.kitchen-pane label{display:block;margin:13px 0 6px;color:#e8e2d8}.kitchen-pane textarea{width:100%;resize:vertical}.kitchen-two{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}.kitchen-two .field{width:100%;min-width:0}.kitchen-ask{margin-top:14px;width:100%}.kitchen-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}.kitchen-quick{display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-height:115px;padding:15px;border:1px solid #76624a;border-radius:16px;background:linear-gradient(145deg,#2a3946,#1a293b);color:#f4e7d4;text-align:left;font-size:24px}.kitchen-quick strong{font-size:15px}.kitchen-quick small{font-size:12px;color:#c4d3dc}.kitchen-recipe,.kitchen-day{border:1px solid #4b6880;border-radius:12px;padding:12px;margin:10px 0;background:#132b40}.kitchen-recipe p{white-space:pre-wrap;overflow-wrap:anywhere}.kitchen-recipe button,.kitchen-day button{margin:5px 5px 0 0}.kitchen-shopping-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #36516a}.kitchen-shopping-item span{flex:1;overflow-wrap:anywhere}.kitchen-shopping-item.done span{text-decoration:line-through;opacity:.6}.kitchen-shopping-item button{border:0;background:transparent;color:#ffc0ad;font-size:20px}.kitchen-note{color:#c3d4df;font-size:12px;line-height:1.6;margin:12px 0}
+/* V25.1: Johann schreibt automatisch weiter; keine Klicks erforderlich. */
+.johann-progressive-text{white-space:pre-wrap;overflow-wrap:anywhere}
+.johann-writing-cursor{display:inline-block;color:#65c6ff;font-weight:700;animation:johannCursorBlink .85s step-end infinite}
+@keyframes johannCursorBlink{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.johann-writing-cursor{animation:none}}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#061322">
@@ -190,7 +195,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
  <div class="panel">
   <div class="panel-head"><div><div class="panel-kicker">JOHANN · KI MIT HERZ</div><div class="panel-title" id="panelTitle">Kommandozentrale</div></div><button class="xbtn" id="closePanel" aria-label="Schließen">×</button></div>
   <section class="panel-section active" id="view-home">
-   <p class="muted">Willkommen in meiner Kommandozentrale, Meister. Was darf es sein?</p>
+   <p class="muted">Willkommen in meiner Kommandozentrale. Was steht an?</p>
    <div class="tiles">
     <button class="tile sudoku-tile" data-view="sudoku"><span class="tile-icon">🧩</span><span class="tile-title">Sudoku</span><div class="tile-sub">Achims Rätsel-Lounge · persönliche Spielstände</div></button>
     <button class="tile kitchen-home-tile" data-view="kitchen"><span class="tile-icon">🍳</span><span class="tile-title">Johanns Kochecke</span><div class="tile-sub">Rezepte · Familienküche · Kinder kochen mit · Einkaufslisten</div></button>
@@ -483,8 +488,8 @@ function safeText(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&
 async function submit(){
   if(sending)return;
   const v=command.value.trim();
-  if(!v){say("Was möchten Sie wissen, Meister? 😄");return}
-  if(v.length>1000){say("Maximal 1000 Zeichen auf einmal, Meister.");return}
+  if(!v){say("Was möchtest du wissen? 😄");return}
+  if(v.length>1000){say("Maximal 1000 Zeichen auf einmal. Mehr passt gerade nicht in meinen Kopf.");return}
   const localAction=johannLocalAction(v);if(localAction){command.value='';showAssistantReply(v,localAction);return}
   const cookingIntent=johannCookingIntent(v);if(cookingIntent){await johannCookingRequest(v,cookingIntent);return}
   const wi=weatherChatIntent(v)||weatherFollowupIntent(v);
@@ -715,13 +720,37 @@ document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',(
 document.querySelector('[data-matchday-entry]').addEventListener('click',()=>{footballTab('matchday');mdRender();});
 const chatArchive=$('chatArchive'),chatMessages=$('chatMessages');
 $('closeChat').addEventListener('click',()=>chatArchive.classList.remove('show'));
+// Johann V25.1: flüssiger Antwortaufbau, unabhängig von der Netzwerkantwort.
+// Ein echter Token-Stream benötigt zusätzlich ein eigenes Streaming-Protokoll im Worker.
+function johannRevealReply(target,cursor,fullText,block){
+ const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(reduced || fullText.length<18){target.textContent=fullText;cursor.remove();return;}
+ const chunks=fullText.match(/\S+\s*|\s+/g)||[fullText];
+ let index=0,shown='';
+ const frame=()=>{
+   if(!block.isConnected){cursor.remove();return;}
+   // Kurze Sätze lesbar aufbauen, lange Antworten nicht künstlich ausbremsen.
+   const amount=fullText.length>1200?Math.max(5,Math.ceil(chunks.length/65)):
+                fullText.length>450?Math.max(3,Math.ceil(chunks.length/75)):2;
+   for(let n=0;n<amount&&index<chunks.length;n++)shown+=chunks[index++];
+   target.textContent=shown;
+   if(index<chunks.length){
+     if(chatArchive.classList.contains('show') && chatArchive.scrollTop<60)chatArchive.scrollTop=0;
+     setTimeout(()=>requestAnimationFrame(frame),fullText.length>1200?19:32);
+   }else cursor.remove();
+ };
+ requestAnimationFrame(frame);
+}
 function showAssistantReply(question,result){
- const reply=String(result.reply||'Da fehlen mir gerade die Worte, Meister.');
+ const reply=String(result.reply||'Da fehlen mir gerade die Worte. Das ist selbst für mich neu.');
  chatHistory.push({role:'user',content:question},{role:'assistant',content:reply});
  if(chatHistory.length>12)chatHistory.splice(0,chatHistory.length-12);
  const block=document.createElement('div');block.className='chat-line';
  const u=document.createElement('div');const label=document.createElement('strong');label.textContent='Du: ';u.append(label,document.createTextNode(question));
- const a=document.createElement('div');const al=document.createElement('strong');al.textContent='Johann: ';a.append(al,document.createTextNode(reply));block.append(u,a);
+ const a=document.createElement('div');const al=document.createElement('strong');al.textContent='Johann: ';
+ const answerText=document.createElement('span');answerText.className='johann-progressive-text';
+ const cursor=document.createElement('span');cursor.className='johann-writing-cursor';cursor.textContent='▍';cursor.setAttribute('aria-hidden','true');
+ a.append(al,answerText,cursor);block.append(u,a);
  if(result.matchdayMatch){
    const m=result.matchdayMatch,card=document.createElement('div');card.className='md-chat-card';
    const title=document.createElement('strong');title.textContent=m.home+' – '+m.away;card.append(title);
@@ -737,6 +766,9 @@ function showAssistantReply(question,result){
  if(Array.isArray(result.sources)&&result.sources.length){const sources=document.createElement('div');sources.className='mini';sources.textContent='Quellen: ';result.sources.slice(0,5).forEach((item,i)=>{try{const url=new URL(item.url);if(!['https:','http:'].includes(url.protocol))return;const link=document.createElement('a');link.href=url.href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=item.title||url.hostname;sources.append(i?' · ':'',link)}catch{}});block.append(sources)}
  clearTimeout(speechTimer);speech.classList.remove('show');
  chatMessages.prepend(block);while(chatMessages.children.length>6)chatMessages.lastElementChild.remove();chatArchive.classList.add('show');chatArchive.scrollTop=0;
+ // Die komplette Antwort ist bereits da. Sie wird automatisch und zügig eingeblendet,
+ // ohne Klicks oder künstlich langsames Buchstabengetippe. Bei reduzierter Bewegung sofort.
+ johannRevealReply(answerText,cursor,reply,block);
  if(result.uiAction){if(result.uiAction==='matchday'){openDashboard('football');footballTab('matchday');mdRender()}else if(['sudoku','weather','kids','reminders','kitchen'].includes(result.uiAction)){openDashboard(result.uiAction)}}
  if(window.johannVoiceAwaiting){window.johannVoiceAwaiting=false;window.johannSpeakReply?.(reply);}
 }
