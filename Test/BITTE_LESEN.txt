@@ -1,0 +1,7 @@
+JOHANN TEST – nur für den Ordner Test in GitHub.
+
+Lade die index.html sowie die ACHT Dateien johann-test-neu-* hoch. BITTE_LESEN.txt nicht hochladen.
+Nur den INHALT des GitHub-Ordners Test leeren, NICHT das Repository oder die Dateien im Hauptverzeichnis!
+Deine produktive index.html, sw.js, manifest.webmanifest, Worker und Datenbank nicht verändern.
+Testlink: https://johann-butler.de/Test/index.html?neu=1
+Testmodus: Wetter und Navigation, Chat zeigt lokale Antwort, kein echter Worker. Kein produktiver Sicherheitstest.
