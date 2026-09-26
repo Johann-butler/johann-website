@@ -1,0 +1,19 @@
+JOHANN – ISOLIERTES LOGIN-LAB (NICHT PRODUKTIV)
+
+SCHRITT 1: Nur auth.html in den bestehenden GitHub-Ordner Test hochladen.
+Öffnen: https://johann-butler.de/Test/auth.html
+Diese Seite zeigt zunächst nur die Eingabemaske. E-Mail-Codes funktionieren erst,
+nachdem ein SEPARATER Test-Worker, eine NEUE Test-D1-Datenbank und Resend eingerichtet sind.
+Keine echten privaten Daten eingeben.
+
+SPÄTER (NICHT JETZT):
+- Eine neue Cloudflare D1-Testdatenbank erstellen (NICHT johann-memory).
+- auth-test-schema.sql NUR in dieser Testdatenbank ausführen.
+- Separaten Test-Worker mit auth-test-worker.js erstellen, Binding DB auf Test-D1.
+- RESEND_API_KEY als Secret, optional AUTH_ALLOWED_EMAIL und AUTH_CODE_PEPPER als Secrets.
+- Absenderadresse in Resend verifizieren und Test-Worker-URL im Formular eingeben.
+
+SICHERHEITSHINWEIS: Dieses Paket ist ein technischer Prototyp, keine produktionsreife
+Authentifizierung. Es nutzt vorläufig ein Bearer-Token im sessionStorage. Vor echtem
+Betrieb: Cookie-/CSRF-Konzept, strengere Tests und Datenschutzprüfung.
+Bestehende Johann-Webseite, produktiven Worker und johann-memory NICHT verändern.
