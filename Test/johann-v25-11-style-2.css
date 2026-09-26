@@ -1,0 +1,5 @@
+#voiceButton{font-size:23px;transition:background .2s,box-shadow .2s}
+#voiceButton.recording{background:#a21c38;color:#fff;border-color:#ff879c;box-shadow:0 0 0 5px #f0456033;animation:voicePulse 1s infinite}
+#voiceButton.busy{opacity:.65}
+@keyframes voicePulse{50%{box-shadow:0 0 0 11px #f0456011}}
+@media(max-width:400px){.controls{gap:7px}.controls .round{width:40px;height:40px;flex-basis:40px}.command{padding-left:12px}}
