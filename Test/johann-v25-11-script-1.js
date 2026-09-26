@@ -1,3 +1,25 @@
+/* TEST-ONLY: no production Johann API calls. Weather/OpenLigaDB remain available. */
+(function(){
+  const nativeFetch=window.fetch.bind(window);
+  const blockedHostnames=new Set(['johann-ki.bjornkorczak.workers.dev','api.johann-butler.de']);
+  window.fetch=function(input,init){
+    const raw=typeof input==='string'?input:(input&&input.url)||'';
+    let url;
+    try { url=new URL(raw,location.href); } catch(_) { return Promise.reject(new Error('Test: Ungültige Anfrageadresse.')); }
+    if(blockedHostnames.has(url.hostname)||url.pathname.includes('api-in-diesem-test-deaktiviert')) {
+      return Promise.reject(new Error('Testmodus: KI, Kochen und Anmeldung sind hier deaktiviert.'));
+    }
+    return nativeFetch(input,init);
+  };
+  document.addEventListener('click',function(e){
+    const el=e.target.closest('button'); if(!el)return;
+    if(el.matches('[data-kitchen-ask], .kitchen-ask, #sendButton, #mdReload, #mdMailTest, #mdImport, #kidsGenerate, #authRequest, #authVerify')){
+      e.preventDefault();e.stopImmediatePropagation();
+      const status=document.getElementById('johann-test-status');
+      if(status)status.textContent='Testmodus: Diese Funktion benötigt Johann-KI und ist hier absichtlich deaktiviert. Wetter und Navigation kannst du testen.';
+    }
+  },true);
+})();
 const PAYPAL="https://www.paypal.me/JohannButler";
 const scene=document.getElementById("scene"),speech=document.getElementById("speech");
 let speechTimer,weatherCode=null,sunrise=null,sunset=null,last1848Day="";
