@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="de">
 <head>
@@ -98,13 +97,10 @@
   </style>
 </head>
 <body>
-
   <h1>🔐 Johann – Testzugang</h1>
   <p>Nur für den privaten Test. Die laufende Johann-Webseite bleibt unverändert.</p>
-
   <section>
     <h2>👋 Willkommen bei Johann</h2>
-
     <label for="url">Test-Worker-Adresse</label>
     <input
       id="url"
@@ -113,12 +109,9 @@
       autocomplete="url"
       value="https://johann-auth-test.bjornkorczak.workers.dev/"
     >
-
     <label for="email">E-Mail</label>
     <input id="email" type="email" autocomplete="email">
-
     <button id="request" type="button">📩 Code anfordern</button>
-
     <label for="code">6-stelliger Anmeldecode</label>
     <input
       id="code"
@@ -129,17 +122,17 @@
       autocomplete="one-time-code"
       placeholder="123456"
     >
-
     <button id="verify" type="button">🔓 Anmelden</button>
+    <button id="passkeyLogin" type="button" class="secondary">👆 Mit Passkey anmelden</button>
     <button id="logout" type="button" class="secondary">Abmelden</button>
-
+    <button id="passkeyRegister" type="button" class="secondary">🔐 Passkey mit Windows Hello / Face ID einrichten</button>
+    <p class="hint">Passkey einrichten funktioniert erst nach der Anmeldung mit E-Mail-Code. Die biometrischen Daten bleiben auf deinem Gerät.</p>
     <p id="authStatus" class="status" role="status" aria-live="polite"></p>
     <p class="hint">
       Johann zeigt hier direkt an, was gerade passiert.
       Bitte den Code nur einmal anfordern und die neueste E-Mail verwenden.
     </p>
   </section>
-
   <section>
     <h2>🔒 Verschlüsseltes Archiv</h2>
     <p>
@@ -149,73 +142,56 @@
         Das Archiv ist noch NICHT mit Johanns Chat verknüpft.
       </small>
     </p>
-
     <label for="pass">Archiv-Passwort (mindestens 14 Zeichen)</label>
     <input id="pass" type="password" autocomplete="new-password">
-
     <label for="note">Private Testnotiz</label>
     <textarea
       id="note"
       rows="5"
       placeholder="Nur Testdaten, keine echten Geheimnisse"
     ></textarea>
-
     <button id="save" type="button">💾 Lokal verschlüsseln und speichern</button>
     <button id="load" type="button">📖 Archiv entschlüsseln</button>
     <button id="del" type="button" class="secondary">Archiv löschen</button>
     <button id="deleteAccount" type="button" class="danger">
       Testkonto endgültig löschen
     </button>
-
     <p id="vaultStatus" class="status" role="status" aria-live="polite"></p>
   </section>
-
 <script>
 "use strict";
-
 const $ = id => document.getElementById(id);
-
 const DEFAULT_URL =
   "https://johann-auth-test.bjornkorczak.workers.dev/";
-
 let token = sessionStorage.getItem("johann-test-token") || "";
-
 $("url").value =
   sessionStorage.getItem("johann-test-url") || DEFAULT_URL;
-
 $("email").value =
   localStorage.getItem("johann-test-email") || "";
-
 function showStatus(id, message, kind = "") {
   const el = $(id);
   el.textContent = message;
   el.className = "status" + (kind ? " " + kind : "");
 }
-
 function authStatus(message, kind = "") {
   showStatus("authStatus", message, kind);
 }
-
 function vaultStatus(message, kind = "") {
   showStatus("vaultStatus", message, kind);
 }
-
 function rememberEmail() {
   const email = $("email").value.trim();
   localStorage.setItem("johann-test-email", email);
   return email;
 }
-
 function getWorkerUrl() {
   const value = $("url").value.trim();
-
   let parsed;
   try {
     parsed = new URL(value);
   } catch {
     throw Error("Bitte eine gültige Test-Worker-Adresse eingeben.");
   }
-
   if (
     parsed.protocol !== "https:" ||
     !parsed.hostname.endsWith(".workers.dev") ||
@@ -227,57 +203,44 @@ function getWorkerUrl() {
   ) {
     throw Error("Bitte eine gültige HTTPS-workers.dev-Adresse eingeben.");
   }
-
   // Diese Testseite darf nur unseren eigenen Auth-Worker ansprechen.
   if (parsed.origin !== new URL(DEFAULT_URL).origin) {
     throw Error("Bitte die Adresse unseres Johann-Test-Workers verwenden.");
   }
-
   sessionStorage.setItem("johann-test-url", parsed.href);
   return parsed.href;
 }
-
 async function call(action, body = {}) {
   const url = getWorkerUrl();
-
   const headers = {
     "Content-Type": "application/json"
   };
-
   if (token) {
     headers.Authorization = "Bearer " + token;
   }
-
   const response = await fetch(url, {
     method: "POST",
     headers,
     body: JSON.stringify({ action, ...body })
   });
-
   let result;
   try {
     result = await response.json();
   } catch {
     throw Error("Johann hat keine gültige Serverantwort geliefert.");
   }
-
   if (!response.ok) {
     throw Error(result.error || "Serverfehler " + response.status);
   }
-
   return result;
 }
-
 async function run(buttonId, statusId, task) {
   const button = $(buttonId);
   if (button.disabled) return;
-
   button.disabled = true;
   const originalText = button.textContent;
   button.textContent = "⏳ Johann arbeitet …";
-
   showStatus(statusId, "⏳ Einen Moment, Johann kümmert sich …", "pending");
-
   try {
     await task();
   } catch (error) {
@@ -291,19 +254,15 @@ async function run(buttonId, statusId, task) {
     button.textContent = originalText;
   }
 }
-
 $("request").onclick = () => run(
   "request",
   "authStatus",
   async () => {
     const email = rememberEmail();
-
     if (!email || !$("email").checkValidity()) {
       throw Error("Bitte eine gültige E-Mail-Adresse eingeben.");
     }
-
     const result = await call("auth_request", { email });
-
     authStatus(
       "📩 " + (result.message || "Anfrage verarbeitet.") +
       "\nPrüfe bitte dein E-Mail-Postfach.",
@@ -311,39 +270,31 @@ $("request").onclick = () => run(
     );
   }
 );
-
 $("verify").onclick = () => run(
   "verify",
   "authStatus",
   async () => {
     const email = rememberEmail();
     const code = $("code").value.trim();
-
     if (!email || !$("email").checkValidity()) {
       throw Error("Bitte zuerst deine E-Mail-Adresse eingeben.");
     }
-
     if (!/^[0-9]{6}$/.test(code)) {
       throw Error("Bitte den vollständigen sechsstelligen Code eingeben.");
     }
-
     const result = await call("auth_verify", { email, code });
-
     if (!result.token) {
       throw Error("Der Server hat kein Sitzungstoken zurückgegeben.");
     }
-
     token = result.token;
     sessionStorage.setItem("johann-test-token", token);
     $("code").value = "";
-
     authStatus(
       "✅ Angemeldet als " + result.email + " (24 Stunden).",
       "success"
     );
   }
 );
-
 $("logout").onclick = () => run(
   "logout",
   "authStatus",
@@ -352,23 +303,17 @@ $("logout").onclick = () => run(
       authStatus("Du bist derzeit nicht angemeldet.");
       return;
     }
-
     await call("auth_logout");
     token = "";
     sessionStorage.removeItem("johann-test-token");
-
     authStatus("👋 Erfolgreich abgemeldet.", "success");
   }
 );
-
 // Verschlüsseltes Testarchiv
-
 const b64 = bytes =>
   btoa(String.fromCharCode(...bytes));
-
 const un64 = value =>
   Uint8Array.from(atob(value), char => char.charCodeAt(0));
-
 async function key(password, salt) {
   const base = await crypto.subtle.importKey(
     "raw",
@@ -377,7 +322,6 @@ async function key(password, salt) {
     false,
     ["deriveKey"]
   );
-
   return crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
@@ -394,25 +338,20 @@ async function key(password, salt) {
     ["encrypt", "decrypt"]
   );
 }
-
 $("save").onclick = () => run(
   "save",
   "vaultStatus",
   async () => {
     const password = $("pass").value;
-
     if (password.length < 14) {
       throw Error("Das Archiv-Passwort braucht mindestens 14 Zeichen.");
     }
-
     const salt = crypto.getRandomValues(new Uint8Array(16));
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const cryptoKey = await key(password, salt);
-
     const data = new TextEncoder().encode(
       JSON.stringify({ note: $("note").value })
     );
-
     const ciphertext = new Uint8Array(
       await crypto.subtle.encrypt(
         { name: "AES-GCM", iv },
@@ -420,13 +359,11 @@ $("save").onclick = () => run(
         data
       )
     );
-
     await call("vault_put", {
       salt: b64(salt),
       iv: b64(iv),
       ciphertext: b64(ciphertext)
     });
-
     vaultStatus(
       "✅ Verschlüsseltes Archiv gespeichert. " +
       "Der Server erhält nur Geheimtext.",
@@ -434,24 +371,20 @@ $("save").onclick = () => run(
     );
   }
 );
-
 $("load").onclick = () => run(
   "load",
   "vaultStatus",
   async () => {
     const { vault } = await call("vault_get");
-
     if (!vault) {
       vaultStatus("Noch kein Archiv vorhanden.");
       return;
     }
-
     try {
       const cryptoKey = await key(
         $("pass").value,
         un64(vault.salt)
       );
-
       const plaintext = await crypto.subtle.decrypt(
         {
           name: "AES-GCM",
@@ -460,11 +393,9 @@ $("load").onclick = () => run(
         cryptoKey,
         un64(vault.ciphertext)
       );
-
       $("note").value = JSON.parse(
         new TextDecoder().decode(plaintext)
       ).note;
-
       vaultStatus("✅ Archiv entschlüsselt.", "success");
     } catch {
       throw Error(
@@ -474,38 +405,30 @@ $("load").onclick = () => run(
     }
   }
 );
-
 $("del").onclick = () => run(
   "del",
   "vaultStatus",
   async () => {
     if (!confirm("Verschlüsseltes Archiv wirklich löschen?")) return;
-
     await call("vault_delete");
     $("note").value = "";
-
     vaultStatus("✅ Archiv gelöscht.", "success");
   }
 );
-
 $("deleteAccount").onclick = () => run(
   "deleteAccount",
   "vaultStatus",
   async () => {
     if (!confirm("Testkonto UND Archiv endgültig löschen?")) return;
-
     await call("auth_delete");
-
     token = "";
     sessionStorage.removeItem("johann-test-token");
     $("note").value = "";
     $("pass").value = "";
-
     authStatus("Testkonto gelöscht.");
     vaultStatus("✅ Testkonto und Archiv gelöscht.", "success");
   }
 );
-
 // Enter im Codefeld löst die Anmeldung aus.
 $("code").addEventListener("keydown", event => {
   if (event.key === "Enter") {
@@ -513,13 +436,115 @@ $("code").addEventListener("keydown", event => {
     $("verify").click();
   }
 });
-
 if (token) {
   authStatus(
     "ℹ️ Auf diesem Gerät ist noch eine Testsitzung gespeichert. " +
     "Du kannst dich abmelden oder das Archiv verwenden."
   );
 }
+
+// Passkeys: WebAuthn direkt über die Browser-API, ohne externes Skript.
+const passkeyBytes = value => {
+  if (typeof value !== "string") throw Error("Ungültige Passkey-Daten.");
+  const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
+  const binary = atob(base64 + "=".repeat((4 - base64.length % 4) % 4));
+  return Uint8Array.from(binary, char => char.charCodeAt(0));
+};
+const passkeyBase64 = buffer => {
+  const bytes = new Uint8Array(buffer);
+  let result = "";
+  for (const byte of bytes) result += String.fromCharCode(byte);
+  return btoa(result).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+};
+function passkeyAvailable() {
+  if (!window.PublicKeyCredential || !navigator.credentials) {
+    throw Error("Dieser Browser unterstützt keine Passkeys.");
+  }
+}
+function registrationPublicKey(options) {
+  return {
+    ...options,
+    challenge: passkeyBytes(options.challenge),
+    user: { ...options.user, id: passkeyBytes(options.user.id) },
+    excludeCredentials: (options.excludeCredentials || []).map(item => ({
+      ...item, id: passkeyBytes(item.id)
+    }))
+  };
+}
+function authenticationPublicKey(options) {
+  return {
+    ...options,
+    challenge: passkeyBytes(options.challenge),
+    allowCredentials: (options.allowCredentials || []).map(item => ({
+      ...item, id: passkeyBytes(item.id)
+    }))
+  };
+}
+function credentialJSON(credential) {
+  const response = credential.response;
+  const base = {
+    id: credential.id,
+    rawId: passkeyBase64(credential.rawId),
+    type: credential.type,
+    clientExtensionResults: credential.getClientExtensionResults(),
+    authenticatorAttachment: credential.authenticatorAttachment || undefined
+  };
+  if (response instanceof AuthenticatorAttestationResponse) {
+    base.response = {
+      clientDataJSON: passkeyBase64(response.clientDataJSON),
+      attestationObject: passkeyBase64(response.attestationObject),
+      transports: response.getTransports ? response.getTransports() : []
+    };
+  } else {
+    base.response = {
+      clientDataJSON: passkeyBase64(response.clientDataJSON),
+      authenticatorData: passkeyBase64(response.authenticatorData),
+      signature: passkeyBase64(response.signature),
+      userHandle: response.userHandle ? passkeyBase64(response.userHandle) : null
+    };
+  }
+  return base;
+}
+$("passkeyRegister").onclick = () => run(
+  "passkeyRegister", "authStatus", async () => {
+    passkeyAvailable();
+    if (!token) throw Error("Bitte zuerst mit deinem E-Mail-Code anmelden.");
+    const { challengeId, options } = await call("passkey_register_start");
+    const credential = await navigator.credentials.create({
+      publicKey: registrationPublicKey(options)
+    });
+    if (!credential) throw Error("Passkey-Einrichtung abgebrochen.");
+    const deviceName = /iPhone|iPad/i.test(navigator.userAgent)
+      ? "Apple Passkey" : "Windows Hello / Passkey";
+    await call("passkey_register_finish", {
+      challengeId, response: credentialJSON(credential), deviceName
+    });
+    authStatus("✅ Passkey gespeichert! Du kannst dich künftig mit Passkey anmelden.", "success");
+  }
+);
+$("passkeyLogin").onclick = () => run(
+  "passkeyLogin", "authStatus", async () => {
+    passkeyAvailable();
+    const email = rememberEmail();
+    if (!email || !$("email").checkValidity()) {
+      throw Error("Bitte zuerst deine E-Mail-Adresse eingeben.");
+    }
+    const { challengeId, options } = await call("passkey_login_start", { email });
+    const credential = await navigator.credentials.get({
+      publicKey: authenticationPublicKey(options)
+    });
+    if (!credential) throw Error("Passkey-Anmeldung abgebrochen.");
+    const result = await call("passkey_login_finish", {
+      challengeId, response: credentialJSON(credential)
+    });
+    if (!result.token) throw Error("Der Server hat kein Sitzungstoken zurückgegeben.");
+    token = result.token;
+    sessionStorage.setItem("johann-test-token", token);
+    $("code").value = "";
+    authStatus("✅ Mit Passkey angemeldet als " + result.email + " (24 Stunden).", "success");
+  }
+);
+
 </script>
 </body>
 </html>
