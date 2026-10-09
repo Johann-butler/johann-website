@@ -1200,7 +1200,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 (function(){
  const URL='https://johann-ki.bjornkorczak.workers.dev/';
  const $=id=>document.getElementById(id),modal=$('ja-modal'),email=$('ja-email'),code=$('ja-code'),primary=$('ja-primary'),message=$('ja-message'),opener=$('ja-open');
- const storageKey='johann_auth_token_v26';let token=sessionStorage.getItem(storageKey)||'',user=null,phase='request',busy=false;
+ const storageKey='johann_auth_token_v26';let token=localStorage.getItem(storageKey)||'',user=null,phase='request',busy=false;
  // Attach a session to every existing Johann Worker call, including Matchday PRO.
  const nativeFetch=window.fetch.bind(window);
  window.fetch=function(input,init){
@@ -1218,10 +1218,10 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
  async function call(payload){const r=await fetch(URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await r.json();if(!r.ok||data.error)throw Error(data.error||'Verbindung fehlgeschlagen');return data}
  async function authenticate(){if(busy)return;const address=email.value.trim().toLowerCase();if(!address){status('Bitte gib deine E-Mail-Adresse ein.',true);return}busy=true;render();try{
   if(phase==='request'){await call({action:'auth_request',email:address});phase='verify';status('Der sechsstellige Code wurde an '+address+' geschickt. Er gilt 10 Minuten.');code.focus()}
-  else{const result=await call({action:'auth_verify',email:address,code:code.value.trim()});token=result.token;sessionStorage.setItem(storageKey,token);user=result.user;status('Willkommen bei Johann Plus! 💙');setTimeout(close,600);}
+  else{const result=await call({action:'auth_verify',email:address,code:code.value.trim()});token=result.token;localStorage.setItem(storageKey,token);user=result.user;status('Willkommen bei Johann Plus! 💙');setTimeout(close,600);}
  }catch(e){status(e.message,true)}finally{busy=false;render()}}
  opener.addEventListener('click',open);$('ja-close').addEventListener('click',close);$('ja-free').addEventListener('click',close);primary.addEventListener('click',authenticate);code.addEventListener('keydown',e=>{if(e.key==='Enter')authenticate()});email.addEventListener('keydown',e=>{if(e.key==='Enter')authenticate()});modal.addEventListener('click',e=>{if(e.target===modal)close()});
- $('ja-logout').addEventListener('click',async()=>{try{await call({action:'auth_logout'})}catch{}token='';user=null;phase='request';code.value='';sessionStorage.removeItem(storageKey);status('Abgemeldet. Johann Free ist weiterhin verfügbar.');render()});
+ $('ja-logout').addEventListener('click',async()=>{try{await call({action:'auth_logout'})}catch{}token='';user=null;phase='request';code.value='';localStorage.removeItem(storageKey);status('Abgemeldet. Johann Free ist weiterhin verfügbar.');render()});
  if(token){call({action:'auth_me'}).then(data=>{user=data.user;render()}).catch(()=>{token='';sessionStorage.removeItem(storageKey);render()})}
  window.johannOpenLogin=open;
 })();
