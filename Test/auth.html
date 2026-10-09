@@ -1,16 +1,525 @@
-<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Johann – privater Testzugang</title><style>body{background:#071426;color:#e9f7ff;font:17px system-ui;max-width:550px;margin:30px auto;padding:18px}input,button{box-sizing:border-box;width:100%;padding:14px;margin:7px 0;border-radius:12px;font:inherit}input{background:#102b49;color:white;border:1px solid #448aca}button{background:#227ec6;color:white;border:0}section{padding:16px;border:1px solid #3475a7;border-radius:20px;margin:15px 0}small{color:#b4cde4}#status{white-space:pre-wrap}</style><h1>🔐 Johann – Testzugang</h1><p>Nur für den privaten Test. Die laufende Johann-Webseite bleibt unverändert.</p><section><label>Test-Worker-Adresse<input id="url" placeholder="https://johann-auth-test.DEINNAME.workers.dev/"></label><label>E-Mail<input id="email" type="email" autocomplete="email"></label><button id="request">Code anfordern</button><label>6-stelliger Code<input id="code" inputmode="numeric" maxlength="6"></label><button id="verify">Anmelden</button><button id="logout">Abmelden</button></section><section><h2>🔒 Verschlüsseltes Archiv</h2><p><small>Dein Passwort verlässt dieses Gerät nicht. Ohne Passwort sind die Daten auch für dich nicht wiederherstellbar. Das Archiv ist noch NICHT mit Johanns Chat verknüpft.</small></p><label>Archiv-Passwort (mindestens 14 Zeichen)<input id="pass" type="password" autocomplete="new-password"></label><label>Private Testnotiz<textarea id="note" rows="5" style="width:100%" placeholder="Nur Testdaten, keine echten Geheimnisse"></textarea></label><button id="save">Lokal verschlüsseln und speichern</button><button id="load">Archiv entschlüsseln</button><button id="del">Archiv löschen</button><button id="deleteAccount">Testkonto endgültig löschen</button></section><p id="status" role="status"></p><script>
-const $=id=>document.getElementById(id),status=s=>$('status').textContent=s;
-let token=sessionStorage.getItem('johann-test-token')||'';
-async function call(action,body={}){const url=$('url').value.trim();if(!/^https:\/\/[a-z0-9.-]+\.workers\.dev\/?$/i.test(url))throw Error('Bitte die vollständige workers.dev-Testadresse eingeben.');sessionStorage.setItem('johann-test-url',url);const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify({action,...body})});const j=await r.json();if(!r.ok)throw Error(j.error||'HTTP '+r.status);return j}
-$('url').value=sessionStorage.getItem('johann-test-url')||'';
-async function run(f){try{status('Einen Moment …');await f()}catch(e){status('⚠️ '+e.message)}}
-$('request').onclick=()=>run(async()=>{const x=await call('auth_request',{email:$('email').value});status(x.message)});
-$('verify').onclick=()=>run(async()=>{const x=await call('auth_verify',{email:$('email').value,code:$('code').value});token=x.token;sessionStorage.setItem('johann-test-token',token);status('Angemeldet als '+x.email+' (24 Stunden).')});
-$('logout').onclick=()=>run(async()=>{await call('auth_logout');token='';sessionStorage.removeItem('johann-test-token');status('Abgemeldet.')});
-const b64=bytes=>btoa(String.fromCharCode(...bytes)),un64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-async function key(pass,salt){const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:310000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
-$('save').onclick=()=>run(async()=>{const pass=$('pass').value;if(pass.length<14)throw Error('Mindestens 14 Zeichen verwenden.');const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),k=await key(pass,salt),ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,new TextEncoder().encode(JSON.stringify({note:$('note').value}))));await call('vault_put',{salt:b64(salt),iv:b64(iv),ciphertext:b64(ct)});status('Verschlüsseltes Testarchiv gespeichert. Server erhält nur Geheimtext.')});
-$('load').onclick=()=>run(async()=>{const {vault:v}=await call('vault_get');if(!v){status('Noch kein Archiv vorhanden.');return}const k=await key($('pass').value,un64(v.salt)),pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:un64(v.iv)},k,un64(v.ciphertext));$('note').value=JSON.parse(new TextDecoder().decode(pt)).note;status('Archiv auf deinem Gerät entschlüsselt.')});
-$('del').onclick=()=>run(async()=>{if(!confirm('Verschlüsseltes Archiv wirklich löschen?'))return;await call('vault_delete');$('note').value='';status('Archiv gelöscht.')});
-$('deleteAccount').onclick=()=>run(async()=>{if(!confirm('Testkonto UND Archiv endgültig löschen?'))return;await call('auth_delete');token='';sessionStorage.removeItem('johann-test-token');status('Testkonto gelöscht.')});
-</script></html>
+
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Johann – privater Testzugang</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      background: #071426;
+      color: #e9f7ff;
+      font: 17px system-ui, sans-serif;
+      max-width: 600px;
+      margin: 24px auto;
+      padding: 16px;
+    }
+    h1 { margin-bottom: 8px; }
+    h2 { font-size: 1.25rem; }
+    section {
+      padding: 18px;
+      border: 1px solid #3475a7;
+      border-radius: 20px;
+      margin: 18px 0;
+      background: #0b1d33;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+    input, textarea, button {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin: 8px 0;
+      border-radius: 12px;
+      font: inherit;
+    }
+    input, textarea {
+      background: #102b49;
+      color: white;
+      border: 1px solid #448aca;
+    }
+    input:focus, textarea:focus {
+      outline: 2px solid #5eb7ff;
+      outline-offset: 2px;
+    }
+    button {
+      background: #227ec6;
+      color: white;
+      border: 0;
+      cursor: pointer;
+      font-weight: 650;
+      transition: background .15s;
+    }
+    button:hover:not(:disabled) {
+      background: #3299e8;
+    }
+    button:disabled {
+      opacity: .55;
+      cursor: wait;
+    }
+    button:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: 3px;
+    }
+    button.secondary { background: #23415e; }
+    button.danger { background: #813349; }
+    small { color: #b4cde4; }
+    .status {
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-top: 12px;
+      background: #122e4b;
+      border: 1px solid #3475a7;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .status:empty { display: none; }
+    .status.error {
+      background: #411c29;
+      border-color: #e56a81;
+    }
+    .status.success {
+      background: #123b35;
+      border-color: #54ba9d;
+    }
+    .status.pending {
+      background: #26364d;
+      border-color: #91add0;
+    }
+    .hint {
+      font-size: .88rem;
+      color: #b4cde4;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔐 Johann – Testzugang</h1>
+  <p>Nur für den privaten Test. Die laufende Johann-Webseite bleibt unverändert.</p>
+
+  <section>
+    <h2>👋 Willkommen bei Johann</h2>
+
+    <label for="url">Test-Worker-Adresse</label>
+    <input
+      id="url"
+      type="url"
+      spellcheck="false"
+      autocomplete="url"
+      value="https://johann-auth-test.bjornkorczak.workers.dev/"
+    >
+
+    <label for="email">E-Mail</label>
+    <input id="email" type="email" autocomplete="email">
+
+    <button id="request" type="button">📩 Code anfordern</button>
+
+    <label for="code">6-stelliger Anmeldecode</label>
+    <input
+      id="code"
+      type="text"
+      inputmode="numeric"
+      pattern="[0-9]{6}"
+      maxlength="6"
+      autocomplete="one-time-code"
+      placeholder="123456"
+    >
+
+    <button id="verify" type="button">🔓 Anmelden</button>
+    <button id="logout" type="button" class="secondary">Abmelden</button>
+
+    <p id="authStatus" class="status" role="status" aria-live="polite"></p>
+    <p class="hint">
+      Johann zeigt hier direkt an, was gerade passiert.
+      Bitte den Code nur einmal anfordern und die neueste E-Mail verwenden.
+    </p>
+  </section>
+
+  <section>
+    <h2>🔒 Verschlüsseltes Archiv</h2>
+    <p>
+      <small>
+        Dein Passwort verlässt dieses Gerät nicht.
+        Ohne Passwort sind die Daten nicht wiederherstellbar.
+        Das Archiv ist noch NICHT mit Johanns Chat verknüpft.
+      </small>
+    </p>
+
+    <label for="pass">Archiv-Passwort (mindestens 14 Zeichen)</label>
+    <input id="pass" type="password" autocomplete="new-password">
+
+    <label for="note">Private Testnotiz</label>
+    <textarea
+      id="note"
+      rows="5"
+      placeholder="Nur Testdaten, keine echten Geheimnisse"
+    ></textarea>
+
+    <button id="save" type="button">💾 Lokal verschlüsseln und speichern</button>
+    <button id="load" type="button">📖 Archiv entschlüsseln</button>
+    <button id="del" type="button" class="secondary">Archiv löschen</button>
+    <button id="deleteAccount" type="button" class="danger">
+      Testkonto endgültig löschen
+    </button>
+
+    <p id="vaultStatus" class="status" role="status" aria-live="polite"></p>
+  </section>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+const DEFAULT_URL =
+  "https://johann-auth-test.bjornkorczak.workers.dev/";
+
+let token = sessionStorage.getItem("johann-test-token") || "";
+
+$("url").value =
+  sessionStorage.getItem("johann-test-url") || DEFAULT_URL;
+
+$("email").value =
+  localStorage.getItem("johann-test-email") || "";
+
+function showStatus(id, message, kind = "") {
+  const el = $(id);
+  el.textContent = message;
+  el.className = "status" + (kind ? " " + kind : "");
+}
+
+function authStatus(message, kind = "") {
+  showStatus("authStatus", message, kind);
+}
+
+function vaultStatus(message, kind = "") {
+  showStatus("vaultStatus", message, kind);
+}
+
+function rememberEmail() {
+  const email = $("email").value.trim();
+  localStorage.setItem("johann-test-email", email);
+  return email;
+}
+
+function getWorkerUrl() {
+  const value = $("url").value.trim();
+
+  let parsed;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw Error("Bitte eine gültige Test-Worker-Adresse eingeben.");
+  }
+
+  if (
+    parsed.protocol !== "https:" ||
+    !parsed.hostname.endsWith(".workers.dev") ||
+    parsed.username ||
+    parsed.password ||
+    parsed.search ||
+    parsed.hash ||
+    parsed.pathname !== "/"
+  ) {
+    throw Error("Bitte eine gültige HTTPS-workers.dev-Adresse eingeben.");
+  }
+
+  // Diese Testseite darf nur unseren eigenen Auth-Worker ansprechen.
+  if (parsed.origin !== new URL(DEFAULT_URL).origin) {
+    throw Error("Bitte die Adresse unseres Johann-Test-Workers verwenden.");
+  }
+
+  sessionStorage.setItem("johann-test-url", parsed.href);
+  return parsed.href;
+}
+
+async function call(action, body = {}) {
+  const url = getWorkerUrl();
+
+  const headers = {
+    "Content-Type": "application/json"
+  };
+
+  if (token) {
+    headers.Authorization = "Bearer " + token;
+  }
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ action, ...body })
+  });
+
+  let result;
+  try {
+    result = await response.json();
+  } catch {
+    throw Error("Johann hat keine gültige Serverantwort geliefert.");
+  }
+
+  if (!response.ok) {
+    throw Error(result.error || "Serverfehler " + response.status);
+  }
+
+  return result;
+}
+
+async function run(buttonId, statusId, task) {
+  const button = $(buttonId);
+  if (button.disabled) return;
+
+  button.disabled = true;
+  const originalText = button.textContent;
+  button.textContent = "⏳ Johann arbeitet …";
+
+  showStatus(statusId, "⏳ Einen Moment, Johann kümmert sich …", "pending");
+
+  try {
+    await task();
+  } catch (error) {
+    showStatus(
+      statusId,
+      "⚠️ " + (error.message || "Unbekannter Fehler."),
+      "error"
+    );
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+
+$("request").onclick = () => run(
+  "request",
+  "authStatus",
+  async () => {
+    const email = rememberEmail();
+
+    if (!email || !$("email").checkValidity()) {
+      throw Error("Bitte eine gültige E-Mail-Adresse eingeben.");
+    }
+
+    const result = await call("auth_request", { email });
+
+    authStatus(
+      "📩 " + (result.message || "Anfrage verarbeitet.") +
+      "\nPrüfe bitte dein E-Mail-Postfach.",
+      "success"
+    );
+  }
+);
+
+$("verify").onclick = () => run(
+  "verify",
+  "authStatus",
+  async () => {
+    const email = rememberEmail();
+    const code = $("code").value.trim();
+
+    if (!email || !$("email").checkValidity()) {
+      throw Error("Bitte zuerst deine E-Mail-Adresse eingeben.");
+    }
+
+    if (!/^[0-9]{6}$/.test(code)) {
+      throw Error("Bitte den vollständigen sechsstelligen Code eingeben.");
+    }
+
+    const result = await call("auth_verify", { email, code });
+
+    if (!result.token) {
+      throw Error("Der Server hat kein Sitzungstoken zurückgegeben.");
+    }
+
+    token = result.token;
+    sessionStorage.setItem("johann-test-token", token);
+    $("code").value = "";
+
+    authStatus(
+      "✅ Angemeldet als " + result.email + " (24 Stunden).",
+      "success"
+    );
+  }
+);
+
+$("logout").onclick = () => run(
+  "logout",
+  "authStatus",
+  async () => {
+    if (!token) {
+      authStatus("Du bist derzeit nicht angemeldet.");
+      return;
+    }
+
+    await call("auth_logout");
+    token = "";
+    sessionStorage.removeItem("johann-test-token");
+
+    authStatus("👋 Erfolgreich abgemeldet.", "success");
+  }
+);
+
+// Verschlüsseltes Testarchiv
+
+const b64 = bytes =>
+  btoa(String.fromCharCode(...bytes));
+
+const un64 = value =>
+  Uint8Array.from(atob(value), char => char.charCodeAt(0));
+
+async function key(password, salt) {
+  const base = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveKey"]
+  );
+
+  return crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt,
+      iterations: 310000,
+      hash: "SHA-256"
+    },
+    base,
+    {
+      name: "AES-GCM",
+      length: 256
+    },
+    false,
+    ["encrypt", "decrypt"]
+  );
+}
+
+$("save").onclick = () => run(
+  "save",
+  "vaultStatus",
+  async () => {
+    const password = $("pass").value;
+
+    if (password.length < 14) {
+      throw Error("Das Archiv-Passwort braucht mindestens 14 Zeichen.");
+    }
+
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const cryptoKey = await key(password, salt);
+
+    const data = new TextEncoder().encode(
+      JSON.stringify({ note: $("note").value })
+    );
+
+    const ciphertext = new Uint8Array(
+      await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv },
+        cryptoKey,
+        data
+      )
+    );
+
+    await call("vault_put", {
+      salt: b64(salt),
+      iv: b64(iv),
+      ciphertext: b64(ciphertext)
+    });
+
+    vaultStatus(
+      "✅ Verschlüsseltes Archiv gespeichert. " +
+      "Der Server erhält nur Geheimtext.",
+      "success"
+    );
+  }
+);
+
+$("load").onclick = () => run(
+  "load",
+  "vaultStatus",
+  async () => {
+    const { vault } = await call("vault_get");
+
+    if (!vault) {
+      vaultStatus("Noch kein Archiv vorhanden.");
+      return;
+    }
+
+    try {
+      const cryptoKey = await key(
+        $("pass").value,
+        un64(vault.salt)
+      );
+
+      const plaintext = await crypto.subtle.decrypt(
+        {
+          name: "AES-GCM",
+          iv: un64(vault.iv)
+        },
+        cryptoKey,
+        un64(vault.ciphertext)
+      );
+
+      $("note").value = JSON.parse(
+        new TextDecoder().decode(plaintext)
+      ).note;
+
+      vaultStatus("✅ Archiv entschlüsselt.", "success");
+    } catch {
+      throw Error(
+        "Entschlüsselung fehlgeschlagen. " +
+        "Bitte Archiv-Passwort prüfen."
+      );
+    }
+  }
+);
+
+$("del").onclick = () => run(
+  "del",
+  "vaultStatus",
+  async () => {
+    if (!confirm("Verschlüsseltes Archiv wirklich löschen?")) return;
+
+    await call("vault_delete");
+    $("note").value = "";
+
+    vaultStatus("✅ Archiv gelöscht.", "success");
+  }
+);
+
+$("deleteAccount").onclick = () => run(
+  "deleteAccount",
+  "vaultStatus",
+  async () => {
+    if (!confirm("Testkonto UND Archiv endgültig löschen?")) return;
+
+    await call("auth_delete");
+
+    token = "";
+    sessionStorage.removeItem("johann-test-token");
+    $("note").value = "";
+    $("pass").value = "";
+
+    authStatus("Testkonto gelöscht.");
+    vaultStatus("✅ Testkonto und Archiv gelöscht.", "success");
+  }
+);
+
+// Enter im Codefeld löst die Anmeldung aus.
+$("code").addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    $("verify").click();
+  }
+});
+
+if (token) {
+  authStatus(
+    "ℹ️ Auf diesem Gerät ist noch eine Testsitzung gespeichert. " +
+    "Du kannst dich abmelden oder das Archiv verwenden."
+  );
+}
+</script>
+</body>
+</html>
