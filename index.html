@@ -174,6 +174,15 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 #ja-modal.ja-visible{display:flex}
 #ja-card{width:min(440px,100%);max-height:90vh;overflow:auto;background:linear-gradient(160deg,#112f50,#081725);border:1px solid #4a94ce88;border-radius:22px;box-shadow:0 18px 70px #000a;color:#f2faff;padding:26px;box-sizing:border-box;font-family:system-ui;text-align:center}
 #ja-card h2{font-size:25px;margin:6px 0 8px}#ja-card p{line-height:1.5}#ja-card .ja-muted{font-size:13px;color:#b6cde0}#ja-card .ja-note{background:#123b56;border:1px solid #42779a;border-radius:14px;padding:14px;margin:18px 0}#ja-card input{display:block;width:100%;box-sizing:border-box;margin:8px 0;padding:13px 14px;background:#fff;color:#10273a;border-radius:10px;border:0;font-size:16px}#ja-card button{cursor:pointer;font:600 14px system-ui;border-radius:10px;padding:12px 14px;border:1px solid #71bff0}#ja-primary{width:100%;background:#3aa6f1;color:#061827}#ja-free{width:100%;margin-top:10px;background:transparent;color:#d8f0ff}#ja-close{float:right;background:transparent;color:#d8f0ff;border:0!important;padding:0!important;font-size:25px!important}#ja-message{font-size:13px;min-height:20px;margin-top:10px}#ja-logout{display:none;background:transparent;color:#d8f0ff;margin-top:10px}#ja-code{display:none}#ja-email{display:block}#ja-card button:disabled{opacity:.6;cursor:wait}
+#ja-open.ja-signed-in{display:none!important}
+#ja-toast{position:fixed;top:max(18px,env(safe-area-inset-top));left:50%;transform:translate(-50%,-12px);z-index:9000;background:#0b2b49ee;color:#e5f5ff;border:1px solid #5eb6ee;border-radius:14px;padding:12px 18px;opacity:0;pointer-events:none;transition:.25s;font:600 13px system-ui;box-shadow:0 8px 30px #0008}
+#ja-toast.visible{opacity:1;transform:translate(-50%,0)}
+#jpro-controls{margin-top:12px;padding-top:12px;border-top:1px solid #42779a;text-align:left}
+#jpro-controls button{width:100%;margin-top:9px;background:#1b5c90;color:white}
+#jpro-controls .ja-muted{font-size:12px}
+#jpro-state{font-size:12px;color:#a9d7f6;margin-top:9px;line-height:1.5}
+#jpro-password{display:none}
+#jpro-voice.active{border-color:#72d8ff;background:#17679c}
 </style>
 </head>
 <body>
@@ -1193,14 +1202,82 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
  <div id="ja-card"><button type="button" id="ja-close" aria-label="Schließen">×</button><div style="font-size:34px">💙</div><h2>Willkommen bei Johann</h2><p class="ja-muted">Dein digitaler Butler mit Herz, Humor und einer kleinen Portion Selbstironie.</p>
  <div class="ja-note"><strong>💙 Kostenlos. Heute und in Zukunft.</strong><p style="margin:9px 0">Johann Free kannst du sofort nutzen. Auch Johann Plus ist kostenlos.</p><p class="ja-muted" style="margin:0">Gefällt dir Johann? Dann freue ich mich über eine freiwillige Spende. Kein Muss, kein Druck – versprochen.</p></div>
  <div id="ja-form"><label for="ja-email">Deine E-Mail-Adresse</label><input id="ja-email" type="email" autocomplete="email" placeholder="du@beispiel.de"><input id="ja-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-stelliger Anmeldecode"><button type="button" id="ja-primary">Anmeldecode anfordern</button></div>
- <p id="ja-message" role="status" aria-live="polite"></p><button type="button" id="ja-free">Ohne Anmeldung Johann Free nutzen</button><button type="button" id="ja-logout">Abmelden</button>
+ <p id="ja-message" role="status" aria-live="polite"></p>
+ <div id="jpro-controls" hidden>
+  <h3 style="margin:6px 0">Johann Pro · nur Owner</h3>
+  <p class="ja-muted">Pro ist ein zusätzlicher Zugang für dein Owner-Konto. Plus bleibt für alle anderen kostenlos.</p>
+  <input id="jpro-password" type="password" autocomplete="current-password" placeholder="Dein Pro-Passwort" aria-label="Johann Pro Passwort">
+  <button id="jpro-unlock" type="button">🔐 Pro freischalten</button>
+  <button id="jpro-voice" type="button" hidden>🎙️ Gesprächsmodus starten</button>
+  <button id="jpro-stop" type="button" hidden>⏹ Gespräch beenden</button>
+  <div id="jpro-state" role="status"></div>
+ </div><button type="button" id="ja-free">Ohne Anmeldung Johann Free nutzen</button><button type="button" id="ja-logout">Abmelden</button>
  </div></div>
 <button type="button" id="ja-open">💙 Johann Plus · Anmelden</button>
+<div id="ja-toast" role="status" aria-live="polite"></div>
 <script id="johann-auth-script">
 (function(){
  const URL='https://johann-ki.bjornkorczak.workers.dev/';
  const $=id=>document.getElementById(id),modal=$('ja-modal'),email=$('ja-email'),code=$('ja-code'),primary=$('ja-primary'),message=$('ja-message'),opener=$('ja-open');
  const storageKey='johann_auth_token_v26';let token=localStorage.getItem(storageKey)||'',user=null,phase='request',busy=false;
+ let proUnlocked=false,proDeviceKey=localStorage.getItem('johann_pro_device_v34')||'',rtc=null,micStream=null,remoteAudio=null,voiceActive=false,channel=null;
+ const proEl=id=>document.getElementById(id);
+ let toastTimer;
+ function toast(msg){const el=proEl('ja-toast');el.textContent=msg;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),3200)}
+ function proState(msg){proEl('jpro-state').textContent=msg}
+ async function proCheck(){
+  if(user?.role!=='owner'){proUnlocked=false;proEl('jpro-controls').hidden=true;return}
+  proEl('jpro-controls').hidden=false;
+  try{const x=await call({action:'pro_status'});proUnlocked=!!x.unlocked;
+   if(!proUnlocked&&proDeviceKey){const r=await call({action:'pro_device_resume',deviceKey:proDeviceKey});proUnlocked=!!r.unlocked}
+  }catch(e){proState('Pro-Status nicht erreichbar: '+e.message)}
+  proRender();
+ }
+ function proRender(){
+  const owner=user?.role==='owner';proEl('jpro-controls').hidden=!owner;
+  proEl('jpro-password').style.display=owner&&!proUnlocked?'block':'none';
+  proEl('jpro-unlock').hidden=!owner||proUnlocked;
+  proEl('jpro-voice').hidden=!owner||!proUnlocked||voiceActive;
+  proEl('jpro-stop').hidden=!voiceActive;
+  if(owner)proState(voiceActive?'Gespräch aktiv – Mikrofon eingeschaltet':proUnlocked?'Johann Pro freigeschaltet · Gesprächsmodus bereit':'Pro ist noch gesperrt. Passwort einmal eingeben.');
+ }
+ async function unlockPro(){
+  const password=proEl('jpro-password').value;
+  if(!password){proState('Bitte Pro-Passwort eingeben.');return}
+  try{await call({action:'pro_unlock',password});proEl('jpro-password').value='';proUnlocked=true;
+   if(!proDeviceKey){const bytes=crypto.getRandomValues(new Uint8Array(32));proDeviceKey=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');localStorage.setItem('johann_pro_device_v34',proDeviceKey)}
+   await call({action:'pro_device_register',deviceKey:proDeviceKey,label:navigator.userAgent.slice(0,65)});
+   proRender();toast('💙 Johann Pro freigeschaltet');
+  }catch(e){proState(e.message)}
+ }
+ async function stopVoice(){voiceActive=false;try{channel?.close()}catch{};channel=null;try{rtc?.close()}catch{};rtc=null;
+  try{micStream?.getTracks().forEach(t=>t.stop())}catch{};micStream=null;
+  if(remoteAudio){remoteAudio.pause();remoteAudio.srcObject=null;remoteAudio.remove();remoteAudio=null}
+  proRender();
+ }
+ async function startVoice(){
+  if(!proUnlocked){open();proState('Bitte Pro freischalten.');return}
+  if(voiceActive)return;
+  try{
+   const response=await call({action:'pro_realtime_token'});
+   const secret=response.client_secret;if(!secret)throw Error('Realtime-Schlüssel fehlt.');
+   micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+   rtc=new RTCPeerConnection();micStream.getTracks().forEach(t=>rtc.addTrack(t,micStream));
+   remoteAudio=document.createElement('audio');remoteAudio.autoplay=true;remoteAudio.setAttribute('playsinline','');remoteAudio.style.display='none';document.body.appendChild(remoteAudio);
+   rtc.ontrack=e=>{remoteAudio.srcObject=e.streams[0];remoteAudio.play().catch(()=>{})};
+   channel=rtc.createDataChannel('oai-events');
+   channel.addEventListener('message',async e=>{try{const evt=JSON.parse(e.data);if(evt.type==='response.done'&&evt.response?.usage){
+    const u=evt.response.usage,detail=u.input_token_details||{},out=u.output_token_details||{};
+    await call({action:'pro_usage_record',eventId:evt.response.id||crypto.randomUUID(),usage:{audio_input:detail.audio_tokens||0,audio_output:out.audio_tokens||0,text_input:detail.text_tokens||0,text_output:out.text_tokens||0}})
+   }}catch(err){console.warn('Johann usage',err)}});
+   const offer=await rtc.createOffer();await rtc.setLocalDescription(offer);
+   const model=response.model||'gpt-realtime';
+   const r=await nativeFetch('https://api.openai.com/v1/realtime/calls?model='+encodeURIComponent(model),{method:'POST',body:offer.sdp,headers:{Authorization:'Bearer '+secret,'Content-Type':'application/sdp'}});
+   if(!r.ok)throw Error('Realtime-Verbindung HTTP '+r.status);
+   await rtc.setRemoteDescription({type:'answer',sdp:await r.text()});voiceActive=true;proRender();close();toast('🎙️ Gespräch mit Johann aktiv');
+  }catch(e){await stopVoice();proState('Gespräch konnte nicht starten: '+e.message);open()}
+ }
+ 
  // Attach a session to every existing Johann Worker call, including Matchday PRO.
  const nativeFetch=window.fetch.bind(window);
  window.fetch=function(input,init){
@@ -1212,17 +1289,30 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   return nativeFetch(input,init);
  };
  function status(text,bad=false){message.textContent=text;message.style.color=bad?'#ffb5b5':'#a9eacb'}
- function render(){opener.textContent=user?'💙 Johann Plus':'💙 Johann Plus · Anmelden';$('ja-logout').style.display=user?'inline-block':'none';$('ja-form').style.display=user?'none':'block';$('ja-code').style.display=phase==='verify'?'block':'none';primary.textContent=phase==='verify'?'Anmelden':'Anmeldecode anfordern';primary.disabled=busy;}
+ function render(){opener.classList.toggle('ja-signed-in',!!user);opener.textContent=user?'💙 Johann Plus':'💙 Johann Plus · Anmelden';$('ja-logout').style.display=user?'inline-block':'none';$('ja-form').style.display=user?'none':'block';$('ja-code').style.display=phase==='verify'?'block':'none';primary.textContent=phase==='verify'?'Anmelden':'Anmeldecode anfordern';primary.disabled=busy;}
  function open(){render();modal.classList.add('ja-visible');if(user)status('Du bist als '+user.email+' angemeldet. Johann Plus ist aktiv.');else status('');}
  function close(){modal.classList.remove('ja-visible')}
  async function call(payload){const r=await fetch(URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await r.json();if(!r.ok||data.error)throw Error(data.error||'Verbindung fehlgeschlagen');return data}
  async function authenticate(){if(busy)return;const address=email.value.trim().toLowerCase();if(!address){status('Bitte gib deine E-Mail-Adresse ein.',true);return}busy=true;render();try{
   if(phase==='request'){await call({action:'auth_request',email:address});phase='verify';status('Der sechsstellige Code wurde an '+address+' geschickt. Er gilt 10 Minuten.');code.focus()}
-  else{const result=await call({action:'auth_verify',email:address,code:code.value.trim()});token=result.token;localStorage.setItem(storageKey,token);user=result.user;status('Willkommen bei Johann Plus! 💙');setTimeout(close,600);}
+  else{const result=await call({action:'auth_verify',email:address,code:code.value.trim()});token=result.token;localStorage.setItem(storageKey,token);user=result.user;status('Willkommen bei Johann Plus! 💙');toast(user?.role==='owner'?'💙 Johann · Owner angemeldet':'💙 Johann Plus aktiv');setTimeout(close,600);proCheck();}
  }catch(e){status(e.message,true)}finally{busy=false;render()}}
  opener.addEventListener('click',open);$('ja-close').addEventListener('click',close);$('ja-free').addEventListener('click',close);primary.addEventListener('click',authenticate);code.addEventListener('keydown',e=>{if(e.key==='Enter')authenticate()});email.addEventListener('keydown',e=>{if(e.key==='Enter')authenticate()});modal.addEventListener('click',e=>{if(e.target===modal)close()});
- $('ja-logout').addEventListener('click',async()=>{try{await call({action:'auth_logout'})}catch{}token='';user=null;phase='request';code.value='';localStorage.removeItem(storageKey);status('Abgemeldet. Johann Free ist weiterhin verfügbar.');render()});
- if(token){call({action:'auth_me'}).then(data=>{user=data.user;render()}).catch(()=>{token='';sessionStorage.removeItem(storageKey);render()})}
+ $('ja-logout').addEventListener('click',async()=>{try{await call({action:'auth_logout'})}catch{}token='';user=null;phase='request';code.value='';localStorage.removeItem(storageKey);status('Abgemeldet. Johann Free ist weiterhin verfügbar.');render();proUnlocked=false;stopVoice();proRender()});
+ if(token){call({action:'auth_me'}).then(data=>{user=data.user;render();proCheck()}).catch(()=>{token='';sessionStorage.removeItem(storageKey);render()})}
+ proEl('jpro-unlock').addEventListener('click',unlockPro);
+ proEl('jpro-password').addEventListener('keydown',e=>{if(e.key==='Enter')unlockPro()});
+ proEl('jpro-voice').addEventListener('click',startVoice);
+ proEl('jpro-stop').addEventListener('click',stopVoice);
+ const info=$('infoBox');
+ const account=document.createElement('button');account.type='button';account.textContent='Konto: Johann Free · Verwalten ↗';account.style.cssText='display:block;width:100%;margin-top:12px;padding:10px 8px;background:#123554;color:#c5eaff;border:1px solid #4a83b2;border-radius:9px;font-size:12px;cursor:pointer;text-align:left';
+ info.appendChild(account);account.addEventListener('click',open);
+ const infoRefresh=()=>{account.textContent=user?'Konto: Johann '+(user.role==='owner'?(proUnlocked?'Pro':'Owner / Plus'):'Plus')+' · Verwalten ↗':'Konto: Johann Free · Anmelden ↗'};
+ const oldRender=render;render=function(){oldRender();infoRefresh()};infoRefresh();
+ const orb=$('touchArea');let longTimer=null,longDone=false;
+ const clearLong=()=>{clearTimeout(longTimer);longTimer=null};
+ orb.addEventListener('pointerdown',()=>{longDone=false;clearLong();longTimer=setTimeout(()=>{longDone=true;if(voiceActive)stopVoice();else if(user?.role==='owner'&&proUnlocked)startVoice();else open()},3000)},true);
+ ['pointerup','pointercancel','pointerleave'].forEach(ev=>orb.addEventListener(ev,clearLong,true));
  window.johannOpenLogin=open;
 })();
 </script>
