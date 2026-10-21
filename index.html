@@ -1266,10 +1266,71 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
    remoteAudio=document.createElement('audio');remoteAudio.autoplay=true;remoteAudio.setAttribute('playsinline','');remoteAudio.style.display='none';document.body.appendChild(remoteAudio);
    rtc.ontrack=e=>{remoteAudio.srcObject=e.streams[0];remoteAudio.play().catch(()=>{})};
    channel=rtc.createDataChannel('oai-events');
-   channel.addEventListener('message',async e=>{try{const evt=JSON.parse(e.data);if(evt.type==='response.done'&&evt.response?.usage){
-    const u=evt.response.usage,detail=u.input_token_details||{},out=u.output_token_details||{};
-    await call({action:'pro_usage_record',eventId:evt.response.id||crypto.randomUUID(),usage:{audio_input:detail.audio_tokens||0,audio_output:out.audio_tokens||0,text_input:detail.text_tokens||0,text_output:out.text_tokens||0}})
-   }}catch(err){console.warn('Johann usage',err)}});
+      // JOHANN_REALTIME_TOOLS_FIX_1
+   const toolChannel=channel,handledCalls=new Set();
+   const sessionOpen=()=>channel===toolChannel&&toolChannel.readyState==='open';
+   async function voiceTool(name,args){
+    if(!sessionOpen())throw Error('Gespräch beendet');
+    const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),12000);
+    try{
+     const r=await fetch(URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'pro_tool_call',name,arguments:args}),signal:ctrl.signal});
+     const data=await r.json();
+     if(!r.ok||data.error||data.ok===false)throw Error(data.error||'Werkzeug HTTP '+r.status);
+     return data.result??data;
+    }finally{clearTimeout(timer)}
+   }
+   async function runVoiceTool(item){
+    try{
+     const args=JSON.parse(item.arguments||'{}');
+     if(!args||typeof args!=='object'||Array.isArray(args))throw Error('Ungültige Werkzeugparameter');
+     let result=await voiceTool(item.name,args);
+     if(result.pending&&result.jobId&&['hue_devices','hue_control'].includes(item.name)){
+      const jobId=result.jobId,deadline=Date.now()+30000;
+      proState('Warte auf Rückmeldung von Asgard …');
+      while(sessionOpen()&&Date.now()<deadline){
+       await new Promise(resolve=>setTimeout(resolve,3000));
+       if(!sessionOpen())return;
+       result=await voiceTool('hue_job_status',{jobId});
+       if(result.error||['done','failed'].includes(result.status))break;
+      }
+      if(['pending','running'].includes(result.status)||result.pending){
+       result={pending:true,jobId,error:'Asgard hat die Ausführung noch nicht bestätigt. Erfolg nicht bestätigt. Auftrag nicht automatisch erneut senden.'};
+      }
+     }
+     return result;
+    }catch(err){
+     const error=err.name==='AbortError'?'Keine rechtzeitige Rückmeldung. Ausführung unbestätigt; Schaltbefehl nicht automatisch wiederholen.':String(err.message||'Werkzeugfehler');
+     proState(error);
+     return {error};
+    }
+   }
+   toolChannel.addEventListener('message',async e=>{
+    try{
+     const evt=JSON.parse(e.data);
+     if(evt.type==='error'){proState('Sprachverbindung: '+String(evt.error?.message||'Unbekannter Fehler'));return}
+     if(evt.type!=='response.done')return;
+     if(evt.response?.usage){
+      const u=evt.response.usage,detail=u.input_token_details||{},out=u.output_token_details||{};
+      call({action:'pro_usage_record',eventId:evt.response.id||crypto.randomUUID(),usage:{audio_input:detail.audio_tokens||0,audio_output:out.audio_tokens||0,text_input:detail.text_tokens||0,text_output:out.text_tokens||0}}).catch(err=>console.warn('Johann usage',err));
+     }
+     const calls=(evt.response?.output||[]).filter(item=>item.type==='function_call'&&item.call_id&&item.status!=='incomplete'&&!handledCalls.has(item.call_id));
+     calls.forEach(item=>handledCalls.add(item.call_id));
+     let outputs=0,end=false;
+     for(const item of calls){
+      if(!sessionOpen())return;
+      const result=await runVoiceTool(item);
+      if(!sessionOpen())return;
+      toolChannel.send(JSON.stringify({type:'conversation.item.create',item:{type:'function_call_output',call_id:item.call_id,output:JSON.stringify(result)}}));
+      outputs++;if(item.name==='end_conversation'&&result?.goodbye)end=true;
+      if(result?.error){proState(result.error);toast(result.error)}
+     }
+     if(outputs&&sessionOpen()){
+      if(end)setTimeout(()=>{if(channel===toolChannel)stopVoice()},1100);
+      else toolChannel.send(JSON.stringify({type:'response.create'}));
+     }
+    }catch(err){proState('Sprachverarbeitung: '+String(err.message||err));console.warn('Johann realtime',err)}
+   });
+
    const offer=await rtc.createOffer();await rtc.setLocalDescription(offer);
    const model=response.model||'gpt-realtime';
    const r=await nativeFetch('https://api.openai.com/v1/realtime/calls?model='+encodeURIComponent(model),{method:'POST',body:offer.sdp,headers:{Authorization:'Bearer '+secret,'Content-Type':'application/sdp'}});
