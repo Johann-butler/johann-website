@@ -15,7 +15,7 @@
  const modal=el('div');modal.id='jp-modal';modal.hidden=true;modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','jp-title');
  modal.innerHTML=`<div id="jp-card"><button id="jp-close" type="button" aria-label="Benachrichtigungen schließen">×</button><p class="jp-muted">JOHANN · OWNER</p><h2 id="jp-title">Benachrichtigungen</h2><p>Johann kann dich bei geschlossenem App-Fenster über den Betrieb von Asgard informieren.</p><p id="jp-status" role="status" aria-live="polite"></p><section><h3>Dieses Gerät</h3><p id="jp-permission"></p><p id="jp-install" class="jp-muted"></p><button id="jp-enable" type="button">Push aktivieren</button><button id="jp-test" type="button">Testmeldung senden</button><button id="jp-disable" type="button">Auf diesem Gerät abschalten</button><p class="jp-muted">Nach Einrichtung auf Asgard sind Betriebs-, Temperatur- und WLAN-Meldungen sowie sensor- und wettergestützte Lüftungshinweise möglich. Push bleibt bis zum Abschalten aktiv, auch wenn du dich bei Johann abmeldest.</p></section><section><h3>Asgard verbinden</h3><p>Erstelle einen einmaligen Code und gib ihn im Einrichtungsprogramm auf Asgard ein. Der Code gilt zehn Minuten.</p><button id="jp-pair" type="button">Kopplungscode erstellen</button><p id="jp-code" class="jp-code"></p></section><section><h3>Betriebsstatus</h3><p id="jp-agent">Noch nicht geladen.</p><p id="jp-cron" class="jp-muted"></p><button id="jp-refresh" type="button">Status aktualisieren</button></section><section><h3>Angemeldete Push-Geräte</h3><div id="jp-devices"></div><p class="jp-muted">Die Push-Anmeldung enthält eine Zustelladresse und Verschlüsselungsschlüssel. In der Cloud werden außerdem Asgards letzte Rückmeldung und kurze Betriebszustände sowie eingerichtete Raum-/Balkonwerte und Wetterzusammenfassungen gespeichert. Bei WLAN-Meldungen werden Gerätename und MAC-Adresse für den Nachrichtentext verarbeitet. Keine Fotos, Dateinamen oder Chattexte. Meldungsaufträge werden nach 30 Tagen entfernt. Abschalten und Entfernen ist hier jederzeit möglich.</p></section></div>`;
  document.body.append(modal);const $=id=>document.getElementById(id);
- const homeSection=el('section');homeSection.innerHTML='<h3>Räume, Balkon & WLAN</h3><div id="jp-home"></div><p class="jp-muted">Grenzen: Wohnzimmer 21 °C, Kinderzimmer 19 °C, Schlafzimmer 18 °C. Warnung nach 20 Minuten darunter; Entwarnung nach zehn Minuten mindestens 0,5 °C darüber. WLAN-Abfrage etwa jede Minute. Meldungen folgen mit der Cloud-Prüfung, gegebenenfalls bis zu fünf Minuten später.</p>';$('jp-agent').closest('section').after(homeSection);
+ const homeSection=el('section');homeSection.innerHTML='<h3>Räume, Balkon & WLAN</h3><div id="jp-home"></div><p class="jp-muted">Grenzen: Wohnzimmer 21 bis 25 °C, Kinderzimmer 19 °C, Schlafzimmer 18 °C, Badezimmer 19 °C, Küche 18 °C. Überwärmung im Wohnzimmer nach zehn Minuten bestätigen; Fenster nur vermuten.  Warnung nach 20 Minuten darunter; Entwarnung nach zehn Minuten mindestens 0,5 °C darüber. WLAN-Abfrage etwa jede Minute. Meldungen folgen mit der Cloud-Prüfung, gegebenenfalls bis zu fünf Minuten später.</p>';$('jp-agent').closest('section').after(homeSection);
  const entry=el('button','🔔 Benachrichtigungen · Owner');entry.type='button';entry.style.cssText='display:block;width:100%;margin-top:10px;padding:11px;background:#123554;color:#c5eaff;border:1px solid #4a83b2;border-radius:10px;text-align:left';
  document.getElementById('infoBox')?.append(entry);
  const supported=()=>('serviceWorker'in navigator)&&('PushManager'in window)&&('Notification'in window);
@@ -46,8 +46,8 @@
   if(!cached?.homeVersion)$('jp-home').append(el('p','Die Raum-/WLAN-Erweiterung ist im Push-Worker noch nicht bereitgestellt.'));
   else if(!home)$('jp-home').append(el('p','Noch keine Raum-/WLAN-Rückmeldung von Asgard. Einrichtung dort abschließen.'));
   else{
-   for(const [key,label] of [['living','Wohnzimmer'],['kids','Kinderzimmer'],['bedroom','Schlafzimmer']]){const r=home.rooms?.[key],fresh=homeFresh&&r?.sample_at&&Date.now()-r.sample_at<660000;
-    const text=!r?.configured?'Sensor noch nicht zugeordnet':!fresh||r.status==='unknown'?'kein aktueller bestätigter Messwert':r.temperature.toLocaleString('de-DE',{maximumFractionDigits:1})+' °C'+(r.humidity!==null?' · '+r.humidity+' % Luftfeuchtigkeit':'')+' · '+({ok:'im Bereich',pending:'unter Grenze; Wartezeit läuft',warning:'Temperaturhinweis aktiv'}[r.status]||'noch nicht bestätigt');
+   for(const [key,label] of [['living','Wohnzimmer'],['kids','Kinderzimmer'],['bedroom','Schlafzimmer'],['bathroom','Badezimmer'],['kitchen','Küche']]){const r=home.rooms?.[key],fresh=homeFresh&&r?.sample_at&&Date.now()-r.sample_at<660000;
+    const text=!r?.configured?'Sensor noch nicht zugeordnet':!fresh||r.status==='unknown'?'kein aktueller bestätigter Messwert':r.temperature.toLocaleString('de-DE',{maximumFractionDigits:1})+' °C'+(r.humidity!==null?' · '+r.humidity+' % Luftfeuchtigkeit':'')+' · '+({ok:'im Bereich',pending:'Grenzwert überschritten/unterschritten; Wartezeit läuft',warning:'Temperaturhinweis aktiv'}[r.status]||'noch nicht bestätigt');
     $('jp-home').append(el('p',label+': '+text));
    }
    const outside=home.rooms?.outdoor,outFresh=homeFresh&&outside?.sample_at&&Date.now()-outside.sample_at<660000&&outside.status!=='unknown';
@@ -62,8 +62,38 @@
     if(outFresh&&weather.current_model_temperature!==null&&Math.abs(outside.temperature-weather.current_model_temperature)>=5)$('jp-home').append(el('p','Balkonmessung und regionales Wettermodell weichen deutlich ab. Sonne, Wandnähe und geschützte Lage können den Sensor beeinflussen.'));
    }else if(outside?.configured)$('jp-home').append(el('p','Noch keine aktuelle Wettervorhersage bestätigt.'));
    const reasons={normal:'Luftfeuchtigkeit unter der Hinweisschwelle',unknown:'Lüftungsbedingungen noch nicht bestätigt',outside_moist:'Außenluft bietet aktuell wenig Trocknungsvorteil',room_cool:'Raum ist bereits unter deiner Temperaturgrenze',weather_unknown:'Vorhersage für einen Lüftungshinweis fehlt',weather_caution:'Außenluft wäre trockener; Regen-/Windvorhersage spricht für Vorsicht',suitable:'Außenluft wäre trockener; Lüftungsfenster nach Sensoren und Vorhersage günstig'};
-   for(const [room,label] of [['living','Wohnzimmer'],['kids','Kinderzimmer'],['bedroom','Schlafzimmer']])if(homeFresh&&home.rooms?.[room]?.configured&&outside?.configured)$('jp-home').append(el('p',label+' · '+(reasons[home.ventilation?.[room]?.reason]||reasons.unknown)));
+   for(const [room,label] of [['living','Wohnzimmer'],['kids','Kinderzimmer'],['bedroom','Schlafzimmer'],['bathroom','Badezimmer'],['kitchen','Küche']])if(homeFresh&&home.rooms?.[room]?.configured&&outside?.configured)$('jp-home').append(el('p',label+' · '+(reasons[home.ventilation?.[room]?.reason]||reasons.unknown)));
    if(outside?.configured){const source=el('p',undefined,'jp-muted');source.append(document.createTextNode('Balkon = Sensorwert am Standort; Prognose = regionales Wettermodell. Quelle: '));const link=el('a','Open-Meteo');link.href='https://open-meteo.com/';link.target='_blank';link.rel='noopener noreferrer';link.style.color='#a7ddff';source.append(link);$('jp-home').append(source)}
+   // JOHANN_ROOM_CLIMATE_UI_V1
+   if(homeFresh&&home.climateVersion){
+    const labels={living:'Wohnzimmer',kids:'Kinderzimmer',bedroom:'Schlafzimmer',bathroom:'Badezimmer',kitchen:'Küche'};
+    const advice={outside_unknown:'Außenwert fehlt; Heizungsziel prüfen.',vent_brief:'Kurz stoßlüften; Heizung herunterregeln, falls eingeschaltet.',vent_cool:'Draußen kühler: kontrolliert lüften; Heizungsziel prüfen.',vent_caution:'Außen kühler, aber Regen/Böen: nur geschützt lüften.',vent_small_gain:'Nur geringer Kühlvorteil durch Lüften; verschatten und Heizungsziel prüfen.',shade_ac:'Außen mindestens genauso warm: Fenster zu, verschatten; ggf. Klimaanlage zum Kühlen.'};
+    for(const [room,hint] of Object.entries(home.room_hints||{}))$('jp-home').append(el('p',labels[room]+': '+(hint.pending?'Wärmeentwicklung wird beobachtet. ':'')+(advice[hint.reason]||'')));
+    const cases=home.room_cases||[];
+    if(cases.length)$('jp-home').append(el('h3','Empfehlungen & deine Rückmeldung'));
+    const fb={window:'Fenster war offen',shower:'Ich habe geduscht',cooking:'Es wurde gekocht',heating:'Heizung war an',wrong:'Vermutung passt nicht',helpful:'Empfehlung war hilfreich'};
+    for(const c of [...cases].reverse()){
+     const p=el('p',labels[c.room]+' · '+stamp(c.at)+' · '+({hot:'Über 25 °C',rising:'Schneller Temperaturanstieg',rapid_drop:'Schneller Temperaturabfall'}[c.scenario]||'Hinweis')+' · '+c.temperature+' °C');
+     if(c.observed_delta!==undefined)p.append(el('span',' · Danach gemessen: '+(c.observed_delta>=0?'+':'')+c.observed_delta+' °C. Ursache nicht bestätigt.'));
+     const prior=Object.entries(c.experience||{}).filter(([k,n])=>n>0&&fb[k]);if(prior.length)p.append(el('span',' · Ähnliche frühere Fälle laut deiner Rückmeldung: '+prior.map(([k,n])=>fb[k]+' ('+n+'×)').join(', ')+'. Aktuelle Ursache unbestätigt.'));
+     const known=(cached.roomFeedback||[]).find(x=>x.case_id===c.id);
+     p.append(el('br'));p.append(el('span',known?'Deine Rückmeldung: '+fb[known.label]+'. ':'Was war tatsächlich los? '));
+     const select=el('select');select.setAttribute('aria-label','Rückmeldung für '+labels[c.room]);select.style.cssText='max-width:100%;min-height:44px;background:#10253b;color:#edf7ff;border:1px solid #77bcec;border-radius:8px;padding:8px';
+     select.append(new Option('Bitte auswählen …',''));for(const [k,v] of Object.entries(fb))select.append(new Option(v,k));if(known)select.value=known.label;
+     const save=el('button','Rückmeldung speichern');save.type='button';save.onclick=()=>{if(!select.value)return;perform(async()=>{await api('room_feedback',{case_id:c.id,label:select.value});await refresh();status('Rückmeldung gespeichert. Sie bestätigt nur deine Angabe; keine Geräte wurden geschaltet.')})};
+     p.append(select,save);$('jp-home').append(p);
+    }
+    if(cases.length)$('jp-home').append(el('p','Verlauf und bestätigte Rückmeldungen sind ein Erfahrungsprotokoll. Keine automatische Änderung deiner Grenzwerte. Bis 30 Tage gespeichert; ausführliche Messreihe bis 72 Stunden auf Asgard.','jp-muted'));
+   }
+   // JOHANN_POWER_UI_V1
+   const power=home.power,powerFresh=homeFresh&&power?.sample_at&&Date.now()-power.sample_at>=-60000&&Date.now()-power.sample_at<180000;
+   let powerText='Stromversorgung: noch kein aktueller bestätigter Windows-Wert';
+   if(powerFresh){
+    powerText='Asgard: '+({mains:'am Netzstrom 🔌',battery:'läuft auf Akku 🪫',unknown:'Stromquelle nicht bestätigt'}[power.ac]||'Stromquelle nicht bestätigt');
+    if(power.percent!==null)powerText+=' · '+power.percent+' % Akku';
+    if(power.saver!==null)powerText+=' · Stromsparmodus '+(power.saver?'aktiv':'aus');
+   }
+   $('jp-home').append(el('p',powerText));
    const wifi=home.wifi,scanFresh=homeFresh&&wifi?.scan_at&&Date.now()-wifi.scan_at<180000;
    $('jp-home').append(el('p','WLAN: '+(!wifi?.configured?'FRITZ!Box noch nicht eingerichtet':scanFresh&&wifi.status==='ok'?wifi.connected+' aktive WLAN-Geräte · zuletzt '+stamp(wifi.scan_at):'keine aktuelle bestätigte Router-Abfrage')));
   }
