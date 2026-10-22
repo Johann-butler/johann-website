@@ -184,6 +184,16 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
 #jpro-password{display:none}
 #jpro-voice.active{border-color:#72d8ff;background:#17679c}
 </style>
+<style>
+/* Johann V14: header clearance for iPhone Home Screen apps. */
+@supports (-webkit-touch-callout: none){
+ @media (display-mode: standalone) and (orientation: portrait) and (max-width: 700px){
+  .clock{top:calc(max(4.3vh,env(safe-area-inset-top,0px)) + 34px)}
+  .brand{top:calc(max(5vh,env(safe-area-inset-top,0px)) + 34px)}
+  .weather{top:calc(max(4.8vh,env(safe-area-inset-top,0px)) + 34px)}
+ }
+}
+</style>
 </head>
 <body>
 <div id="vflShow" role="status" aria-live="polite" aria-label="Johanns 18:48 VfL-Spektakel"><div class="vfl-ring"></div><div class="vfl-ring"></div><div class="vfl-center"><div class="vfl-pretitle" id="vflPretitle">DAS REVIER ZÄHLT RUNTER</div><div class="vfl-number" id="vflNumber">18:48</div><div class="vfl-message" id="vflMessage">BOCHUM. HEIMAT. VfL.</div><div class="vfl-sub" id="vflSub">Blau und Weiß – ein Leben lang. 💙🤍</div></div><div id="vflParticles"></div><button type="button" class="vfl-close" id="vflClose" aria-label="Animation schließen">Schließen ×</button></div>
