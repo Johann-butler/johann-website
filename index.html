@@ -231,7 +231,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
   <div class="panel-head"><div><div class="panel-kicker">JOHANN · KI MIT HERZ</div><div class="panel-title" id="panelTitle">Kommandozentrale</div></div><button class="xbtn" id="closePanel" aria-label="Schließen">×</button></div>
   <section class="panel-section active" id="view-home">
    <p class="muted">Willkommen in meiner Kommandozentrale. Was steht an?</p>
-   <div class="tiles"><!-- JOHANN_MAIL_MODULE_V1 --><button class="tile" id="johannMailTile" data-view="mail" type="button" hidden><span class="tile-icon">✉️</span><span class="tile-title">Johann Mail</span><div class="tile-sub">Gmail &amp; STRATO · lesen, antworten, merken</div></button>
+   <div class="tiles"><!-- HEIMDALL_HOME_TILE_V2 -->
+<button class="tile" id="johannHeimdallTile" type="button" hidden aria-label="HEIMDALL Sicherheitszentrale öffnen"><span class="tile-icon" aria-hidden="true">🛡️</span><span class="tile-title">HEIMDALL</span><div class="tile-sub">Sicherheitszentrale · Asgard &amp; Prüfungen</div></button>
+<!-- JOHANN_MAIL_MODULE_V1 --><button class="tile" id="johannMailTile" data-view="mail" type="button" hidden><span class="tile-icon">✉️</span><span class="tile-title">Johann Mail</span><div class="tile-sub">Gmail &amp; STRATO · lesen, antworten, merken</div></button>
     <button class="tile sudoku-tile" data-view="sudoku"><span class="tile-icon">🧩</span><span class="tile-title">Sudoku</span><div class="tile-sub">Achims Rätsel-Lounge · persönliche Spielstände</div></button>
     <button class="tile kitchen-home-tile" data-view="kitchen"><span class="tile-icon">🍳</span><span class="tile-title">Johanns Kochecke</span><div class="tile-sub">Rezepte · Familienküche · Kinder kochen mit · Einkaufslisten</div></button>
     <button class="tile johann-studio-home-tile johann-studio-owner" id="johannStudioTile" type="button" data-view="studio" aria-label="Johann Studio auf Asgard öffnen" hidden><span class="tile-icon">🎬</span><span class="tile-title">JOHANN STUDIO</span><div class="tile-sub">Henri &amp; Axel · Filme auf Asgard erstellen →</div></button>
@@ -1424,5 +1426,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 <script src="./johann-push.js"></script>
 <script src="./johann-studio-entry.js"></script>
 <script src="./johann-mail-entry.js"></script>
+<!-- HEIMDALL_CENTER_HTML_V1 -->
+<script src="./johann-heimdall-center-v1.js" defer></script>
 </body>
 </html>

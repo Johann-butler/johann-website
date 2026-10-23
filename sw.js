@@ -1,6 +1,6 @@
 // Cache-Version bei jedem Website-Release ändern. Kein sofortiges skipWaiting!
-const CACHE = 'johann-shell-mail-phishing-v2-1792766781100727400';
-const SHELL = ['./johann-mail-entry.js', './johann-mail-ui.js', './johann-mail.css', './johann-studio-entry.js', './johann-push.js', './', './index.html', './manifest.webmanifest', './johann-icon-192.png', './johann-icon-512.png', './johann-icon-180.png'];
+const CACHE = 'johann-shell-heimdall-home-v2-1792768091290075300';
+const SHELL = ['./johann-heimdall-center-v1.js', './johann-mail-entry.js', './johann-mail-ui.js', './johann-mail.css', './johann-studio-entry.js', './johann-push.js', './', './index.html', './manifest.webmanifest', './johann-icon-192.png', './johann-icon-512.png', './johann-icon-180.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)));
 });
