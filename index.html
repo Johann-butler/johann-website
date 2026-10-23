@@ -194,6 +194,15 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
  }
 }
 </style>
+<style>
+/* JOHANN STUDIO ENTRY V1 */
+.johann-studio-owner[hidden]{display:none!important}
+.johann-studio-home-tile{grid-column:1/-1;text-align:left;border:2px solid #83d4d0!important;background:linear-gradient(125deg,rgba(20,88,98,.96),rgba(14,38,66,.97))!important;box-shadow:0 8px 28px rgba(40,143,150,.2)}
+.johann-studio-home-tile .tile-icon{font-size:35px}.johann-studio-home-tile .tile-title{font-weight:850;letter-spacing:.07em}.johann-studio-home-tile .tile-sub{color:#d1efed}
+.johann-studio-launch{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 18px;box-sizing:border-box;text-decoration:none;max-width:100%;white-space:normal;text-align:center}
+.johann-studio-note{margin:18px 0;padding:16px;border:1px solid rgba(131,212,208,.35);border-radius:16px;background:rgba(17,51,65,.45)}.johann-studio-note p{margin:9px 0 0}
+[data-football-tab="matchday"]{display:none!important}
+</style>
 </head>
 <body>
 <div id="vflShow" role="status" aria-live="polite" aria-label="Johanns 18:48 VfL-Spektakel"><div class="vfl-ring"></div><div class="vfl-ring"></div><div class="vfl-center"><div class="vfl-pretitle" id="vflPretitle">DAS REVIER ZÄHLT RUNTER</div><div class="vfl-number" id="vflNumber">18:48</div><div class="vfl-message" id="vflMessage">BOCHUM. HEIMAT. VfL.</div><div class="vfl-sub" id="vflSub">Blau und Weiß – ein Leben lang. 💙🤍</div></div><div id="vflParticles"></div><button type="button" class="vfl-close" id="vflClose" aria-label="Animation schließen">Schließen ×</button></div>
@@ -225,7 +234,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
    <div class="tiles">
     <button class="tile sudoku-tile" data-view="sudoku"><span class="tile-icon">🧩</span><span class="tile-title">Sudoku</span><div class="tile-sub">Achims Rätsel-Lounge · persönliche Spielstände</div></button>
     <button class="tile kitchen-home-tile" data-view="kitchen"><span class="tile-icon">🍳</span><span class="tile-title">Johanns Kochecke</span><div class="tile-sub">Rezepte · Familienküche · Kinder kochen mit · Einkaufslisten</div></button>
-    <button class="tile matchday-home-tile" data-view="football" data-matchday-entry="true" aria-label="Matchday PRO – Prognosen und Analysen direkt öffnen"><span class="tile-icon">📊</span><span class="tile-title">MATCHDAY PRO</span><div class="tile-sub">Johanns Prognosen · Spieltagsanalyse · Tipp-Tagebuch →</div></button>
+    <button class="tile johann-studio-home-tile johann-studio-owner" id="johannStudioTile" type="button" data-view="studio" aria-label="Johann Studio auf Asgard öffnen" hidden><span class="tile-icon">🎬</span><span class="tile-title">JOHANN STUDIO</span><div class="tile-sub">Henri &amp; Axel · Filme auf Asgard erstellen →</div></button>
     <button class="tile" data-view="football"><span class="tile-icon">⚽</span><span class="tile-title">Fußball</span><div class="tile-sub">Dein Verein · 1.–3. Liga · The Haggens</div></button>
     <button class="tile" data-view="kids"><span class="tile-icon">📖</span><span class="tile-title">Johann Kids</span><div class="tile-sub">Märchen, große Gefühle und Gute-Nacht-Geschichten</div></button>
     <button class="tile" data-view="weather"><span class="tile-icon">🌤️</span><span class="tile-title">Wetter</span><div class="tile-sub">Aktuelles Wetter und 5-Tage-Vorschau</div></button>
@@ -342,6 +351,23 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
     <div class="glass"><span class="pill">🔒 NUR FÜR DEN CHEF</span><h2>Lernvorschläge prüfen</h2><p class="muted">Johann übernimmt nichts ungeprüft. Nur freigegebene, allgemeine und zeitunabhängige Fragen können künftig ohne KI-Aufruf beantwortet werden.</p>
       <input class="field" id="learnAdminKey" type="password" autocomplete="off" placeholder="Admin-Schlüssel"><button class="secondary" id="learnAdminLoad" type="button">Vorschläge laden</button><button class="secondary" id="learnFaqLoad" type="button">Gespeicherte Antworten</button><p class="mini" id="learnAdminStatus" role="status"></p><div id="learnAdminItems"></div>
     </div>
+  </section>
+
+  <!-- JOHANN STUDIO ENTRY V1 -->
+  <section class="panel-section" id="view-studio">
+   <button class="backbtn" data-view="home">← Zurück</button>
+   <div class="glass">
+    <div class="pill">🎬 JOHANN STUDIO · ASGARD</div>
+    <h2>Deine Idee. Dein kleiner Film.</h2>
+    <div id="johannStudioLocked"><p class="muted">Melde dich mit deinem Owner-Konto an, um dein Studio zu öffnen.</p><button class="primary" id="johannStudioLogin" type="button">Bei Johann anmelden</button></div>
+    <div id="johannStudioContent" class="johann-studio-owner" hidden>
+     <p class="muted">Henri und Axel, lokale Animationen und deine bisherigen Videoprojekte. Asgard erstellt den Film und speichert ihn auf deiner Festplatte.</p>
+     <a id="johannStudioLaunch" class="primary johann-studio-launch" href="http://192.168.188.183:8767/" target="_blank" rel="noopener noreferrer">Studio auf Asgard öffnen ↗</a>
+     <p class="mini">Am Handy und auf Asgard dieselbe Oberfläche. Studio öffnet sich in einem eigenen Fenster.</p>
+     <div class="johann-studio-note"><strong>Zu Hause: Heim-WLAN. Unterwegs: VPN.</strong><p>Asgard muss eingeschaltet sein. Falls Studio nicht öffnet, prüfe die Verbindung zum Heimnetz.</p><p>Beim ersten Besuch meldest du dich zusätzlich bei Studio an. Auf einem bereits verbundenen Handy bleibt die bestehende Studio-Anmeldung nutzbar.</p></div>
+     <p class="mini">Für die vorbereitete Henri-und-Axel-Folge wähle im Studio „Ganze Folge öffnen“ und danach „Folge lokal erstellen / fortsetzen“. Asgard arbeitet weiter, wenn du das Fenster schließt.</p>
+    </div>
+   </div>
   </section>
   <section class="panel-section" id="view-memory"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Gedächtnis</h2><p class="muted">Das Admin-Gedächtnis ist im Worker eingerichtet. Diese öffentliche Ansicht zeigt keine gespeicherten Fakten. Persönliche Benutzerkonten und getrennte private Erinnerungen sind noch nicht verfügbar.</p><span class="pill">🔒 Admin-Zugriff geschützt</span></div></section>
   <section class="panel-section" id="view-analytics">
@@ -718,7 +744,7 @@ safeResize(true);requestAnimationFrame(animate);
 // JOHANN · Dashboard, Browser-Sudoku und lokale Werkzeuge
 const dash=$('dashboard');
 $('infoAdminLink').addEventListener('click',()=>{document.getElementById('infoBox').classList.remove('show');openDashboard('analytics')});
-const viewTitles={home:'Kommandozentrale',kitchen:'Johanns Kochecke',sudoku:'Sudoku',weather:'Wetter',notes:'Sag es Johann!',reminders:'Erinnerungen',memory:'Gedächtnis',learning:'Johann lernt',status:'Systemstatus',football:'Fußball',kids:'Johann Kids',analytics:'Johann Analytics'};
+const viewTitles={home:'Kommandozentrale',studio:'Johann Studio',kitchen:'Johanns Kochecke',sudoku:'Sudoku',weather:'Wetter',notes:'Sag es Johann!',reminders:'Erinnerungen',memory:'Gedächtnis',learning:'Johann lernt',status:'Systemstatus',football:'Fußball',kids:'Johann Kids',analytics:'Johann Analytics'};
 function openDashboard(view='home'){
  dash.classList.add('open');document.body.style.overflow='hidden';showView(view);
  $('closePanel').focus();
@@ -743,7 +769,7 @@ dash.addEventListener('click',e=>{if(e.target===dash)closeDashboard()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&dash.classList.contains('open'))closeDashboard()});
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 // Eigener Startseiten-Zugang: bestehende Matchday-Ansicht direkt öffnen, ohne Worker-Änderung.
-document.querySelector('[data-matchday-entry]').addEventListener('click',()=>{footballTab('matchday');mdRender();});
+// Der Studio-Einstieg nutzt die bestehende Dashboard-Navigation.
 const chatArchive=$('chatArchive'),chatMessages=$('chatMessages');
 $('closeChat').addEventListener('click',()=>chatArchive.classList.remove('show'));
 // Johann V25.1: flüssiger Antwortaufbau, unabhängig von der Netzwerkantwort.
@@ -1361,7 +1387,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   return nativeFetch(input,init);
  };
  function status(text,bad=false){message.textContent=text;message.style.color=bad?'#ffb5b5':'#a9eacb'}
- function render(){opener.classList.toggle('ja-signed-in',!!user);opener.textContent=user?'💙 Johann Plus':'💙 Johann Plus · Anmelden';$('ja-logout').style.display=user?'inline-block':'none';$('ja-form').style.display=user?'none':'block';$('ja-code').style.display=phase==='verify'?'block':'none';primary.textContent=phase==='verify'?'Anmelden':'Anmeldecode anfordern';primary.disabled=busy;}
+ function render(){window.dispatchEvent(new CustomEvent('johann-auth-state'));opener.classList.toggle('ja-signed-in',!!user);opener.textContent=user?'💙 Johann Plus':'💙 Johann Plus · Anmelden';$('ja-logout').style.display=user?'inline-block':'none';$('ja-form').style.display=user?'none':'block';$('ja-code').style.display=phase==='verify'?'block':'none';primary.textContent=phase==='verify'?'Anmelden':'Anmeldecode anfordern';primary.disabled=busy;}
  function open(){render();modal.classList.add('ja-visible');if(user)status('Du bist als '+user.email+' angemeldet. Johann Plus ist aktiv.');else status('');}
  function close(){modal.classList.remove('ja-visible')}
  async function call(payload){const r=await fetch(URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await r.json();if(!r.ok||data.error)throw Error(data.error||'Verbindung fehlgeschlagen');return data}
@@ -1385,9 +1411,11 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
  const clearLong=()=>{clearTimeout(longTimer);longTimer=null};
  orb.addEventListener('pointerdown',()=>{longDone=false;clearLong();longTimer=setTimeout(()=>{longDone=true;if(voiceActive)stopVoice();else if(user?.role==='owner'&&proUnlocked)startVoice();else open()},3000)},true);
  ['pointerup','pointercancel','pointerleave'].forEach(ev=>orb.addEventListener(ev,clearLong,true));
+ window.johannStudioIsOwner=()=>user?.role==='owner';
  window.johannOpenLogin=open;
 })();
 </script>
 <script src="./johann-push.js"></script>
+<script src="./johann-studio-entry.js"></script>
 </body>
 </html>
