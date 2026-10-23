@@ -231,7 +231,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
   <div class="panel-head"><div><div class="panel-kicker">JOHANN · KI MIT HERZ</div><div class="panel-title" id="panelTitle">Kommandozentrale</div></div><button class="xbtn" id="closePanel" aria-label="Schließen">×</button></div>
   <section class="panel-section active" id="view-home">
    <p class="muted">Willkommen in meiner Kommandozentrale. Was steht an?</p>
-   <div class="tiles">
+   <div class="tiles"><!-- JOHANN_MAIL_MODULE_V1 --><button class="tile" id="johannMailTile" data-view="mail" type="button" hidden><span class="tile-icon">✉️</span><span class="tile-title">Johann Mail</span><div class="tile-sub">Gmail &amp; STRATO · lesen, antworten, merken</div></button>
     <button class="tile sudoku-tile" data-view="sudoku"><span class="tile-icon">🧩</span><span class="tile-title">Sudoku</span><div class="tile-sub">Achims Rätsel-Lounge · persönliche Spielstände</div></button>
     <button class="tile kitchen-home-tile" data-view="kitchen"><span class="tile-icon">🍳</span><span class="tile-title">Johanns Kochecke</span><div class="tile-sub">Rezepte · Familienküche · Kinder kochen mit · Einkaufslisten</div></button>
     <button class="tile johann-studio-home-tile johann-studio-owner" id="johannStudioTile" type="button" data-view="studio" aria-label="Johann Studio auf Asgard öffnen" hidden><span class="tile-icon">🎬</span><span class="tile-title">JOHANN STUDIO</span><div class="tile-sub">Henri &amp; Axel · Filme auf Asgard erstellen →</div></button>
@@ -380,7 +380,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-vis
       <p id="analyticsStatus" class="analytics-status" role="status">Die Statistik benötigt noch die Analytics-Erweiterung im Worker.</p>
     </div>
   </section>
-  <section class="panel-section" id="view-status"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Systemstatus</h2><p>🌤️ Wetter: <span id="statusWeather">Wird geprüft</span></p><p>🧠 KI: Über den bestehenden Cloudflare-Worker angebunden</p><p>🧩 Sudoku: Im Browser spielbar</p><p>💾 Sudoku-Spielstände: Auf diesem Gerät</p><p>💙 Wunschbox: Aktiv – Nachrichten werden in D1 gespeichert; E-Mail-Versand über Resend eingerichtet (Zustellung nicht live geprüft)</p><p>🔒 Admin-Gedächtnis: Im Worker aktiv und durch Admin-Schlüssel geschützt; persönliche Benutzerkonten fehlen noch.</p><p>📊 Analytics: Aktiv nach freiwilliger Einwilligung; Admin-Auswertung über das ⓘ-Symbol.</p><p>📚 Johann Kids: Aktiv – Geschichten über den Cloudflare-Worker.</p><p>🎙️ Sprachmodus: Mikrofon und KI-Stimme (benötigt V16-Worker). 🏠 Dell-Heimserver: Geplant; V19 läuft vorerst in Cloudflare</p></div></section>
+  <section class="panel-section" id="view-mail"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><div class="pill">✉️ JOHANN MAIL</div><h2>Deine Post. Direkt in Johann.</h2><div id="johannMailLocked"><p>Mail ist nur für dein Owner-Konto verfügbar.</p><button id="johannMailLogin" class="primary" type="button">Bei Johann anmelden</button></div><div id="johannMailContent" hidden><p id="johannMailNotice" class="muted" style="white-space:pre-wrap" role="status"></p><div class="row-actions"><button id="johannMailRefresh" class="secondary" type="button">Verbindung aktualisieren</button><button id="johannMailPair" class="primary" type="button">Kopplungscode erstellen</button><button id="johannMailDisconnect" class="secondary" type="button" hidden>Asgard-Verbindung aufheben</button></div></div></div><iframe id="johannMailFrame" title="Johann Mail" sandbox="allow-scripts allow-same-origin" style="border:0;width:100%;height:80dvh;min-height:600px;border-radius:16px;background:#071522" hidden></iframe></section><section class="panel-section" id="view-status"><button class="backbtn" data-view="home">← Zurück</button><div class="glass"><h2>Johanns Systemstatus</h2><p>🌤️ Wetter: <span id="statusWeather">Wird geprüft</span></p><p>🧠 KI: Über den bestehenden Cloudflare-Worker angebunden</p><p>🧩 Sudoku: Im Browser spielbar</p><p>💾 Sudoku-Spielstände: Auf diesem Gerät</p><p>💙 Wunschbox: Aktiv – Nachrichten werden in D1 gespeichert; E-Mail-Versand über Resend eingerichtet (Zustellung nicht live geprüft)</p><p>🔒 Admin-Gedächtnis: Im Worker aktiv und durch Admin-Schlüssel geschützt; persönliche Benutzerkonten fehlen noch.</p><p>📊 Analytics: Aktiv nach freiwilliger Einwilligung; Admin-Auswertung über das ⓘ-Symbol.</p><p>📚 Johann Kids: Aktiv – Geschichten über den Cloudflare-Worker.</p><p>🎙️ Sprachmodus: Mikrofon und KI-Stimme (benötigt V16-Worker). 🏠 Dell-Heimserver: Geplant; V19 läuft vorerst in Cloudflare</p></div></section>
  </div>
 </div>
 
@@ -744,7 +744,7 @@ safeResize(true);requestAnimationFrame(animate);
 // JOHANN · Dashboard, Browser-Sudoku und lokale Werkzeuge
 const dash=$('dashboard');
 $('infoAdminLink').addEventListener('click',()=>{document.getElementById('infoBox').classList.remove('show');openDashboard('analytics')});
-const viewTitles={home:'Kommandozentrale',studio:'Johann Studio',kitchen:'Johanns Kochecke',sudoku:'Sudoku',weather:'Wetter',notes:'Sag es Johann!',reminders:'Erinnerungen',memory:'Gedächtnis',learning:'Johann lernt',status:'Systemstatus',football:'Fußball',kids:'Johann Kids',analytics:'Johann Analytics'};
+const viewTitles={mail:'Johann Mail',home:'Kommandozentrale',studio:'Johann Studio',kitchen:'Johanns Kochecke',sudoku:'Sudoku',weather:'Wetter',notes:'Sag es Johann!',reminders:'Erinnerungen',memory:'Gedächtnis',learning:'Johann lernt',status:'Systemstatus',football:'Fußball',kids:'Johann Kids',analytics:'Johann Analytics'};
 function openDashboard(view='home'){
  dash.classList.add('open');document.body.style.overflow='hidden';showView(view);
  $('closePanel').focus();
@@ -1413,9 +1413,16 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
  ['pointerup','pointercancel','pointerleave'].forEach(ev=>orb.addEventListener(ev,clearLong,true));
  window.johannStudioIsOwner=()=>user?.role==='owner';
  window.johannOpenLogin=open;
+ window.johannMailCall=async payload=>{
+  if(!token||user?.role!=='owner')throw Error('Bitte mit deinem Johann-Owner-Konto anmelden.');
+  const response=await nativeFetch('https://johann-mail.bjornkorczak.workers.dev/',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(payload)});
+  const result=await response.json();if(!response.ok||result.error)throw Error(result.error||'Mail-Verbindung fehlgeschlagen.');return result;
+ };
+
 })();
 </script>
 <script src="./johann-push.js"></script>
 <script src="./johann-studio-entry.js"></script>
+<script src="./johann-mail-entry.js"></script>
 </body>
 </html>
