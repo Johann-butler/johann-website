@@ -100,6 +100,17 @@
   $('jp-devices').replaceChildren();for(const s of cached?.subscriptions||[]){const p=el('p',(s.id===id?'Dieses Gerät':'Weiteres Gerät')+' · angemeldet '+stamp(s.created_at));const remove=el('button','Entfernen');remove.type='button';remove.onclick=()=>perform(async()=>{await api('push_unsubscribe',{id:s.id});if(s.id===id&&sub)await sub.unsubscribe();await refresh();status('Push-Gerät entfernt.')});p.append(document.createElement('br'),remove);$('jp-devices').append(p)}
   if(agent){const disconnect=el('button','Asgard-Kopplung aufheben');disconnect.type='button';disconnect.onclick=()=>perform(async()=>{await api('push_revoke_agent',{id:agent.id});await refresh();status('Asgard-Kopplung aufgehoben. Der lokale Wächter läuft weiter.')});$('jp-devices').append(disconnect)}
  }
+ // JOHANN_WOHNUNG_SNAPSHOT_V1: only the existing Owner-protected status endpoint.
+ window.johannHomeReadSnapshot=async()=>{
+  if(window.johannStudioIsOwner?.()!==true)throw Error('Bitte mit deinem Owner-Konto anmelden.');
+  let before='';try{before=localStorage.getItem(AUTH_KEY)||''}catch{}
+  if(!before)throw Error('Owner-Anmeldung fehlt.');
+  const snapshot=await api('push_status');
+  let after='';try{after=localStorage.getItem(AUTH_KEY)||''}catch{}
+  if(before!==after||window.johannStudioIsOwner?.()!==true)throw Error('Anmeldung wurde geändert. Bitte Ansicht erneut öffnen.');
+  const h=snapshot?.home;
+  return {homeVersion:snapshot?.homeVersion,home:h?{receivedAt:h.receivedAt,rooms:h.rooms,outdoor_trend:h.outdoor_trend,weather:h.weather,ventilation:h.ventilation,climateVersion:h.climateVersion,room_hints:h.room_hints,room_cases:h.room_cases,power:h.power}:null};
+ };
  async function refresh(){cached=await api('push_status');await render()}
  async function perform(fn){if(busy)return;busy=true;try{await render();await fn()}catch(e){status(e.name==='TimeoutError'?'Push-Dienst antwortet nicht rechtzeitig.':e.message,true)}finally{busy=false;await render().catch(()=>{})}}
  function close(){modal.hidden=true;previousFocus?.focus()}
