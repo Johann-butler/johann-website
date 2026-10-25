@@ -1,6 +1,6 @@
 // Cache-Version bei jedem Website-Release ändern. Kein sofortiges skipWaiting!
-const CACHE = 'johann-shell-wohnung-3d-1792929158248095900';
-const SHELL = ['./johann-wohnung.js', './johann-heimdall-dashboard-v23.js', './johann-heimdall-dashboard-v22.js', './johann-heimdall-dashboard-v21.js', './johann-heimdall-dashboard-v2.js', './johann-heimdall-center-v1.js', './johann-mail-entry.js', './johann-mail-ui.js', './johann-mail.css', './johann-studio-entry.js', './johann-push.js', './', './index.html', './manifest.webmanifest', './johann-icon-192.png', './johann-icon-512.png', './johann-icon-180.png'];
+const CACHE = 'johann-shell-internet-1792930322047451800';
+const SHELL = ['./johann-heimdall-dashboard-v24.js', './johann-wohnung.js', './johann-heimdall-dashboard-v23.js', './johann-heimdall-dashboard-v22.js', './johann-heimdall-dashboard-v21.js', './johann-heimdall-dashboard-v2.js', './johann-heimdall-center-v1.js', './johann-mail-entry.js', './johann-mail-ui.js', './johann-mail.css', './johann-studio-entry.js', './johann-push.js', './', './index.html', './manifest.webmanifest', './johann-icon-192.png', './johann-icon-512.png', './johann-icon-180.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)));
 });
